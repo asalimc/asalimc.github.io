@@ -2,42 +2,44 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ASC | Ahmet Salim Çınarbaş</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,700&family=Inter:wght@300;400;600;900&family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,700&family=Inter:wght@300;400;600;900&family=Monsieur+La+Doulaise&display=swap&subset=latin-ext" rel="stylesheet">
     
     <style>
         :root { 
             --brand-red: #7a0f24; --text-dark: #1a1a1a; --text-light: #555;
-            --bg-gray: #f4f1ea; 
-            --card-bg: #ffffff; --border-color: #e8e4d8;
+            --bg-gray: #f4f1ea; --card-bg: #ffffff; --border-color: #e8e4d8;
         }
 
-        [data-theme="dark"] {
-            --bg-gray: #0d0d0d; --text-dark: #e0e0e0; --text-light: #aaa;
-            --card-bg: #161616; --border-color: #2a2a2a;
-        }
+        * { -webkit-text-size-adjust: none; box-sizing: border-box; }
         
         body { 
             margin: 0; padding: 0; background-color: var(--bg-gray); 
             background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
             font-family: 'Lora', serif; color: var(--text-dark); 
             line-height: 2; -webkit-font-smoothing: antialiased;
-            transition: background 0.5s ease;
+            overflow-x: hidden;
         }
 
         /* Progress Bar */
         #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: transparent; z-index: 9999; }
         #progress-bar { height: 100%; background: var(--brand-red); width: 0%; transition: width 0.1s; }
 
-        header { background-color: var(--brand-red); color: white; text-align: center; padding: 80px 0; position: relative; z-index: 100; }
+        header { background-color: var(--brand-red); color: white; text-align: center; padding: 80px 20px; position: relative; z-index: 100; }
         
-        #theme-toggle { position: absolute; top: 25px; right: 25px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 15px; cursor: pointer; border-radius: 4px; font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
-
         .kufi-box { border: 8px solid white; padding: 15px 30px; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 3.5rem; letter-spacing: -4px; line-height: 0.8; text-transform: uppercase; display: inline-block; margin-bottom: 25px; }
-        .header-info h1 { font-family: 'Inter'; font-size: 1.4rem; letter-spacing: 8px; text-transform: uppercase; margin: 0; font-weight: 400; }
+        
+        /* Header İsim: Mobilde Tek Satır */
+        .header-info h1 { 
+            font-family: 'Inter'; font-size: 1.4rem; letter-spacing: 6px; 
+            text-transform: uppercase; margin: 0; font-weight: 400;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
-        .main-wrapper { max-width: 1200px; margin: 0 auto; display: flex; gap: 50px; position: relative; }
+        .main-wrapper { max-width: 1200px; margin: 0 auto; display: flex; gap: 50px; position: relative; padding: 0 20px; }
 
         /* Sticky Sidebar */
         .author-sidebar {
@@ -60,10 +62,10 @@
         .sidebar-social a { color: var(--brand-red); text-decoration: none; font-weight: 900; font-family: 'Inter'; font-size: 0.75rem; letter-spacing: 2px; border-bottom: 1px solid var(--brand-red); padding-bottom: 2px; }
 
         /* Container */
-        .container { flex: 1; max-width: 750px; margin: -50px 0 80px 0; background: var(--card-bg); padding: 80px 100px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); position: relative; z-index: 10; }
+        .container { flex: 1; max-width: 750px; margin: -50px 0 80px 0; background: var(--card-bg); padding: 80px 100px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); position: relative; z-index: 10; border: 1px solid var(--border-color); }
 
         h2 { 
-            font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--brand-red); 
+            font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--brand-red); 
             margin-bottom: 50px; border-bottom: 3px solid var(--brand-red); padding-bottom: 20px; 
             text-transform: uppercase; font-weight: 900;
         }
@@ -75,49 +77,55 @@
             line-height: 0.8; padding: 10px 15px 0 0; color: var(--brand-red); font-weight: 900;
         }
 
-        .content-tr, .content-pt { text-align: justify; font-size: 1.3rem; color: var(--text-dark); clear: both; }
+        .content-tr, .content-pt { text-align: justify; font-size: 1.25rem; color: var(--text-dark); clear: both; }
         .content-tr p, .content-pt p { margin-bottom: 35px; }
         
         .lang-divider { margin: 100px 0; text-align: center; position: relative; }
         .lang-divider::after { content: "❦"; font-size: 2.5rem; color: var(--brand-red); opacity: 0.3; }
         .lang-divider span { display: block; font-family: 'Inter'; font-size: 0.7rem; letter-spacing: 8px; color: #bbb; text-transform: uppercase; margin-top: 10px; }
 
-        /* İmza Alanı - Bölünme Engellendi */
+        /* İmza Alanı - Mobilde Taşma Engellendi */
         .signature-block { 
             text-align: right; 
             margin-top: 40px; 
             padding-bottom: 20px;
-            white-space: nowrap; /* İsmin bölünmesini engeller */
+            white-space: nowrap;
         }
-        .sig-text { font-family: 'Monsieur La Doulaise', cursive; font-size: 3.5rem; color: var(--brand-red); margin: 0; line-height: 0.7; display: inline-block; }
-        .sig-sub { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 5px; text-transform: uppercase; color: var(--text-light); display: block; margin-top: 15px; font-weight: 600; }
+        .sig-text { font-family: 'Monsieur La Doulaise', cursive; font-size: 3.2rem; color: var(--brand-red); margin: 0; line-height: 0.7; display: inline-block; }
+        .sig-sub { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase; color: var(--text-light); display: block; margin-top: 12px; font-weight: 600; }
 
+        /* Sponsorlar */
         .sponsor-section { text-align: center; margin-top: 100px; padding-top: 60px; border-top: 2px solid var(--border-color); }
-        .sponsor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
-        .product-card { padding: 30px 10px; border: 1px solid var(--border-color); transition: 0.4s; height: 100px; display: flex; flex-direction: column; justify-content: center; text-decoration: none; color: inherit; }
+        .sponsor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 40px; }
+        .product-card { padding: 25px 10px; border: 1px solid var(--border-color); transition: 0.4s; height: 100px; display: flex; flex-direction: column; justify-content: center; text-decoration: none; color: inherit; }
         .product-card:hover { border-color: var(--brand-red); background: rgba(122, 15, 36, 0.02); }
-        .product-card span { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 8px; }
-        .product-card strong { font-family: 'Playfair Display'; font-size: 1.1rem; color: var(--text-dark); }
+        .product-card span { font-family: 'Inter'; font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 8px; }
+        .product-card strong { font-family: 'Playfair Display'; font-size: 1rem; color: var(--text-dark); }
 
-        footer { background: var(--brand-red); color: white; padding: 80px 0; clear: both; }
+        footer { background: var(--brand-red); color: white; padding: 80px 0; clear: both; width: 100%; }
         .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; font-family: 'Inter'; font-size: 0.8rem; letter-spacing: 2px; }
 
+        /* MİLİMETRİK RESPONSIVE AYARLAR */
         @media (max-width: 1024px) {
-            .main-wrapper { flex-direction: column; align-items: center; }
+            .main-wrapper { flex-direction: column; align-items: center; padding: 0 15px; }
             .author-sidebar { position: relative; top: 0; width: 100%; margin-bottom: 50px; }
-            .sidebar-motto { writing-mode: horizontal-tb; transform: none; }
-            .container { padding: 40px; width: 90%; }
-            h2 { white-space: normal; font-size: 1.6rem; }
+            .sidebar-motto { writing-mode: horizontal-tb; transform: none; margin: 15px 0; }
+            .container { padding: 40px 25px; width: 100%; margin-top: 0; }
+            h2 { white-space: normal; font-size: 1.5rem; text-align: center; }
+            .header-info h1 { font-size: 1rem; letter-spacing: 3px; }
+            .kufi-box { font-size: 2.5rem; }
             .signature-block { white-space: normal; }
+            .sig-text { font-size: 2.5rem; }
+            .sponsor-grid { grid-template-columns: 1fr; }
+            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
         }
     </style>
 </head>
-<body id="main-body">
+<body>
 
 <div id="progress-container"><div id="progress-bar"></div></div>
 
 <header>
-    <button id="theme-toggle" onclick="toggleTheme()">GECE</button>
     <div class="kufi-box">ASC</div>
     <div class="header-info">
         <h1>Ahmet Salim Çınarbaş</h1>
@@ -136,11 +144,11 @@
 
     <div class="container">
         <article>
-            <div class="meta" style="font-family:'Inter'; font-size:0.75rem; color:#bbb; letter-spacing:4px; margin-bottom:25px;">24 MART 2026</div>
-            <h2>İKİ BAŞKENT, TEK RUH</h2>
+            <div class="meta" style="font-family:'Inter'; font-size:0.7rem; color:#bbb; letter-spacing:4px; margin-bottom:25px; text-align:center;">24 MART 2026</div>
+            <h2>İKİ BAŞKENT TEK RUH</h2>
             
             <div class="content-tr">
-                <p>Mardin’in altın sarısı taş evlerinden yükselen Mezopotamya güneşi ile Brasília’nın uçsuz buçaksız gökyüzü altında parlayan modern beton çizgileri, ilk bakışta birbirine uzak görünse de aslında aynı evrensel estetiğin parçalarıdır. Mardin, zamanın binlerce yıl boyunca ilmik ilmik işlediği bir sabır şehridir; Brasília ise insan iradesinin ve modernizmin sıfırdan var ettiği bir gelecek düşüdür. Bu iki coğrafya, insanın yeryüzünde bıraktığı kalıcı izlerin, mimari birer şiire dönüşmüş halidir.</p>
+                <p>Mardin’in altın sarısı taş evlerinden yükselen Mezopotamya güneşi ile Brasília’nın uçsuz buçaksız gökyüzü altında parlayan modern beton çizgileri, ilk bakışta birbirine uzak görünse de aslında aynı evrensel estetiğin parçalarıdır. Mardin, zamanın binlerce yıl boyunca ilmik ilmik işlediği bir sabır şehridir; Brasília ise insan iradesinin ve modernizmin sıfırdan var ettiği bir gelecek düşüdür.</p>
                 
                 <p>Mardin’in dar sokaklarında yankılanan çekiç sesleri, taş ustalarının kadim bilgisini günümüze taşırken; Oscar Niemeyer’in Brasília’da betona verdiği kavisler, modern dünyanın yeni bir ritim arayışını temsil eder. Bir yanda binlerce yıllık manastırların sessizliği, diğer yanda katedralin göğe yükselen fütüristik elleri bulunur. Her iki şehir de kendi döneminin "zirve" noktasıdır.</p>
                 
@@ -168,8 +176,8 @@
             </div>
 
             <div class="sponsor-section">
-                <small style="font-family:'Inter'; font-size:0.65rem; letter-spacing:5px; color:#bbb; text-transform:uppercase;">Kültür Sponsoru</small>
-                <h3 style="font-family:'Playfair Display'; color:var(--brand-red); margin:10px 0 35px 0; font-size:1.6rem;">Yaşarbey Kahve</h3>
+                <small style="font-family:'Inter'; font-size:0.6rem; letter-spacing:5px; color:#bbb; text-transform:uppercase;">Kültür Sponsoru</small>
+                <h3 style="font-family:'Playfair Display'; color:var(--brand-red); margin:10px 0 35px 0; font-size:1.5rem;">Yaşarbey Kahve</h3>
                 
                 <div class="sponsor-grid">
                     <a href="https://www.yasarbey.com/kategori/dibek-kahvesi" target="_blank" class="product-card"><span>MARDİN</span><strong>Dibek Kahvesi</strong></a>
@@ -196,18 +204,6 @@
         let scrolled = (winScroll / height) * 100;
         document.getElementById("progress-bar").style.width = scrolled + "%";
     };
-
-    function toggleTheme() {
-        const body = document.getElementById('main-body');
-        const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        body.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        document.getElementById('theme-toggle').innerText = theme === 'dark' ? 'GÜNDÜZ' : 'GECE';
-    }
-    if (localStorage.getItem('theme') === 'dark') {
-        document.getElementById('main-body').setAttribute('data-theme', 'dark');
-        document.getElementById('theme-toggle').innerText = 'GÜNDÜZ';
-    }
 </script>
 
 </body>

@@ -24,100 +24,46 @@
             overflow-x: hidden;
         }
 
-        /* Progress Bar */
         #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: transparent; z-index: 9999; }
         #progress-bar { height: 100%; background: var(--brand-red); width: 0%; transition: width 0.1s; }
 
         header { background-color: var(--brand-red); color: white; text-align: center; padding: 80px 20px; position: relative; z-index: 100; }
-        
         .kufi-box { border: 8px solid white; padding: 15px 30px; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 3.5rem; letter-spacing: -4px; line-height: 0.8; text-transform: uppercase; display: inline-block; margin-bottom: 25px; }
-        
-        /* Header İsim: Mobilde Tek Satır */
-        .header-info h1 { 
-            font-family: 'Inter'; font-size: 1.4rem; letter-spacing: 6px; 
-            text-transform: uppercase; margin: 0; font-weight: 400;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .header-info h1 { font-family: 'Inter'; font-size: 1.4rem; letter-spacing: 6px; text-transform: uppercase; margin: 0; font-weight: 400; white-space: nowrap; }
 
         .main-wrapper { max-width: 1200px; margin: 0 auto; display: flex; gap: 50px; position: relative; padding: 0 20px; }
 
-        /* Sticky Sidebar */
-        .author-sidebar {
-            width: 180px; position: sticky; top: 50px; height: fit-content;
-            padding: 40px 0; text-align: center; margin-top: -30px;
-        }
-        .author-photo {
-            width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--brand-red);
-            margin: 0 auto 20px; background-color: #fff; overflow: hidden;
-            background-image: url('https://pbs.twimg.com/profile_images/1559852899303317504/pjkJwYHb_400x400.jpg');
-            background-size: cover; background-position: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .sidebar-motto {
-            writing-mode: vertical-rl; transform: rotate(180deg);
-            font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 5px;
-            text-transform: uppercase; color: var(--brand-red); font-weight: 700;
-            margin: 25px auto; opacity: 0.6;
-        }
-        .sidebar-social a { color: var(--brand-red); text-decoration: none; font-weight: 900; font-family: 'Inter'; font-size: 0.75rem; letter-spacing: 2px; border-bottom: 1px solid var(--brand-red); padding-bottom: 2px; }
+        .author-sidebar { width: 180px; position: sticky; top: 50px; height: fit-content; padding: 40px 0; text-align: center; margin-top: -30px; }
+        .author-photo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--brand-red); margin: 0 auto 20px; background-color: #fff; overflow: hidden; background-image: url('https://pbs.twimg.com/profile_images/1559852899303317504/pjkJwYHb_400x400.jpg'); background-size: cover; background-position: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .sidebar-motto { writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--brand-red); font-weight: 700; margin: 25px auto; opacity: 0.6; }
 
-        /* Container */
+        .glossary-term { border-bottom: 2px dotted var(--brand-red); cursor: help; position: relative; }
+        .glossary-content { visibility: hidden; width: 220px; background-color: var(--text-dark); color: #fff; text-align: center; border-radius: 6px; padding: 15px; position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-family: 'Inter'; font-size: 0.75rem; line-height: 1.4; white-space: normal; }
+        .glossary-term:hover .glossary-content { visibility: visible; opacity: 1; }
+
         .container { flex: 1; max-width: 750px; margin: -50px 0 80px 0; background: var(--card-bg); padding: 80px 100px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); position: relative; z-index: 10; border: 1px solid var(--border-color); }
-
+        
+        /* Başlık: Tek Satır ve Taşma Yapmaz */
         h2 { 
-            font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--brand-red); 
+            font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--brand-red); 
             margin-bottom: 50px; border-bottom: 3px solid var(--brand-red); padding-bottom: 20px; 
-            text-transform: uppercase; font-weight: 900;
+            text-transform: uppercase; font-weight: 900; line-height: 1.2;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        /* Drop Cap */
-        .content-tr p:first-of-type::first-letter, 
-        .content-pt p:first-of-type::first-letter {
-            float: left; font-family: 'Playfair Display'; font-size: 5rem;
-            line-height: 0.8; padding: 10px 15px 0 0; color: var(--brand-red); font-weight: 900;
-        }
-
-        .content-tr, .content-pt { text-align: justify; font-size: 1.25rem; color: var(--text-dark); clear: both; }
+        .content-tr p:first-of-type::first-letter { float: left; font-family: 'Playfair Display'; font-size: 5rem; line-height: 0.8; padding: 10px 15px 0 0; color: var(--brand-red); font-weight: 900; }
+        .content-tr, .content-pt { text-align: justify; font-size: 1.2rem; color: var(--text-dark); clear: both; }
         .content-tr p, .content-pt p { margin-bottom: 35px; }
         
-        .lang-divider { margin: 100px 0; text-align: center; position: relative; }
-        .lang-divider::after { content: "❦"; font-size: 2.5rem; color: var(--brand-red); opacity: 0.3; }
-        .lang-divider span { display: block; font-family: 'Inter'; font-size: 0.7rem; letter-spacing: 8px; color: #bbb; text-transform: uppercase; margin-top: 10px; }
+        .signature-block { text-align: right; margin-top: 50px; padding-bottom: 10px; display: block; width: 100%; clear: both; }
+        .sig-text { font-family: 'Monsieur La Doulaise', cursive; font-size: 4rem; color: var(--brand-red); margin: 0; line-height: 0.8; display: inline-block; white-space: nowrap; }
+        .sig-sub { font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--text-light); display: block; margin-top: 5px; font-weight: 900; }
 
-        /* İmza Alanı - Mobilde Taşma Engellendi */
-        .signature-block { 
-            text-align: right; 
-            margin-top: 40px; 
-            padding-bottom: 20px;
-            white-space: nowrap;
-        }
-        .sig-text { font-family: 'Monsieur La Doulaise', cursive; font-size: 3.2rem; color: var(--brand-red); margin: 0; line-height: 0.7; display: inline-block; }
-        .sig-sub { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase; color: var(--text-light); display: block; margin-top: 12px; font-weight: 600; }
-
-        /* Sponsorlar */
-        .sponsor-section { text-align: center; margin-top: 100px; padding-top: 60px; border-top: 2px solid var(--border-color); }
-        .sponsor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 40px; }
-        .product-card { padding: 25px 10px; border: 1px solid var(--border-color); transition: 0.4s; height: 100px; display: flex; flex-direction: column; justify-content: center; text-decoration: none; color: inherit; }
-        .product-card:hover { border-color: var(--brand-red); background: rgba(122, 15, 36, 0.02); }
-        .product-card span { font-family: 'Inter'; font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 8px; }
-        .product-card strong { font-family: 'Playfair Display'; font-size: 1rem; color: var(--text-dark); }
-
-        footer { background: var(--brand-red); color: white; padding: 80px 0; clear: both; width: 100%; }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; font-family: 'Inter'; font-size: 0.8rem; letter-spacing: 2px; }
-
-        /* MİLİMETRİK RESPONSIVE AYARLAR */
         @media (max-width: 1024px) {
-            .main-wrapper { flex-direction: column; align-items: center; padding: 0 15px; }
-            .author-sidebar { position: relative; top: 0; width: 100%; margin-bottom: 50px; }
-            .sidebar-motto { writing-mode: horizontal-tb; transform: none; margin: 15px 0; }
-            .container { padding: 40px 25px; width: 100%; margin-top: 0; }
-            h2 { white-space: normal; font-size: 1.5rem; text-align: center; }
-            .header-info h1 { font-size: 1rem; letter-spacing: 3px; }
-            .kufi-box { font-size: 2.5rem; }
-            .signature-block { white-space: normal; }
-            .sig-text { font-size: 2.5rem; }
-            .sponsor-grid { grid-template-columns: 1fr; }
-            .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+            .main-wrapper { flex-direction: column; align-items: center; }
+            .container { padding: 40px 25px; width: 100%; }
+            h2 { font-size: 1.1rem; letter-spacing: 1px; }
+            .sig-text { font-size: 2.8rem; }
         }
     </style>
 </head>
@@ -137,52 +83,52 @@
         <div class="author-photo"></div>
         <div style="font-family:'Inter'; font-weight:900; font-size:0.8rem; letter-spacing:2px; color:var(--text-dark); margin-top:10px;">A.S.Ç.</div>
         <div class="sidebar-motto">Mardin & Brasília Günlüğü</div>
-        <div class="sidebar-social">
-            <a href="https://x.com/ASCIBARBAS" target="_blank">X / @ASCIBARBAS</a>
+        <div class="sidebar-social" style="margin-top:20px;">
+            <a href="https://x.com/ASCIBARBAS" target="_blank" style="color: var(--brand-red); text-decoration: none; font-weight: 900; font-family: 'Inter'; font-size: 0.75rem; letter-spacing: 2px; border-bottom: 1px solid var(--brand-red);">X / @ASCIBARBAS</a>
         </div>
     </aside>
 
     <div class="container">
         <article>
             <div class="meta" style="font-family:'Inter'; font-size:0.7rem; color:#bbb; letter-spacing:4px; margin-bottom:25px; text-align:center;">24 MART 2026</div>
-            <h2>İKİ BAŞKENT TEK RUH</h2>
+            
+            <h2>MARDİN VE BRASÍLIA: MEDENİYETİN İKİ UCU</h2>
             
             <div class="content-tr">
-                <p>Mardin’in altın sarısı taş evlerinden yükselen Mezopotamya güneşi ile Brasília’nın uçsuz buçaksız gökyüzü altında parlayan modern beton çizgileri, ilk bakışta birbirine uzak görünse de aslında aynı evrensel estetiğin parçalarıdır. Mardin, zamanın binlerce yıl boyunca ilmik ilmik işlediği bir sabır şehridir; Brasília ise insan iradesinin ve modernizmin sıfırdan var ettiği bir gelecek düşüdür.</p>
+                <p>
+                    <span class="glossary-term">Mardin<span class="glossary-content">Artuklu mimarisinin zirvesi olan açık hava müzesi şehir.</span></span>, 
+                    jeolojik olarak <span class="glossary-term">Kretase<span class="glossary-content">Tebeşir dönemi; Mardin taşının oluştuğu 145-66 milyon yıl öncesi.</span></span> 
+                    dönemine ait kireçtaşlarının insan eliyle mühürlendiği bir <span class="glossary-term">Antroposen<span class="glossary-content">İnsanın dünya ekosistemi üzerinde baskın hale geldiği çağ.</span></span> 
+                    mucizesidir. Şehrin dikey yerleşimi, sadece estetik bir tercih değil, Mezopotamya'nın termal rüzgarlarını optimize eden kadim bir iklimlendirme mühendisliğidir. Binlerce yıllık taş işçiliği, bugün modern mimarinin "sürdürülebilirlik" dediği kavramın tarihsel temelidir.
+                </p>
                 
-                <p>Mardin’in dar sokaklarında yankılanan çekiç sesleri, taş ustalarının kadim bilgisini günümüze taşırken; Oscar Niemeyer’in Brasília’da betona verdiği kavisler, modern dünyanın yeni bir ritim arayışını temsil eder. Bir yanda binlerce yıllık manastırların sessizliği, diğer yanda katedralin göğe yükselen fütüristik elleri bulunur. Her iki şehir de kendi döneminin "zirve" noktasıdır.</p>
+                <p>
+                    Öte yandan <span class="glossary-term">Brasília<span class="glossary-content">Modernizmin ve rasyonalizmin betona bürünmüş hali.</span></span>, 
+                    bilimsel rasyonalizmin ve fütüristik vizyonun yeryüzündeki izdüşümüdür. <span class="glossary-term">Oscar Niemeyer<span class="glossary-content">Eğrisel çizgileri betonla birleştiren Pritzker ödüllü dahi.</span></span>'in 
+                    kavisli beton formları, maddenin direnci ile matematiğin zarafeti arasındaki dengenin kanıtıdır. Brasília, bir şehirden ziyade, insan zihninin doğaya karşı kurduğu modern bir geometrik düzendir.
+                </p>
                 
-                <p>Kültürlerin birbirine dokunduğu en zarif nokta ise kuşkusuz damak tadı ve misafirperverliktir. Mardin’de bir fincan Dibek kahvesi içmek, Mezopotamya’nın tüm katmanlarını koklamak demektir. Brasília’nın geniş bulvarlarında verilen bir kahve molası ise, Brezilya topraklarının bereketini ve Latin Amerika’nın sıcaklığını hissettirir. Kahve, her iki kültürde de sadece bir içecek değil, dostluğun ve paylaşımın en somut simgesidir.</p>
+                <p>
+                    Kültürel düzlemde bu iki uç, kahvenin moleküler yolculuğunda birleşir. Mardin'in <span class="glossary-term">Dibek<span class="glossary-content">Kahvenin taş havanda dövülerek aromatik yağlarının korunması yöntemi.</span></span> 
+                    geleneği, aromatik yağların fiziksel çarpışmayla açığa çıkmasıyken; Brezilya'nın dünya kahve üretimindeki %37'lik bilimsel dominasyonu, Latin Amerika'nın biyolojik çeşitliliğini temsil eder. Her iki coğrafya da insanlığın ortak mirasının farklı frekanslardaki yankısıdır.
+                </p>
 
                 <div class="signature-block">
-                    <span class="sig-text">Ahmet Salim Cinarbas</span>
+                    <span class="sig-text">Ahmet Salim</span>
                     <span class="sig-sub">Mardin Notları</span>
                 </div>
             </div>
 
-            <div class="lang-divider"><span>PORTUGUÊS (BRASIL)</span></div>
+            <div class="lang-divider"><span>RESUMO CIENTÍFICO E CULTURAL</span></div>
 
             <div class="content-pt">
-                <p>O sol da Mesopotâmia, que nasce sobre as casas de pedra amarela de Mardin, e as linhas de concreto moderno que brilham sob o céu infinito de Brasília, embora pareçam distantes à primeira vista, são na verdade partes da mesma estética universal. Mardin é uma cidade de paciência, tecida ponto a ponto ao longo de milênios; Brasília, por outro lado, é um sonho de futuro criado do zero pela vontade humana e pelo modernismo.</p>
+                <p>Mardin representa a engenharia vernacular milenar, otimizando o fluxo térmico da Mesopotâmia através de sua arquitetura de calcário. Por outro lado, Brasília é o ápice do racionalismo científico, onde Niemeyer desafiou a gravidade com curvas matemáticas em concreto armado.</p>
                 
-                <p>Enquanto o som dos martelos ecoando nas ruas estreitas de Mardin carrega o conhecimento antigo dos mestres pedreiros para o presente, as curvas que Oscar Niemeyer deu ao concreto em Brasília representam a busca do mundo moderno por um novo ritmo. De um lado está o silêncio de mosteiros milenares, do outro, as mãos futuristas da catedral erguendo-se ao céu. Ambas as cidades são o "ápice" de seus períodos.</p>
-                
-                <p>O ponto mais elegante onde as culturas se tocam é, sem dúvida, o paladar e a hospitalidade. Beber uma xícara de café Dibek em Mardin significa sentir o aroma de todas as camadas da Mesopotâmia. Uma pausa para o café nas largas avenidas de Brasília faz sentir a fertilidade das terras brasileiras e o calor da América Latina. O café, em ambas as culturas, não é apenas uma bebida, mas o símbolo mais concreto de amizade e partilha.</p>
+                <p>Ambas as cidades, embora separadas por oceanos e milênios, convergem na busca humana pela harmonia entre o ambiente construído e o cosmos. É um diálogo entre a pedra ancestral e o concreto futurista.</p>
 
                 <div class="signature-block">
-                    <span class="sig-text">Ahmet Salim Cinarbas</span>
+                    <span class="sig-text">Ahmet Salim</span>
                     <span class="sig-sub">Notas de Brasília</span>
-                </div>
-            </div>
-
-            <div class="sponsor-section">
-                <small style="font-family:'Inter'; font-size:0.6rem; letter-spacing:5px; color:#bbb; text-transform:uppercase;">Kültür Sponsoru</small>
-                <h3 style="font-family:'Playfair Display'; color:var(--brand-red); margin:10px 0 35px 0; font-size:1.5rem;">Yaşarbey Kahve</h3>
-                
-                <div class="sponsor-grid">
-                    <a href="https://www.yasarbey.com/kategori/dibek-kahvesi" target="_blank" class="product-card"><span>MARDİN</span><strong>Dibek Kahvesi</strong></a>
-                    <a href="https://www.yasarbey.com/kategori/suryani-kahvesi" target="_blank" class="product-card"><span>KADİM</span><strong>Süryani Kahvesi</strong></a>
-                    <a href="https://www.yasarbey.com/kategori/turk-kahvesi" target="_blank" class="product-card"><span>ÖZEL</span><strong>Türk Kahvesi</strong></a>
                 </div>
             </div>
         </article>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brasília Digital | Official Master Portal</title>
+    <title>Brasília Digital | City OS v3.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -12,420 +12,314 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
         :root {
             --royal-blue: #0057B7;
             --gold: #FFD700;
-            --snow-white: #FFFFFF;
-            --ghost-white: #F8FAFC;
+            --pure-white: #FFFFFF;
+            --snow-bg: #F8FAFC;
             --slate-900: #0F172A;
+            /* Atmospheric Lighting - Dinamik Değişecek */
+            --sky-tint: rgba(0, 87, 183, 0.02);
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--ghost-white); 
+            background-color: var(--snow-bg); 
             color: var(--slate-900);
             font-style: normal !important;
-            scroll-behavior: smooth;
+            overflow-x: hidden;
+            background-image: radial-gradient(var(--sky-tint) 2px, transparent 2px);
+            background-size: 40px 40px;
         }
 
-        /* STRICT NO ITALIC */
-        * { font-style: normal !important; outline: none; }
+        /* STRICT NO ITALIC RULE */
+        * { font-style: normal !important; scroll-behavior: smooth; }
 
-        /* Premium Glassmorphism */
-        .glass {
+        .glass-panel {
             background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 87, 183, 0.1);
         }
 
-        .premium-shadow {
-            box-shadow: 0 20px 50px -12px rgba(0, 87, 183, 0.12);
+        /* Traffic & Pulse Animations */
+        .pulse-line {
+            stroke-dasharray: 10;
+            animation: flow 15s linear infinite;
+        }
+        @keyframes flow { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+
+        .glow-blue { box-shadow: 0 0 20px rgba(0, 87, 183, 0.3); }
+
+        /* Digital Twin Mini-Map Container */
+        #digital-twin {
+            width: 180px; height: 180px;
+            perspective: 1000px;
+        }
+        .twin-box {
+            width: 100%; height: 100%;
+            background: linear-gradient(45deg, var(--royal-blue), #003066);
+            border-radius: 24px;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
         }
 
-        /* Hero Image Parallax Feel */
-        .hero-shape {
-            border-radius: 60% 40% 70% 30% / 40% 50% 60% 70%;
-            background: linear-gradient(45deg, var(--royal-blue), #003d82);
+        /* Timeline Styling */
+        .timeline-item::before {
+            content: ''; position: absolute; left: -21px; top: 0;
+            width: 2px; height: 100%; background: #E2E8F0;
+        }
+        .timeline-active::before { background: var(--royal-blue); }
+
+        /* AR Blueprint Effect */
+        .blueprint-card {
+            background-image: linear-gradient(rgba(0, 87, 183, 0.1) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(0, 87, 183, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #f0f4f8;
+            border: 2px solid var(--royal-blue);
         }
 
-        /* Map Styling */
-        #map { 
-            height: 600px; 
-            width: 100%; 
-            border-radius: 40px; 
-            z-index: 10;
-        }
-
-        /* Traffic Animation */
-        .traffic-flow {
-            stroke-dasharray: 12;
-            animation: dash 30s linear infinite;
-        }
-        @keyframes dash { to { stroke-dashoffset: 1000; } }
-
-        /* Section Transition */
-        .reveal { animation: reveal 0.8s ease-out forwards; }
-        @keyframes reveal {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--ghost-white); }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        #map { height: 650px; border-radius: 40px; z-index: 10; }
     </style>
 </head>
-<body x-data="cityMaster()">
+<body x-data="cityOS()">
 
-    <nav class="fixed w-full z-[3000] glass px-6 py-4 border-b border-slate-100">
-        <div class="max-w-[1600px] mx-auto flex justify-between items-center">
+    <nav class="fixed w-full z-[3000] glass-panel px-8 py-5 border-b border-blue-50">
+        <div class="max-w-[1700px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-[var(--royal-blue)] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
-                    <i data-lucide="building-2" class="text-white w-6 h-6"></i>
+                <div class="w-12 h-12 bg-[var(--royal-blue)] rounded-2xl flex items-center justify-center glow-blue">
+                    <i data-lucide="cpu" class="text-white w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tighter uppercase leading-none text-slate-900">Brasília<span class="text-[var(--royal-blue)]">OS</span></h1>
-                    <p class="text-[9px] font-extrabold text-slate-400 tracking-[0.3em] mt-1">Sponsor: Yaşarbey Kahve</p>
+                    <h1 class="text-2xl font-black tracking-tighter uppercase leading-none">Brasília<span class="text-[var(--royal-blue)]">OS</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-[0.3em] mt-1">Sponsor: Yaşarbey Kahve</p>
                 </div>
-            </div>
-            
-            <div class="hidden lg:flex items-center gap-10 font-bold text-xs uppercase tracking-widest text-slate-500">
-                <a href="#services" class="hover:text-[var(--royal-blue)] transition-colors">Serviços</a>
-                <a href="#live-map" class="hover:text-[var(--royal-blue)] transition-colors">Monitoramento</a>
-                <a href="#culture" class="hover:text-[var(--royal-blue)] transition-colors">Cultura</a>
-                <a href="#news" class="hover:text-[var(--royal-blue)] transition-colors">Notícias</a>
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="hidden sm:flex flex-col text-right mr-4 border-r border-slate-200 pr-4">
-                    <span class="text-sm font-black" x-text="currentTime"></span>
-                    <span class="text-[9px] font-bold text-green-500 uppercase tracking-widest">Sistema Online</span>
+            <div class="hidden xl:flex items-center gap-12 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
+                <a href="#pulse" class="hover:text-[var(--royal-blue)] transition">Pulse</a>
+                <a href="#map-engine" class="hover:text-[var(--royal-blue)] transition">Live Map</a>
+                <a href="#timeline" class="hover:text-[var(--royal-blue)] transition">Timeline</a>
+                <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                    <i data-lucide="sun" class="w-3 h-3 text-[var(--gold)]"></i>
+                    <span class="text-[var(--royal-blue)]" x-text="sunPhase"></span>
                 </div>
-                <button class="bg-slate-900 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[var(--royal-blue)] transition-all active:scale-95">Acessar</button>
             </div>
+
+            <button class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[var(--royal-blue)] transition shadow-xl">Master Access</button>
         </div>
     </nav>
 
-    <section class="relative pt-44 pb-32 px-6 overflow-hidden">
-        <div class="max-w-[1600px] mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div class="relative z-10 reveal">
-                <div class="inline-flex items-center gap-3 bg-white px-5 py-2 rounded-full border border-slate-100 shadow-sm mb-8">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cidade Digital Inteligente</span>
-                </div>
-                <h2 class="text-7xl md:text-8xl font-black tracking-tighter leading-[0.85] text-slate-900 mb-8">
-                    O Futuro é <br> <span class="text-[var(--royal-blue)] underline decoration-gold/30">Agora.</span>
-                </h2>
-                <p class="text-xl text-slate-500 font-medium leading-relaxed max-w-xl mb-12">
-                    Sinta o pulsar de Brasília. Da fluidez do trânsito à efervescência cultural, tudo o que você precisa está integrado na palma da sua mão.
-                </p>
-                <div class="flex flex-wrap gap-6">
-                    <a href="#live-map" class="bg-[var(--royal-blue)] text-white px-12 py-6 rounded-[24px] font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-blue-300 hover:scale-105 transition-transform">Ver Mapa Vivo</a>
-                    <button class="bg-white border-2 border-slate-100 px-12 py-6 rounded-[24px] font-black uppercase text-xs tracking-[0.2em] text-slate-800 hover:bg-slate-50 transition-colors">Portal de Serviços</button>
-                </div>
-            </div>
-            
-            <div class="relative reveal" style="animation-delay: 0.2s">
-                <div class="hero-shape absolute -top-10 -right-10 w-[120%] h-[120%] opacity-5"></div>
-                <img src="https://images.unsplash.com/photo-1599450012224-345479261a38?auto=format&fit=crop&q=80&w=1200" class="rounded-[60px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] relative z-10 transform -rotate-1">
-                
-                <div class="absolute -bottom-12 -left-12 z-20 glass p-8 rounded-[40px] premium-shadow max-w-xs">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shadow-inner">
-                            <i data-lucide="coffee"></i>
+    <main class="pt-32 pb-20 px-8 max-w-[1700px] mx-auto grid xl:grid-cols-12 gap-10">
+        
+        <div class="xl:col-span-3 space-y-8" id="pulse">
+            <div class="glass-panel p-8 rounded-[40px]">
+                <h3 class="text-xs font-black text-[var(--royal-blue)] uppercase tracking-[0.3em] mb-6">Pulse of Brasília</h3>
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-black uppercase">Consumo de Energia</span>
+                            <span class="text-[10px] font-black text-green-500">OPTIMAL</span>
                         </div>
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Yaşarbey Kahve</p>
-                            <p class="text-sm font-black text-slate-800">Aroma da Capital</p>
+                        <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500 animate-pulse" style="width: 62%"></div>
                         </div>
                     </div>
-                    <p class="text-xs font-bold text-slate-500 leading-relaxed mb-4">"A energia que move os arquitetos do amanhã."</p>
-                    <button class="text-[10px] font-black text-[var(--royal-blue)] uppercase tracking-widest border-b-2 border-blue-100">Encontrar Lojas</button>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-black uppercase">Densidade Social</span>
+                            <span class="text-[10px] font-black text-blue-500">HIGH (Eixo)</span>
+                        </div>
+                        <div class="flex gap-1 h-8 items-end">
+                            <template x-for="i in 12">
+                                <div class="bg-blue-200 w-full rounded-t-sm" :style="`height: ${Math.random()*100}%`"></div>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                        <i data-lucide="waves" class="w-4 h-4 text-slate-400"></i>
+                        <span class="text-xs font-black">42 dB (Quiet)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 rounded-[40px]" id="timeline">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Smart Timeline</h3>
+                <div class="space-y-10 ml-5 relative">
+                    <template x-for="log in timelineLogs">
+                        <div class="relative timeline-item" :class="log.active ? 'timeline-active' : ''">
+                            <div class="absolute -left-[27px] top-0 w-3 h-3 rounded-full border-2 border-white" :class="log.active ? 'bg-[var(--royal-blue)] glow-blue' : 'bg-slate-200'"></div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase" x-text="log.time"></p>
+                            <h4 class="text-xs font-bold mt-1 text-slate-800" x-text="log.msg"></h4>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section id="services" class="py-32 bg-white">
-        <div class="max-w-[1600px] mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
-                <div>
-                    <h3 class="text-5xl font-black tracking-tighter uppercase mb-4">Ecossistema de <span class="text-[var(--royal-blue)]">Serviços</span></h3>
-                    <p class="text-slate-400 font-semibold uppercase tracking-widest text-xs">Acesso rápido e desburocratizado</p>
-                </div>
-                <div class="flex gap-4">
-                    <div class="px-6 py-3 bg-slate-50 rounded-2xl text-[10px] font-black uppercase text-slate-400">Total: 42 Serviços</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <template x-for="service in services">
-                    <div class="group p-10 rounded-[48px] bg-slate-50 border border-transparent hover:border-[var(--royal-blue)] hover:bg-white transition-all duration-500 cursor-pointer premium-shadow">
-                        <div :class="service.color" class="w-20 h-20 rounded-3xl flex items-center justify-center text-white mb-8 shadow-2xl transition-transform group-hover:scale-110">
-                            <i :data-lucide="service.icon" class="w-8 h-8"></i>
+        <div class="xl:col-span-6 space-y-8" id="map-engine">
+            <div class="glass-panel p-4 rounded-[48px] relative">
+                <div id="map"></div>
+                
+                <div class="absolute top-10 left-10 z-[1000] glass-panel p-6 rounded-3xl border-l-4 border-[var(--gold)]">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i data-lucide="coffee" class="text-amber-600 w-4 h-4"></i>
+                        <span class="text-[10px] font-black uppercase">Yaşarbey Coffee-Working</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Ocupação</p>
+                            <p class="text-sm font-black text-slate-800">72%</p>
                         </div>
-                        <h4 class="text-2xl font-black text-slate-900 mb-4" x-text="service.title"></h4>
-                        <p class="text-sm text-slate-400 font-medium leading-relaxed" x-text="service.desc"></p>
-                        <div class="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span class="text-[10px] font-black text-[var(--royal-blue)] uppercase">Acessar agora</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--royal-blue)]"></i>
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">WiFi Speed</p>
+                            <p class="text-sm font-black text-green-500">850 Mbps</p>
+                        </div>
+                    </div>
+                </div>
+
+                <template x-if="scannedBuilding">
+                    <div class="absolute inset-0 z-[2000] p-10 flex items-center justify-center bg-white/20 backdrop-blur-md">
+                        <div class="blueprint-card w-full max-w-lg p-10 rounded-[40px] shadow-2xl relative">
+                            <button @click="scannedBuilding = null" class="absolute top-6 right-6 text-[var(--royal-blue)]"><i data-lucide="x-circle"></i></button>
+                            <p class="text-[10px] font-black text-[var(--royal-blue)] uppercase tracking-widest mb-4">AI Architecture Scanner</p>
+                            <h3 class="text-3xl font-black text-slate-900 mb-6" x-text="scannedBuilding.name"></h3>
+                            <div class="grid grid-cols-2 gap-8 mb-8">
+                                <div class="border-l-2 border-blue-200 pl-4 text-[10px] font-bold text-slate-500 uppercase">Niemeyer Concept: <br> <span class="text-slate-900" x-text="scannedBuilding.concept"></span></div>
+                                <div class="border-l-2 border-blue-200 pl-4 text-[10px] font-bold text-slate-500 uppercase">Estrutura: <br> <span class="text-slate-900" x-text="scannedBuilding.tech"></span></div>
+                            </div>
+                            <button class="w-full py-4 bg-[var(--royal-blue)] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl">Visualizar em 3D</button>
                         </div>
                     </div>
                 </template>
             </div>
         </div>
-    </section>
 
-    <section id="live-map" class="py-32 px-6">
-        <div class="max-w-[1600px] mx-auto">
-            <div class="glass p-12 rounded-[60px] premium-shadow relative overflow-hidden">
-                <div class="grid lg:grid-cols-4 gap-12">
-                    <div class="lg:col-span-1 space-y-8 relative z-20">
-                        <h3 class="text-4xl font-black tracking-tighter uppercase leading-none">Monitoramento <br> <span class="text-[var(--royal-blue)]">Brasília Viva</span></h3>
-                        
-                        <div class="space-y-4">
-                            <button @click="setMapMode('traffic')" :class="mapMode === 'traffic' ? 'bg-[var(--royal-blue)] text-white' : 'bg-white'" class="w-full p-6 rounded-3xl text-left flex items-center justify-between border border-slate-100 transition-all shadow-sm">
-                                <span class="text-xs font-black uppercase tracking-widest">Fluxo de Tráfego</span>
-                                <i data-lucide="navigation-2" class="w-4 h-4"></i>
-                            </button>
-                            <button @click="setMapMode('events')" :class="mapMode === 'events' ? 'bg-[var(--royal-blue)] text-white' : 'bg-white'" class="w-full p-6 rounded-3xl text-left flex items-center justify-between border border-slate-100 transition-all shadow-sm">
-                                <span class="text-xs font-black uppercase tracking-widest">Cultura & Eventos</span>
-                                <i data-lucide="ticket" class="w-4 h-4"></i>
-                            </button>
-                            <button @click="setMapMode('aroma')" :class="mapMode === 'aroma' ? 'bg-[var(--royal-blue)] text-white' : 'bg-white'" class="w-full p-6 rounded-3xl text-left flex items-center justify-between border border-slate-100 transition-all shadow-sm">
-                                <span class="text-xs font-black uppercase tracking-widest">Aroma Map (Yaşarbey)</span>
-                                <i data-lucide="coffee" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-
-                        <div class="p-8 bg-slate-900 rounded-[40px] text-white space-y-6">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] font-black text-slate-400 uppercase">Qualidade do Ar</span>
-                                <span class="text-green-400 font-bold">Excelente</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] font-black text-slate-400 uppercase">Umidade</span>
-                                <span class="font-bold">14%</span>
-                            </div>
-                            <div class="pt-4 border-t border-slate-800">
-                                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Trânsito Médio</p>
-                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-green-500 h-full w-[85%]"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-3 relative h-[700px]">
-                        <div id="map" class="shadow-inner"></div>
-                        
-                        <div class="absolute top-6 right-6 z-[1000] glass p-6 rounded-3xl flex items-center gap-6 shadow-2xl">
-                            <div class="text-center px-4 border-r border-slate-100">
-                                <p class="text-[10px] font-black text-slate-400 uppercase">Brasília Now</p>
-                                <p class="text-3xl font-black text-slate-900">28°C</p>
-                            </div>
-                            <div class="text-center px-4">
-                                <p class="text-[10px] font-black text-slate-400 uppercase">Vento (N)</p>
-                                <p class="text-xl font-black text-[var(--royal-blue)]">12km/h</p>
-                            </div>
-                        </div>
+        <div class="xl:col-span-3 space-y-8">
+            <div class="glass-panel p-8 rounded-[40px] flex flex-col items-center">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-6 self-start">Digital Twin</h3>
+                <div id="digital-twin" @mousemove="tiltTwin($event)">
+                    <div class="twin-box flex items-center justify-center" :style="`transform: rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`">
+                        <i data-lucide="box" class="text-white w-12 h-12 opacity-20"></i>
                     </div>
                 </div>
+                <p class="mt-6 text-[10px] font-black text-slate-400 uppercase">Interação Direta 3D</p>
+            </div>
+
+            <div class="glass-panel p-8 rounded-[40px] bg-[var(--royal-blue)] text-white border-none">
+                <div class="flex justify-between items-start mb-10">
+                    <div>
+                        <h4 class="text-4xl font-black">28°C</h4>
+                        <p class="text-[10px] font-black uppercase opacity-60 mt-1">Brasília, DF</p>
+                    </div>
+                    <i data-lucide="sun" class="w-10 h-10 text-[var(--gold)]"></i>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-[10px] font-black uppercase">
+                        <span>Vento</span>
+                        <span>12 KM/H (N)</span>
+                    </div>
+                    <div class="h-[1px] bg-white/10"></div>
+                    <div class="flex justify-between text-[10px] font-black uppercase">
+                        <span>Pôr do Sol</span>
+                        <span>18:12</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 rounded-[40px] relative overflow-hidden group">
+                <div class="relative z-10">
+                    <h4 class="text-xl font-black leading-tight mb-2">Yaşarbey <br> Experience</h4>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase leading-relaxed mb-6">Grãos selecionados para os pensadores da capital.</p>
+                    <button class="bg-[var(--gold)] text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest">Reserve Desk</button>
+                </div>
+                <i data-lucide="coffee" class="absolute -right-6 -bottom-6 w-24 h-24 text-blue-50 opacity-5 group-hover:scale-110 transition"></i>
             </div>
         </div>
-    </section>
+    </main>
 
-    <section id="news" class="py-32 px-6 max-w-[1600px] mx-auto">
-        <div class="grid lg:grid-cols-12 gap-16">
-            <div class="lg:col-span-8 space-y-12">
-                <h3 class="text-5xl font-black tracking-tighter uppercase">Diário da <span class="text-[var(--royal-blue)]">Capital</span></h3>
-                <div class="grid md:grid-cols-2 gap-12">
-                    <template x-for="n in news">
-                        <div class="group cursor-pointer">
-                            <div class="aspect-video rounded-[40px] overflow-hidden mb-6">
-                                <img :src="n.image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                            </div>
-                            <span class="text-[10px] font-black text-[var(--royal-blue)] uppercase tracking-widest" x-text="n.cat"></span>
-                            <h4 class="text-2xl font-black text-slate-900 mt-4 leading-tight group-hover:text-[var(--royal-blue)] transition-colors" x-text="n.title"></h4>
-                        </div>
-                    </template>
-                </div>
-            </div>
-            
-            <div class="lg:col-span-4 space-y-12">
-                <h3 class="text-3xl font-black tracking-tighter uppercase">Fique por dentro</h3>
-                <div class="space-y-6">
-                    <template x-for="event in events">
-                        <div class="premium-card p-6 flex gap-6 items-center">
-                            <div class="text-center bg-blue-50 p-4 rounded-2xl min-w-[70px]">
-                                <p class="text-[10px] font-black text-[var(--royal-blue)] uppercase" x-text="event.month"></p>
-                                <p class="text-2xl font-black text-slate-900" x-text="event.day"></p>
-                            </div>
-                            <div>
-                                <h5 class="font-black text-slate-900 text-sm leading-tight mb-2" x-text="event.title"></h5>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" x-text="event.loc"></p>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="bg-[var(--royal-blue)] rounded-[48px] p-10 text-white relative overflow-hidden group">
-                    <div class="relative z-10">
-                        <h4 class="text-2xl font-black leading-tight mb-4">Yaşarbey <br> Coffee Break?</h4>
-                        <p class="text-xs font-medium opacity-80 mb-8 leading-relaxed">Descubra onde estão os grãos selecionados que inspiram Brasília.</p>
-                        <button class="bg-white text-[var(--royal-blue)] px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">Ver Unidades</button>
-                    </div>
-                    <i data-lucide="coffee" class="absolute -right-10 -bottom-10 w-48 h-48 opacity-10 group-hover:rotate-12 transition-transform duration-700"></i>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="py-24 bg-white border-t border-slate-100 px-6">
-        <div class="max-w-[1600px] mx-auto grid md:grid-cols-4 gap-16">
-            <div class="md:col-span-1">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-                        <i data-lucide="shield-check" class="text-white w-5 h-5"></i>
-                    </div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase">Brasília OS</h1>
-                </div>
-                <p class="text-sm text-slate-400 font-medium leading-relaxed">O sistema operacional definitivo da capital brasileira. Inovação a serviço do cidadão.</p>
-            </div>
-            
-            <div class="space-y-6">
-                <h5 class="font-black text-xs uppercase tracking-widest text-slate-900">Governo</h5>
-                <nav class="flex flex-col gap-4 text-xs font-bold text-slate-500">
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Secretarias</a>
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Transparência</a>
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Diário Oficial</a>
-                </nav>
-            </div>
-
-            <div class="space-y-6">
-                <h5 class="font-black text-xs uppercase tracking-widest text-slate-900">Institucional</h5>
-                <nav class="flex flex-col gap-4 text-xs font-bold text-slate-500">
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Sobre o Portal</a>
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Ouvidoria</a>
-                    <a href="#" class="hover:text-[var(--royal-blue)]">Privacidade</a>
-                </nav>
-            </div>
-
-            <div class="space-y-8">
-                <h5 class="font-black text-xs uppercase tracking-widest text-slate-900">Parceiro Estratégico</h5>
-                <div class="p-6 bg-amber-50 rounded-3xl border border-amber-100">
-                    <p class="text-xs font-black text-amber-800 mb-2 uppercase">Yaşarbey Kahve</p>
-                    <p class="text-[10px] text-amber-700 font-medium leading-relaxed">Referência em café de alta qualidade no Distrito Federal.</p>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-[1600px] mx-auto mt-24 pt-12 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">© 2026 Brasília Digital. Governo do Distrito Federal.</p>
-            <div class="flex gap-6">
-                <i data-lucide="instagram" class="w-5 h-5 text-slate-300 hover:text-[var(--royal-blue)] cursor-pointer"></i>
-                <i data-lucide="facebook" class="w-5 h-5 text-slate-300 hover:text-[var(--royal-blue)] cursor-pointer"></i>
-                <i data-lucide="linkedin" class="w-5 h-5 text-slate-300 hover:text-[var(--royal-blue)] cursor-pointer"></i>
+    <footer class="py-16 px-8 border-t border-slate-100 bg-white">
+        <div class="max-w-[1700px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">© 2026 Brasília OS v3.0 | Intelligent City Infrastructure</p>
+            <div class="flex gap-10 text-[10px] font-black uppercase tracking-widest text-slate-900">
+                <a href="#">Security</a>
+                <a href="#">API Docs</a>
+                <a href="#">Privacy</a>
             </div>
         </div>
     </footer>
 
     <script>
-        function cityMaster() {
+        function cityOS() {
             return {
-                currentTime: '',
-                mapMode: 'traffic',
+                sunPhase: 'GÜN ORTASI',
+                scannedBuilding: null,
+                tilt: { x: 0, y: 0 },
                 map: null,
-                trafficLines: [],
-                markers: [],
-                
-                services: [
-                    { title: 'Transporte', desc: 'Monitoramento de ônibus e metrô em tempo real.', icon: 'bus', color: 'bg-blue-500' },
-                    { title: 'Saúde', desc: 'Agendamento de vacinas e consultas digitais.', icon: 'activity', color: 'bg-rose-500' },
-                    { title: 'Educação', desc: 'Portal de matrículas e notas do ensino público.', icon: 'graduation-cap', color: 'bg-indigo-500' },
-                    { title: 'Fiscal', desc: 'Emissão de guias de IPTU e taxas governamentais.', icon: 'file-text', color: 'bg-amber-500' }
-                ],
-                
-                news: [
-                    { title: 'Nova linha de metrô ligando o Eixo Sul à Esplanada', cat: 'Mobilidade', image: 'https://images.unsplash.com/photo-1542344807-157f76301e8a?auto=format&fit=crop&q=80&w=800' },
-                    { title: 'Brasília se torna hub de inovação tech na AL', cat: 'Econômia', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800' }
-                ],
-
-                events: [
-                    { day: '14', month: 'ABR', title: 'Jazz na Esplanada', loc: 'Museu Nacional' },
-                    { day: '21', month: 'ABR', title: 'Aniversário de Brasília', loc: 'Eixo Monumental' }
+                timelineLogs: [
+                    { time: '13:42', msg: 'Tráfego intenso detectado no Eixão Sul.', active: true },
+                    { time: '12:00', msg: 'Yaşarbey Coffee: Horário de pico de produtividade.', active: false },
+                    { time: '09:15', msg: 'Iluminação pública desligada automaticamente.', active: false },
+                    { time: '07:30', msg: 'Abertura dos Monumentos da Esplanada.', active: false }
                 ],
                 
                 init() {
                     lucide.createIcons();
-                    this.updateTime();
-                    setInterval(() => this.updateTime(), 1000);
-                    
-                    setTimeout(() => {
-                        this.initMap();
-                    }, 500);
-                },
-
-                updateTime() {
-                    const now = new Date();
-                    this.currentTime = now.toLocaleTimeString('pt-BR', { hour12: false }) + ' - ' + now.toLocaleDateString('pt-BR');
+                    this.initMap();
+                    this.updateAtmosphere();
                 },
 
                 initMap() {
-                    this.map = L.map('map', { 
-                        zoomControl: false, 
-                        attributionControl: false 
-                    }).setView([-15.7938, -47.8828], 13);
-
+                    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-15.7938, -47.8828], 13);
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.map);
-                    this.renderTraffic();
-                    this.renderMarkers();
-                },
-
-                setMapMode(mode) {
-                    this.mapMode = mode;
-                    this.renderMarkers();
-                },
-
-                renderTraffic() {
-                    const flowCoords = [
-                        [[-15.7938, -47.8828], [-15.7997, -47.8641]], // Eixo S
-                        [[-15.7938, -47.8828], [-15.7834, -47.8992]]  // Eixo N
-                    ];
                     
-                    flowCoords.forEach((path, i) => {
-                        L.polyline(path, {
-                            color: i % 2 === 0 ? '#22C55E' : '#EF4444',
-                            weight: 5,
-                            opacity: 0.6,
-                            className: 'traffic-flow'
-                        }).addTo(this.map);
+                    // Add Pulse Traffic Lines
+                    const traffic = [
+                        [[-15.7938, -47.8828], [-15.7997, -47.8641]],
+                        [[-15.7938, -47.8828], [-15.7834, -47.8992]]
+                    ];
+                    traffic.forEach((line, i) => {
+                        L.polyline(line, { color: i===0 ? '#22C55E' : '#0057B7', weight: 4, opacity: 0.6, className: 'pulse-line' }).addTo(this.map);
+                    });
+
+                    // Add Interactive Architecture Markers
+                    const buildings = [
+                        { name: 'Catedral de Brasília', coords: [-15.7982, -47.8755], concept: 'Mãos elevadas ao céu', tech: '16 colunas de concreto hiperboloide' },
+                        { name: 'Congresso Nacional', coords: [-15.7997, -47.8641], concept: 'Dualidade e Equilíbrio', tech: 'Cúpulas côncava e convexa' }
+                    ];
+
+                    buildings.forEach(b => {
+                        const icon = L.divIcon({
+                            className: 'custom-pin',
+                            html: `<div style="background:var(--royal-blue); width:20px; height:20px; border-radius:50%; border:4px solid white; box-shadow:0 0 20px rgba(0,0,0,0.2)"></div>`
+                        });
+                        L.marker(b.coords, { icon }).addTo(this.map).on('click', () => {
+                            this.scannedBuilding = b;
+                            setTimeout(() => lucide.createIcons(), 50);
+                        });
                     });
                 },
 
-                renderMarkers() {
-                    // Clear previous markers
-                    this.markers.forEach(m => this.map.removeLayer(m));
-                    this.markers = [];
+                updateAtmosphere() {
+                    const hour = new Date().getHours();
+                    if(hour >= 18 || hour < 6) {
+                        this.sunPhase = 'GECE MODU';
+                        document.documentElement.style.setProperty('--sky-tint', 'rgba(0, 0, 0, 0.05)');
+                    } else if(hour >= 16) {
+                        this.sunPhase = 'GÜN BATIMI';
+                        document.documentElement.style.setProperty('--sky-tint', 'rgba(255, 165, 0, 0.05)');
+                    }
+                },
 
-                    const points = [
-                        { name: 'Catedral de Brasília', coords: [-15.7982, -47.8755], type: 'events' },
-                        { name: 'Congresso Nacional', coords: [-15.7997, -47.8641], type: 'events' },
-                        { name: 'Yaşarbey Kahve - Pontão', coords: [-15.8236, -47.8710], type: 'aroma' }
-                    ];
-
-                    points.forEach(p => {
-                        if (this.mapMode === 'traffic' || this.mapMode === p.type) {
-                            const icon = L.divIcon({
-                                className: 'custom-pin',
-                                html: `<div style="background:${p.type === 'aroma' ? 'var(--gold)' : 'var(--royal-blue)'}; width:16px; height:16px; border-radius:50%; border:3px solid white; box-shadow:0 0 15px rgba(0,0,0,0.1)"></div>`
-                            });
-                            const m = L.marker(p.coords, { icon }).addTo(this.map).bindPopup(`<b class="font-black uppercase text-[10px]">${p.name}</b>`);
-                            this.markers.push(m);
-                        }
-                    });
+                tiltTwin(e) {
+                    const rect = document.getElementById('digital-twin').getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width/2;
+                    const y = e.clientY - rect.top - rect.height/2;
+                    this.tilt.x = -y / 10;
+                    this.tilt.y = x / 10;
                 }
             }
         }

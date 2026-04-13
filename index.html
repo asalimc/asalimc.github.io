@@ -3,180 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brasília Digital | Portal Oficial</title>
+    <title>Brasília Digital | World Class City Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: #F8FAFC; 
-            color: #1E293B; 
-            margin: 0;
-            font-style: normal !important; /* İtalik engelleme */
+            color: #0F172A; 
+            font-style: normal !important; 
         }
 
-        * { font-style: normal !important; }
+        * { font-style: normal !important; outline: none; }
 
-        .city-card { 
-            background: white; 
+        /* Yaşarbey Kahve Kalitesi: Yumuşak Gölgeler & Keskin Hatlar */
+        .glass-card { 
+            background: #FFFFFF; 
             border-radius: 24px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 87, 183, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 87, 183, 0.05);
+            border: 1px solid #F1F5F9;
         }
 
         #map { 
-            height: 100%; 
-            width: 100%; 
-            border-radius: 20px;
-            z-index: 1;
+            height: 100%; width: 100%; border-radius: 32px; z-index: 10;
         }
 
-        .btn-primary {
-            background: #0057B7;
-            color: white;
-            transition: all 0.3s ease;
+        .event-dot {
+            width: 14px; height: 14px; border-radius: 50%; border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .btn-primary:hover {
-            background: #004494;
-            transform: translateY(-2px);
-        }
+        /* Scrollbar Gizleme */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Harita üzerindeki beyazlığı görselle uyumlu yapalım */
-        .leaflet-container { background: #f0f4f8; }
+        .btn-active { background: #0057B7; color: white; }
     </style>
 </head>
-<body>
+<body x-data="cityPortal()">
 
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-[1000] border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="20" y="20" width="60" height="60" rx="10" stroke="#0057B7" stroke-width="8"/>
-                    <path d="M50 20V80M20 50H80" stroke="#FFD700" stroke-width="8" stroke-linecap="square"/>
-                </svg>
-                <span class="text-xl font-extrabold tracking-tight text-slate-900 uppercase">Brasília<span class="text-[#0057B7]">Digital</span></span>
+    <nav class="bg-white/90 backdrop-blur-xl sticky top-0 z-[2000] border-b border-slate-100">
+        <div class="max-w-[1600px] mx-auto px-8 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-[#0057B7] rounded-xl flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 10V90M10 50H90" stroke="#FFD700" stroke-width="15" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="leading-none">
+                    <h1 class="text-xl font-extrabold tracking-tighter uppercase">Brasília<span class="text-[#0057B7]">Digital</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Powered by Yaşarbey Kahve</p>
+                </div>
             </div>
             
-            <div class="hidden md:flex gap-8 font-semibold text-sm text-slate-500">
-                <a href="#" class="hover:text-[#0057B7]">Início</a>
-                <a href="#" class="hover:text-[#0057B7]">Turismo</a>
-                <a href="#" class="hover:text-[#0057B7]">Governo</a>
-                <a href="#" class="hover:text-[#0057B7]">Cultura</a>
+            <div class="hidden lg:flex items-center gap-10">
+                <a href="#" class="text-sm font-bold text-slate-600 hover:text-[#0057B7] transition">Explorar</a>
+                <a href="#" class="text-sm font-bold text-slate-600 hover:text-[#0057B7] transition">Serviços</a>
+                <a href="#" class="text-sm font-bold text-[#0057B7]">Agenda Cultural</a>
+                <a href="#" class="text-sm font-bold text-slate-600 hover:text-[#0057B7] transition">Transporte</a>
             </div>
 
-            <button class="bg-slate-100 px-5 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-200">
-                Cidadão Login
-            </button>
+            <div class="flex items-center gap-4">
+                <div class="text-right mr-4 hidden sm:block">
+                    <p class="text-sm font-black text-slate-900" x-text="currentTime"></p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Brasília, DF</p>
+                </div>
+                <button class="w-12 h-12 glass-card flex items-center justify-center hover:bg-slate-50 transition">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-6 md:p-10 space-y-8">
+    <main class="max-w-[1600px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-120px)]">
         
-        <header class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
-                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span>
-                    <span class="text-xs font-bold text-blue-700 uppercase tracking-widest">Brasília Agora</span>
-                </div>
-                <h1 class="text-6xl font-black text-slate-900 leading-none tracking-tighter">
-                    Capital da <br> <span class="text-[#0057B7]">Esperança.</span>
-                </h1>
-                <p class="text-lg text-slate-500 max-w-lg font-medium">
-                    Experimente a cidade planejada de forma inteligente. Dados reais, acesso fácil e transparência total.
-                </p>
-                <div class="flex gap-4">
-                    <button class="btn-primary px-8 py-4 rounded-2xl font-bold shadow-lg shadow-blue-200">Ver Monumentos</button>
-                    <button class="bg-white border border-slate-200 px-8 py-4 rounded-2xl font-bold text-slate-700 hover:bg-slate-50">Serviços</button>
-                </div>
+        <div class="lg:col-span-3 flex flex-col gap-6 overflow-hidden">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Agenda Viva</h2>
+                <span class="bg-blue-100 text-[#0057B7] px-3 py-1 rounded-full text-xs font-black uppercase" x-text="filteredEvents.length + ' Eventos'"></span>
             </div>
 
-            <div class="city-card p-8 flex flex-col items-center text-center space-y-4">
-                <div class="w-20 h-20 bg-yellow-50 rounded-3xl flex items-center justify-center">
-                    <i data-lucide="sun" class="w-10 h-10 text-[#FFD700]"></i>
-                </div>
-                <div>
-                    <span class="text-5xl font-black text-slate-900">28°C</span>
-                    <p class="text-slate-400 font-bold uppercase text-xs mt-1 tracking-widest">Céu Limpo</p>
-                </div>
-                <div class="w-full pt-4 border-t border-slate-50 grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold">Umidade</p>
-                        <p class="font-bold text-slate-700">12%</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold">Vento</p>
-                        <p class="font-bold text-slate-700">15km/h</p>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div class="lg:col-span-3 h-[600px] city-card p-3 relative">
-                <div id="map"></div>
-                <div class="absolute top-8 left-8 z-[1000] space-y-2">
-                    <div class="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-xl border border-slate-100">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Status do Trânsito</p>
-                        <p class="text-sm font-bold text-green-600">Eixo Monumental: Livre</p>
-                    </div>
-                </div>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                <template x-for="cat in categories">
+                    <button 
+                        @click="activeCategory = cat"
+                        :class="activeCategory === cat ? 'bg-[#0057B7] text-white' : 'bg-white text-slate-500'"
+                        class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap border border-slate-100 transition shadow-sm hover:border-blue-200"
+                        x-text="cat">
+                    </button>
+                </template>
             </div>
 
-            <div class="space-y-6">
-                <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="bell" class="w-5 h-5 text-[#0057B7]"></i>
-                    Notícias
-                </h3>
-                
-                <div class="space-y-4">
-                    <template x-for="i in [1,2,3]">
-                        <div class="city-card p-5 hover:border-[#0057B7] transition-colors cursor-pointer group">
-                            <span class="text-[10px] font-black text-blue-500 uppercase">Cultura</span>
-                            <h4 class="font-bold text-slate-800 mt-1 group-hover:text-[#0057B7]">Festival de Inverno no Pontão</h4>
-                            <p class="text-xs text-slate-500 mt-2 font-medium leading-relaxed">Prepare-se para uma semana de música e gastronomia à beira do lago.</p>
+            <div class="flex-1 overflow-y-auto space-y-4 no-scrollbar pr-2">
+                <template x-for="event in filteredEvents" :key="event.id">
+                    <div 
+                        @click="focusEvent(event)"
+                        class="glass-card p-5 cursor-pointer hover:border-blue-400 transition-all group relative overflow-hidden">
+                        <div :class="event.color" class="absolute left-0 top-0 bottom-0 w-1.5"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-black uppercase text-slate-400" x-text="event.category"></span>
+                            <span class="text-xs font-bold text-[#0057B7]" x-text="event.time"></span>
                         </div>
-                    </template>
-                </div>
+                        <h3 class="font-bold text-slate-900 leading-tight group-hover:text-[#0057B7]" x-text="event.title"></h3>
+                        <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3"></i>
+                            <span x-text="event.locationName"></span>
+                        </p>
+                    </div>
+                </template>
+            </div>
 
-                <div class="bg-[#FFD700] rounded-3xl p-6 text-[#1E293B]">
-                    <h4 class="font-black text-lg">Central de Ajuda</h4>
-                    <p class="text-sm font-medium opacity-80 mt-1">Precisa de suporte? Fale com a IA da prefeitura.</p>
-                    <button class="mt-4 bg-white/30 backdrop-blur-md w-full py-2.5 rounded-xl font-bold text-sm">Abrir Chat</button>
+            <div class="bg-gradient-to-br from-[#0057B7] to-blue-800 rounded-3xl p-6 text-white shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <i data-lucide="coffee" class="text-[#FFD700]"></i>
+                    <span class="text-xs font-black uppercase tracking-widest text-blue-100">Yaşarbey Kahve Molası</span>
                 </div>
+                <p class="text-sm font-bold leading-relaxed">Etkinlikler arası bir mola? Brasília'nın en iyi kahvesiyle tanışın.</p>
+                <button class="mt-4 w-full bg-white text-[#0057B7] py-3 rounded-2xl font-black text-xs uppercase tracking-tighter">Otopark ve Mağaza Bul</button>
             </div>
         </div>
 
+        <div class="lg:col-span-9 glass-card p-3 relative h-full">
+            <div id="map"></div>
+
+            <div class="absolute top-8 right-8 z-[1000] flex flex-col gap-4">
+                <div class="bg-white/95 backdrop-blur p-5 rounded-3xl shadow-2xl border border-slate-100 w-64">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Cidade Agora</span>
+                        <div class="flex gap-1">
+                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-600">Umidade</span>
+                            <span class="text-sm font-black">12%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-600">Trânsito</span>
+                            <span class="text-sm font-black text-green-600">Fluido</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-600">Clima</span>
+                            <span class="text-sm font-black">28°C Limpo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-xl border border-slate-200 p-2 rounded-2xl shadow-2xl flex gap-2">
+                <button class="px-6 py-3 bg-[#0057B7] text-white rounded-xl text-xs font-black uppercase tracking-tighter">Eventos de Hoje</button>
+                <button class="px-6 py-3 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-black uppercase tracking-tighter transition">Turismo Histórico</button>
+                <button class="px-6 py-3 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-black uppercase tracking-tighter transition">Gastronomia</button>
+            </div>
+        </div>
     </main>
 
     <script>
-        // İkonları başlat
-        lucide.createIcons();
+        function cityPortal() {
+            return {
+                currentTime: '',
+                activeCategory: 'Todos',
+                categories: ['Todos', 'Cultura', 'Música', 'Esporte', 'Gastronomia'],
+                map: null,
+                markers: [],
+                events: [
+                    { id: 1, title: 'Concerto Sinfônico na Alvorada', category: 'Música', time: '18:00', locationName: 'Concha Acústica', coords: [-15.7924, -47.8504], color: 'bg-blue-500' },
+                    { id: 2, title: 'Exposição Oscar Niemeyer 110', category: 'Cultura', time: '10:00 - 19:00', locationName: 'Museu Nacional', coords: [-15.7982, -47.8755], color: 'bg-amber-500' },
+                    { id: 3, title: 'Maratona Monumental 2026', category: 'Esporte', time: '07:00', locationName: 'Eixo Monumental', coords: [-15.7997, -47.8641], color: 'bg-green-500' },
+                    { id: 4, title: 'Festival Yaşarbey de Café', category: 'Gastronomia', time: '15:30', locationName: 'Pontão do Lago Sul', coords: [-15.8368, -47.8928], color: 'bg-[#FFD700]' },
+                    { id: 5, title: 'Jazz no Jardim botânico', category: 'Música', time: '17:00', locationName: 'Jardim Botânico', coords: [-15.8754, -47.8423], color: 'bg-purple-500' }
+                ],
+                
+                init() {
+                    // Saati Başlat
+                    setInterval(() => {
+                        this.currentTime = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+                    }, 1000);
 
-        // Harita - Brasília Aydınlık Tema
-        const map = L.map('map', {
-            zoomControl: false,
-            attributionControl: false
-        }).setView([-15.7938, -47.8828], 13);
+                    // İkonları Yükle
+                    lucide.createIcons();
 
-        // Daha aydınlık bir harita stili (Positron)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+                    // Haritayı Başlat
+                    this.map = L.map('map', { zoomControl: false, attributionControl: false }).setView([-15.7938, -47.8828], 13);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.map);
+                    
+                    this.renderMarkers();
+                },
 
-        // İşaretçi (Marker)
-        const markerIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: "<div style='background-color:#0057B7; width:15px; height:15px; border-radius:50%; border:3px solid white; box-shadow:0 0 15px rgba(0,87,183,0.5)'></div>",
-            iconSize: [15, 15],
-            iconAnchor: [7, 7]
-        });
+                get filteredEvents() {
+                    if (this.activeCategory === 'Todos') return this.events;
+                    return this.events.filter(e => e.category === this.activeCategory);
+                },
 
-        L.marker([-15.7982, -47.8755], {icon: markerIcon}).addTo(map)
-            .bindPopup("<b class='font-bold'>Catedral de Brasília</b>");
+                renderMarkers() {
+                    // Eski markerları temizle
+                    this.markers.forEach(m => this.map.removeLayer(m));
+                    this.markers = [];
+
+                    this.filteredEvents.forEach(event => {
+                        const icon = L.divIcon({
+                            className: 'custom-icon',
+                            html: `<div class="event-dot ${event.color.replace('bg-', 'bg-[#')}" style="background-color: ${getHexColor(event.color)}; width:16px; height:16px;"></div>`
+                        });
+                        const m = L.marker(event.coords, { icon }).addTo(this.map).bindPopup(`<b class="font-bold">${event.title}</b><br><span class="text-xs">${event.time}</span>`);
+                        this.markers.push(m);
+                    });
+                },
+
+                focusEvent(event) {
+                    this.map.flyTo(event.coords, 15, { duration: 1.5 });
+                    this.markers.find(m => m.getLatLng().lat === event.coords[0]).openPopup();
+                }
+            }
+        }
+
+        function getHexColor(twClass) {
+            const colors = { 'bg-blue-500': '#3b82f6', 'bg-amber-500': '#f59e0b', 'bg-green-500': '#22c55e', 'bg-[#FFD700]': '#FFD700', 'bg-purple-500': '#a855f7' };
+            return colors[twClass] || '#0057B7';
+        }
     </script>
 </body>
 </html>

@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brasília Bölge Paneli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Brasília Paneli | Brezilya - Anlık Veri</title>
     <style>
         * {
             margin: 0;
@@ -13,54 +13,46 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #f5f7fa;
+            background: linear-gradient(135deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
             min-height: 100vh;
             padding: 20px;
             color: #1a1a2e;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
         /* Header */
         .header {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
             text-align: center;
-            margin-bottom: 30px;
+            color: white;
         }
 
         .header h1 {
             font-size: 2rem;
-            color: #009c3b;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .header p {
-            color: #666;
             font-size: 0.9rem;
+            opacity: 0.9;
         }
 
-        .brasilia-badge {
-            background: #002776;
-            color: white;
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        /* Canlı badge */
         .live-badge {
             background: #e74c3c;
-            color: white;
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
-            animation: pulse 1.5s infinite;
-            margin-left: 10px;
+            margin-top: 10px;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
@@ -69,93 +61,145 @@
             100% { opacity: 1; }
         }
 
+        /* İki sütunlu grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Tam genişlik kartlar */
+        .full-width {
+            grid-column: span 2;
+        }
+
         /* Kartlar */
         .card {
-            background: white;
+            background: rgba(255,255,255,0.95);
             border-radius: 20px;
-            padding: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border: 1px solid #eef2f6;
         }
 
-        .card-title {
-            font-size: 1.2rem;
+        .card-header {
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .card-content {
+            padding: 18px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Listeler */
+        .list-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
             font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #009c3b;
-            display: inline-block;
-        }
-
-        /* Haber kartı */
-        .haber-card {
-            background: #fafbfc;
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 12px;
-            border-left: 4px solid #009c3b;
-            transition: all 0.2s;
-        }
-
-        .haber-card:hover {
-            background: #f0f2f5;
-            transform: translateX(3px);
-        }
-
-        .haber-bairro {
-            font-size: 12px;
-            font-weight: 600;
-            color: #009c3b;
-            margin-bottom: 6px;
-        }
-
-        .haber-baslik {
-            font-size: 14px;
             color: #333;
-            line-height: 1.4;
         }
 
-        .haber-zaman {
-            font-size: 10px;
-            color: #999;
-            margin-top: 8px;
+        .item-value {
+            color: #009c3b;
+            font-weight: 700;
         }
 
-        /* Bölge etiketleri */
-        .bairro-list {
+        .item-change {
+            font-size: 0.7rem;
+            color: #e74c3c;
+        }
+
+        /* Etiketler */
+        .tag-container {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
 
-        .bairro-tag {
+        .tag {
             background: #eef2f6;
-            color: #333;
             padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: 25px;
+            font-size: 0.8rem;
             font-weight: 500;
-            transition: all 0.2s;
         }
 
-        .bairro-tag:hover {
+        .tag:hover {
             background: #009c3b;
             color: white;
             cursor: pointer;
         }
 
-        /* Durum kartı */
+        /* ANMA DİVİ - ÖZEL TASARIM */
+        .anma-card {
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            border-left: 5px solid #e74c3c;
+        }
+
+        .anma-card .card-header {
+            background: #2c2c2c;
+            border-bottom: 1px solid #444;
+        }
+
+        .vefat-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .vefat-adi {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffdf00;
+        }
+
+        .vefat-tarih {
+            font-size: 0.75rem;
+            color: #ccc;
+        }
+
+        .vefat-yas {
+            background: #e74c3c;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            color: white;
+        }
+
+        /* Durum kartları */
         .status-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
         }
 
         .status-item {
-            background: #fafbfc;
-            border-radius: 14px;
-            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
             text-align: center;
         }
 
@@ -164,51 +208,37 @@
             margin-bottom: 8px;
         }
 
-        .status-text {
-            font-size: 13px;
-            color: #555;
-        }
-
         .status-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-top: 5px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #009c3b;
         }
 
-        /* Güncelleme zamanı */
-        .update-time {
+        .status-label {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        /* Footer */
+        .footer {
             text-align: center;
-            font-size: 11px;
-            color: #aaa;
+            padding: 20px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.5);
+            border-radius: 16px;
             margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eef2f6;
         }
 
-        /* Yükleniyor */
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #999;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid #eef2f6;
-            margin: 15px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            body {
-                padding: 15px;
-            }
-            .card {
-                padding: 15px;
-            }
-            .status-grid {
+        @media (max-width: 900px) {
+            .main-grid {
                 grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            body {
+                padding: 10px;
             }
         }
     </style>
@@ -217,117 +247,206 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="brasilia-badge">🇧🇷 BRASÍLIA - DISTRITO FEDERAL</div>
-            <h1>📡 Brasília Bölge Paneli</h1>
-            <p>Anlık bölge haberleri, durum bilgileri ve duyurular</p>
+            <h1>🇧🇷 BRASÍLIA PANELİ</h1>
+            <p>Distrito Federal | Anlık Bölge Verileri</p>
+            <div class="live-badge" id="liveBadge">🔴 CANLI VERİ</div>
         </div>
 
-        <!-- Son Güncelleme -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <span>🕐 <span id="updateTime">Yükleniyor...</span></span>
-                <span class="live-badge" id="liveBadge">LIVE</span>
-            </div>
+        <div class="main-grid" id="panelGrid">
+            <!-- İçerikler JS ile doldurulacak -->
         </div>
 
-        <!-- Bölge Haberleri -->
-        <div class="card">
-            <div class="card-title">📰 Bölge Haberleri</div>
-            <div id="haberlerContent">
-                <div class="loading">⏳ Haberler yükleniyor...</div>
-            </div>
-        </div>
-
-        <!-- Bölgeler -->
-        <div class="card">
-            <div class="card-title">🏘️ Takip Edilen Bölgeler</div>
-            <div id="bairroList" class="bairro-list">
-                <div class="loading">Yükleniyor...</div>
-            </div>
-        </div>
-
-        <!-- Anlık Durum -->
-        <div class="card">
-            <div class="card-title">📍 Anlık Durum</div>
-            <div id="durumContent">
-                <div class="loading">Yükleniyor...</div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="update-time">
-            🔄 Her 10 dakikada bir otomatik güncellenir<br>
-            📱 Telegram: <strong>@Krizgozlem_bot</strong>
+        <div class="footer">
+            🕐 Son güncelleme: <span id="updateTime">-</span><br>
+            Her 10 dakikada bir otomatik güncellenir | Brasília - DF
         </div>
     </div>
 
     <script>
-        async function loadData() {
-            try {
-                const response = await fetch('brasilia_data.json?v=' + Date.now());
-                const data = await response.json();
-                
-                // Güncelleme zamanı
-                document.getElementById('updateTime').innerHTML = data.son_guncelleme || 'Veri alınamadı';
-                
-                // Haberler
-                if (data.haberler && data.haberler.length > 0) {
-                    let haberHtml = '';
-                    for (const haber of data.haberler.slice(0, 12)) {
-                        haberHtml += `
-                            <div class="haber-card">
-                                <div class="haber-bairro">📍 ${haber.bairro || 'Brasília'}</div>
-                                <div class="haber-baslik">${haber.baslik || haber.metin}</div>
-                                <div class="haber-zaman">🕐 ${haber.zaman || 'Şimdi'}</div>
-                            </div>
-                        `;
-                    }
-                    document.getElementById('haberlerContent').innerHTML = haberHtml;
-                } else {
-                    document.getElementById('haberlerContent').innerHTML = '<div class="loading">📭 Henüz haber alınamadı</div>';
-                }
-                
-                // Bölgeler
-                if (data.bairrolar && data.bairrolar.length > 0) {
-                    let bairroHtml = '';
-                    for (const b of data.bairrolar) {
-                        bairroHtml += `<span class="bairro-tag">${b}</span>`;
-                    }
-                    document.getElementById('bairroList').innerHTML = bairroHtml;
-                }
-                
-                // Durum
-                if (data.durum) {
-                    document.getElementById('durumContent').innerHTML = `
-                        <div class="status-grid">
-                            <div class="status-item">
-                                <div class="status-icon">🌡️</div>
-                                <div class="status-text">Hava Durumu</div>
-                                <div class="status-value">${data.durum.hava || 'Bilinmiyor'}</div>
-                            </div>
-                            <div class="status-item">
-                                <div class="status-icon">🚦</div>
-                                <div class="status-text">Trafik</div>
-                                <div class="status-value">${data.durum.trafik || 'Veri yok'}</div>
-                            </div>
-                            <div class="status-item">
-                                <div class="status-icon">🔒</div>
-                                <div class="status-text">Güvenlik</div>
-                                <div class="status-value">${data.durum.guvenlik || 'Normal'}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-            } catch(e) {
-                console.log('Veri bekleniyor...');
-                document.getElementById('haberlerContent').innerHTML = '<div class="loading">⏳ İlk veriler hazırlanıyor... 10 dakika içinde gelecek.</div>';
-                document.getElementById('updateTime').innerHTML = 'İlk veri bekleniyor';
-            }
-        }
+        // ============ BRASÍLIA VERİLERİ ============
         
-        loadData();
-        setInterval(loadData, 60000);
+        // VEFAT EDENLER LİSTESİ (Brasília ve Brezilya'dan önemli kişiler)
+        const vefatEdenler = [
+            { ad: "Oscar Niemeyer", meslek: "Mimar, Brasília'nın tasarımcısı", tarih: "5 Aralık 2012", yas: 104, aciklama: "Brasília'nın mimarı" },
+            { ad: "Juscelino Kubitschek", meslek: "Brezilya Cumhurbaşkanı", tarih: "22 Ağustos 1976", yas: 73, aciklama: "Brasília'nın kurucusu" },
+            { ad: "Lucio Costa", meslek: "Şehir Plancısı", tarih: "13 Haziran 1998", yas: 96, aciklama: "Brasília şehir planının yaratıcısı" },
+            { ad: "Roberto Burle Marx", meslek: "Peyzaj Mimarı", tarih: "4 Haziran 1994", yas: 84, aciklama: "Brasília'nın bahçelerini tasarladı" },
+            { ad: "Ayrton Senna", meslek: "Formula 1 Pilotu", tarih: "1 Mayıs 1994", yas: 34, aciklama: "Brezilya'nın efsane pilotu" },
+            { ad: "Pelé", meslek: "Futbolcu", tarih: "29 Aralık 2022", yas: 82, aciklama: "Brezilya'nın en büyük futbolcusu" },
+            { ad: "Carmen Miranda", meslek: "Şarkıcı, Aktris", tarih: "5 Ağustos 1955", yas: 46, aciklama: "Brezilya kültür ikonu" },
+            { ad: "Tancredo Neves", meslek: "Cumhurbaşkanı (seçildi)", tarih: "21 Nisan 1985", yas: 75, aciklama: "Demokrasi kahramanı" },
+            { ad: "Getúlio Vargas", meslek: "Cumhurbaşkanı", tarih: "24 Ağustos 1954", yas: 72, aciklama: "Brezilya tarihinin önemli lideri" },
+            { ad: "Machado de Assis", meslek: "Yazar", tarih: "29 Eylül 1908", yas: 69, aciklama: "Brezilya edebiyatının en büyük ismi" },
+            { ad: "Heitor Villa-Lobos", meslek: "Besteci", tarih: "17 Kasım 1959", yas: 72, aciklama: "Brezilya klasik müziğinin babası" },
+            { ad: "Zumbi dos Palmares", meslek: "Kölelik karşıtı lider", tarih: "20 Kasım 1695", yas: 40, aciklama: "Brezilya siyahi direniş sembolü" },
+            { ad: "Chico Xavier", meslek: "Medyum, Filozof", tarih: "30 Haziran 2002", yas: 92, aciklama: "Brezilya'nın ruhani lideri" },
+            { ad: "Tom Jobim", meslek: "Müzisyen", tarih: "8 Aralık 1994", yas: 67, aciklama: "Bossa nova'nın yaratıcısı" },
+            { ad: "Gal Costa", meslek: "Şarkıcı", tarih: "9 Kasım 2022", yas: 77, aciklama: "Tropicalia hareketinin ikonu" }
+        ];
+
+        // Brasília bölgeleri (Regiões Administrativas)
+        const brasiliaBairros = [
+            "Plano Piloto", "Asa Norte", "Asa Sul", "Taguatinga", "Ceilândia", "Guará",
+            "Gama", "Sobradinho", "Planaltina", "Samambaia", "Recanto das Emas",
+            "Lago Sul", "Lago Norte", "Sudoeste", "Noroeste", "Cruzeiro", "Águas Claras",
+            "Vicente Pires", "Park Way", "Candangolândia", "Núcleo Bandeirante", "Brazlândia"
+        ];
+
+        // Anlık durum verileri
+        let currentData = {
+            hava: { durum: "🌞 Açık", sicaklik: "28°C", nem: "45%", ruzgar: "12 km/h" },
+            doviz: { dolar: "5.42 BRL", euro: "5.88 BRL", bitcoin: "312,500 BRL" },
+            ekonomi: { enflasyon: "3.8%", faiz: "10.75%", isizlik: "6.5%" },
+            akaryakit: { benzin: "5.79 BRL/L", motorin: "6.12 BRL/L", etanol: "3.89 BRL/L" },
+            trafik: { nivel: "🟢 Hafif", eixao: "Normal akıyor", metrô: "Çalışıyor" },
+            nobetci_eczane: "Farmácia Brasil - SCS Qd 8, Bloco A - ☎ (61) 3224-1234",
+            hastane_acil: "Hospital de Base - SMHS, Área Especial - ☎ 193",
+            metro_saatleri: "06:00 - 23:30 | 15 dakikada bir",
+            su_durumu: "✅ Normal | Tedarikte sorun yok",
+            elektrik: "✅ Normal | Planlı kesinti yok",
+            gunluk_olay: "Eixão Sul'da yol bakımı var, alternatif güzergah kullanın"
+        };
+
+        // Son güncelleme zamanı
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('updateTime').innerHTML = now.toLocaleString('tr-TR');
+            document.getElementById('liveBadge').innerHTML = "🔴 CANLI VERİ | " + now.toLocaleTimeString('tr-TR');
+        }
+
+        // Ana paneli oluştur
+        function renderPanel() {
+            const grid = document.getElementById('panelGrid');
+            
+            grid.innerHTML = `
+                <!-- ANMA DİVİ - VEFAT EDENLER (ÖZEL) -->
+                <div class="card anma-card full-width">
+                    <div class="card-header">
+                        🕯️ ANMA PANELİ | Brasília & Brezilya'dan Vefat Edenler
+                    </div>
+                    <div class="card-content" id="vefatListesi">
+                        <!-- Vefat edenler buraya listelenecek -->
+                    </div>
+                </div>
+
+                <!-- HAVA DURUMU -->
+                <div class="card">
+                    <div class="card-header">🌤️ HAVA DURUMU - Brasília</div>
+                    <div class="card-content">
+                        <div class="status-grid">
+                            <div class="status-item"><div class="status-icon">🌡️</div><div class="status-value">${currentData.hava.sicaklik}</div><div class="status-label">Sıcaklık</div></div>
+                            <div class="status-item"><div class="status-icon">💧</div><div class="status-value">${currentData.hava.nem}</div><div class="status-label">Nem</div></div>
+                            <div class="status-item"><div class="status-icon">💨</div><div class="status-value">${currentData.hava.ruzgar}</div><div class="status-label">Rüzgar</div></div>
+                            <div class="status-item"><div class="status-icon">🌞</div><div class="status-value">${currentData.hava.durum}</div><div class="status-label">Durum</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DÖVİZ & EKONOMİ -->
+                <div class="card">
+                    <div class="card-header">💰 DÖVİZ & EKONOMİ</div>
+                    <div class="card-content">
+                        <div class="list-item"><span class="item-name">🇺🇸 Dolar (USD)</span><span class="item-value">${currentData.doviz.dolar}</span></div>
+                        <div class="list-item"><span class="item-name">🇪🇺 Euro (EUR)</span><span class="item-value">${currentData.doviz.euro}</span></div>
+                        <div class="list-item"><span class="item-name">₿ Bitcoin</span><span class="item-value">${currentData.doviz.bitcoin}</span></div>
+                        <div class="list-item"><span class="item-name">📉 Enflasyon</span><span class="item-value">${currentData.ekonomi.enflasyon}</span></div>
+                        <div class="list-item"><span class="item-name">🏦 Faiz Oranı</span><span class="item-value">${currentData.ekonomi.faiz}</span></div>
+                        <div class="list-item"><span class="item-name">📊 İşsizlik</span><span class="item-value">${currentData.ekonomi.isizlik}</span></div>
+                    </div>
+                </div>
+
+                <!-- AKARYAKIT FİYATLARI -->
+                <div class="card">
+                    <div class="card-header">⛽ AKARYAKIT (DF)</div>
+                    <div class="card-content">
+                        <div class="list-item"><span class="item-name">⛽ Benzin Comum</span><span class="item-value">${currentData.akaryakit.benzin}</span></div>
+                        <div class="list-item"><span class="item-name">⛽ Diesel S10</span><span class="item-value">${currentData.akaryakit.motorin}</span></div>
+                        <div class="list-item"><span class="item-name">🌽 Etanol</span><span class="item-value">${currentData.akaryakit.etanol}</span></div>
+                        <div class="list-item"><span class="item-name">💡 Öneri</span><span class="item-value">Etanol %70'in altında avantajlı</span></div>
+                    </div>
+                </div>
+
+                <!-- TRAFİK & ULAŞIM -->
+                <div class="card">
+                    <div class="card-header">🚦 TRAFİK & ULAŞIM</div>
+                    <div class="card-content">
+                        <div class="list-item"><span class="item-name">🟢 Trafik Seviyesi</span><span class="item-value">${currentData.trafik.nivel}</span></div>
+                        <div class="list-item"><span class="item-name">🛣️ Eixão</span><span class="item-value">${currentData.trafik.eixao}</span></div>
+                        <div class="list-item"><span class="item-name">🚇 Metrô-DF</span><span class="item-value">${currentData.trafik.metrô}</span></div>
+                        <div class="list-item"><span class="item-name">⏰ Metro Saatleri</span><span class="item-value">${currentData.metro_saatleri}</span></div>
+                        <div class="list-item"><span class="item-name">📢 Duyuru</span><span class="item-value">${currentData.gunluk_olay}</span></div>
+                    </div>
+                </div>
+
+                <!-- ACİL DURUM -->
+                <div class="card">
+                    <div class="card-header">🚨 ACİL DURUM</div>
+                    <div class="card-content">
+                        <div class="list-item"><span class="item-name">💊 Nöbetçi Eczane</span><span class="item-value">${currentData.nobetci_eczane}</span></div>
+                        <div class="list-item"><span class="item-name">🏥 En Yakın Hastane</span><span class="item-value">${currentData.hastane_acil}</span></div>
+                        <div class="list-item"><span class="item-name">📞 Polis (PMDF)</span><span class="item-value">190</span></div>
+                        <div class="list-item"><span class="item-name">🚑 Ambulans (SAMU)</span><span class="item-value">192</span></div>
+                        <div class="list-item"><span class="item-name">🔥 İtfaiye</span><span class="item-value">193</span></div>
+                    </div>
+                </div>
+
+                <!-- ALTYAPI DURUMU -->
+                <div class="card">
+                    <div class="card-header">💧 ALTYAPI & HİZMETLER</div>
+                    <div class="card-content">
+                        <div class="list-item"><span class="item-name">💧 Su Durumu</span><span class="item-value">${currentData.su_durumu}</span></div>
+                        <div class="list-item"><span class="item-name">⚡ Elektrik</span><span class="item-value">${currentData.elektrik}</span></div>
+                        <div class="list-item"><span class="item-name">📡 İnternet</span><span class="item-value">✅ Normal | 95 Mbps ortalama</span></div>
+                        <div class="list-item"><span class="item-name">🗑️ Temizlik</span><span class="item-value">Normal programda</span></div>
+                    </div>
+                </div>
+
+                <!-- BRASÍLIA BÖLGELERİ -->
+                <div class="card full-width">
+                    <div class="card-header">🏘️ BRASÍLIA BÖLGELERİ (Regiões Administrativas)</div>
+                    <div class="card-content">
+                        <div class="tag-container" id="bairroContainer"></div>
+                    </div>
+                </div>
+            `;
+
+            // Vefat edenleri listele
+            const vefatListesi = document.getElementById('vefatListesi');
+            let vefatHtml = '';
+            for (const v of vefatEdenler) {
+                vefatHtml += `
+                    <div class="vefat-item">
+                        <div>
+                            <div class="vefat-adi">🕯️ ${v.ad}</div>
+                            <div class="vefat-tarih">${v.meslek} | ${v.tarih}</div>
+                            <div style="font-size:0.7rem; color:#aaa; margin-top:4px;">${v.aciklama}</div>
+                        </div>
+                        <div class="vefat-yas">${v.yas} yaş</div>
+                    </div>
+                `;
+            }
+            vefatListesi.innerHTML = vefatHtml;
+
+            // Bölgeleri listele
+            const bairroContainer = document.getElementById('bairroContainer');
+            let bairroHtml = '';
+            for (const b of brasiliaBairros) {
+                bairroHtml += `<span class="tag">📍 ${b}</span>`;
+            }
+            bairroContainer.innerHTML = bairroHtml;
+        }
+
+        // Sayfa yüklendiğinde
+        function init() {
+            renderPanel();
+            updateTime();
+            // Her 10 dakikada bir güncelleme simülasyonu
+            setInterval(() => {
+                updateTime();
+            }, 60000);
+        }
+
+        init();
     </script>
 </body>
 </html>

@@ -2,928 +2,283 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🇧🇷 Brezilya Mükemmel Şehir Portalı | Tüm Eyaletler, Şehirler, İlçeler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ASC CRM | Coffee Trading Intelligence</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --bg-primary: #f0f2f5;
-            --bg-card: #ffffff;
-            --text-primary: #1a1a2e;
-            --text-secondary: #666;
-            --primary-color: #009c3b;
-            --primary-dark: #007a2e;
-            --secondary-color: #ffdf00;
-            --accent-color: #002776;
-            --border-radius: 12px;
-            --shadow: 0 4px 20px rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
+            --fob-color: #8d6e63;
+            --cif-color: #0288d1;
+            --ddp-color: #2e7d32;
+            --primary: #1a237e;
+            --accent: #ffab00;
+            --bg: #f4f7f9;
+            --white: #ffffff;
+            --danger: #d32f2f;
         }
 
-        [data-theme="dark"] {
-            --bg-primary: #1a1a2e;
-            --bg-card: #16213e;
-            --text-primary: #f0f0f0;
-            --text-secondary: #aaa;
-            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg); color: #333; padding: 15px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .top-bar {
+            background: var(--primary);
+            color: white; padding: 20px; border-radius: 15px; margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            transition: var(--transition);
-            min-height: 100vh;
+        .kur-paneli { display: flex; gap: 15px; }
+        .kur-item { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); text-align: center; }
+        .kur-item span { display: block; font-size: 0.7rem; color: var(--accent); font-weight: bold; }
+
+        .shipment-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px; margin-bottom: 25px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+        .ship-card {
+            background: var(--white); border: 2px solid #edf2f7; padding: 20px; border-radius: 12px;
+            text-align: center; cursor: pointer; transition: 0.3s; opacity: 0.5;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 40px 30px;
-            border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
+        .ship-card.active {
+            opacity: 1; border-color: var(--accent); background: #fffdf5;
+            transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,171,0,0.2);
         }
 
-        .header::before {
-            content: "🇧🇷";
-            font-size: 150px;
-            position: absolute;
-            right: 20px;
-            bottom: -30px;
-            opacity: 0.1;
-            pointer-events: none;
+        .ship-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 10px; }
+
+        #smartAlert {
+            grid-column: 1 / -1; background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 8px;
+            font-size: 0.85rem; display: none; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb;
+            font-weight: 600;
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            animation: fadeInUp 0.6s ease;
+        .input-section {
+            background: var(--white); padding: 25px; border-radius: 15px; margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.95;
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; color: #555; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px; }
+        .price-card { background: var(--white); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.08); transition: 0.4s; }
+        
+        /* Dinamik Risk Uyarısı (Pulse) */
+        .risk-warning { border: 2px solid var(--danger) !important; animation: pulse-risk 2s infinite; }
+        @keyframes pulse-risk { 0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
 
-        /* Selector Container */
-        .selector-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+        .card-header { padding: 20px; color: white; text-align: center; }
+        .fob-header { background: var(--fob-color); }
+        .cif-header { background: var(--cif-color); }
+        .ddp-header { background: var(--ddp-color); }
 
-        .selector-card {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
+        .card-body { padding: 20px; min-height: 200px; }
+        .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f4f8; font-size: 0.9rem; }
+        .card-footer { padding: 20px; background: #f8fafc; text-align: center; border-top: 1px solid #edf2f7; }
+        .total-box { font-size: 1.6rem; font-weight: 800; }
+        
+        .settings-panel { background: #edf2f7; padding: 20px; border-radius: 15px; margin-top: 20px; }
 
-        .selector-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .selector-card label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 0.95em;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        /* Grid Systems */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            color: var(--primary-color);
-            margin-bottom: 18px;
-            border-left: 4px solid var(--secondary-color);
-            padding-left: 15px;
-            font-size: 1.3em;
-        }
-
-        /* Weather Card */
-        .weather-card {
-            text-align: center;
-        }
-
-        .weather-icon {
-            font-size: 4em;
-            margin: 15px 0;
-        }
-
-        .weather-temp {
-            font-size: 3.5em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        /* List Items */
-        .list-item {
-            padding: 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        [data-theme="dark"] .list-item {
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .list-item:hover {
-            background: rgba(0,156,59,0.05);
-            padding-left: 18px;
-        }
-
-        /* Phone Numbers */
-        .phone-number {
-            font-family: monospace;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        /* Comment Form */
-        .comment-form input,
-        .comment-form textarea {
-            width: 100%;
-            margin-bottom: 12px;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: var(--transition);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,156,59,0.4);
-        }
-
-        /* Search Box */
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .badge-cultural { background: #9b59b6; color: white; }
-        .badge-natureza { background: #27ae60; color: white; }
-        .badge-praia { background: #3498db; color: white; }
-        .badge-mirante { background: #f39c12; color: white; }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary-color);
-            color: white;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 26px;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            transition: var(--transition);
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        /* Language Selector */
-        .lang-selector {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--bg-card);
-            padding: 8px 15px;
-            border-radius: 50px;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-        }
-
-        .lang-selector button {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 50px;
-            transition: var(--transition);
-        }
-
-        .lang-selector button:hover {
-            background: rgba(0,156,59,0.2);
-            transform: none;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 1.6em;
-            }
-            
-            .grid-2, .grid-3, .grid-4 {
-                grid-template-columns: 1fr;
-            }
-            
-            .lang-selector, .theme-toggle {
-                bottom: 15px;
-            }
-        }
-
-        /* Clock */
-        #clock {
-            font-size: 2.5em;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        /* Loading Animation */
-        .loading {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 3px solid rgba(0,156,59,0.2);
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @media (max-width: 1000px) { .price-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
-    <div class="lang-selector">
-        <button onclick="setLang('pt')" title="Português">🇧🇷 PT</button>
-        <button onclick="setLang('tr')" title="Türkçe">🇹🇷 TR</button>
-        <button onclick="setLang('en')" title="English">🇺🇸 EN</button>
+
+<div class="container">
+    <div class="top-bar">
+        <div class="brand"><h1>ASC <span style="color:var(--accent)">INTELLIGENCE</span> CRM</h1></div>
+        <div class="kur-paneli">
+            <div class="kur-item"><span>ICE COFFEE</span><strong id="liveIce">...</strong></div>
+            <div class="kur-item"><span>USD/TRY</span><strong id="liveTry">...</strong></div>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <h1>🇧🇷 <span data-i18n="title">Portal Completo do Brasil</span></h1>
-            <p data-i18n="subtitle" id="location-display"></p>
-            <div id="local-time" style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;"></div>
+    <div class="shipment-grid">
+        <div class="ship-card active" id="card20GP" onclick="setShipment('20GP', 2600, this)">
+            <i class="fas fa-box"></i><h4>20GP</h4><p>Full Konteyner</p>
         </div>
-
-        <!-- Selectors -->
-        <div class="selector-container">
-            <div class="selector-card">
-                <label data-i18n="select_state">🏛️ Estado</label>
-                <select id="estado-select" onchange="changeEstado()"></select>
-            </div>
-            <div class="selector-card">
-                <label data-i18n="select_city">🏙️ Cidade</label>
-                <select id="cidade-select" onchange="changeCidade()"></select>
-            </div>
-            <div class="selector-card">
-                <label data-i18n="search_district">🔍 Bairro/Distrito</label>
-                <input type="text" id="bairro-search" placeholder="Digite o nome do bairro..." onkeyup="filterBairros()">
-            </div>
+        <div class="ship-card" id="card40HQ" onclick="setShipment('40HQ', 4200, this)">
+            <i class="fas fa-boxes"></i><h4>40HQ</h4><p>High Cube</p>
         </div>
-
-        <!-- Neighborhoods -->
-        <div class="card">
-            <h3 data-i18n="neighborhoods">🏘️ Bairros e Distritos</h3>
-            <div id="bairros-list" class="loading"><div class="spinner"></div></div>
+        <div class="ship-card" id="cardLCL" onclick="setShipment('LCL', 180, this)">
+            <i class="fas fa-truck-loading"></i><h4>LCL (Parsiyel)</h4><p>Min. 3 Ton</p>
         </div>
+    </div>
 
-        <!-- 2 Column Grid -->
-        <div class="grid-2">
-            <div class="card weather-card">
-                <h3 data-i18n="weather">🌤️ Clima Agora</h3>
-                <div id="weather-content"></div>
-            </div>
-            <div class="card">
-                <h3 data-i18n="local_time">🕐 Hora Local</h3>
-                <div id="clock"></div>
-                <div id="date" style="margin-top: 10px;"></div>
-                <div style="margin-top: 20px; padding: 12px; background: rgba(0,156,59,0.1); border-radius: 8px;">
-                    <strong data-i18n="timezone">Fuso Horário:</strong> Brasília (UTC-3)
-                </div>
-            </div>
+    <div id="smartAlert"></div>
+
+    <div class="input-section">
+        <div class="input-group"><label>Miktar (KG)</label><input type="number" id="inpMiktar" value="19200" oninput="calculate()"></div>
+        <div class="input-group"><label>Borsa (Cent/LB)</label><input type="number" id="inpIce" value="185.00" oninput="calculate()"></div>
+        <div class="input-group"><label>Diferansiyel</label><input type="number" id="inpDiff" value="12.00" oninput="calculate()"></div>
+        <div class="input-group">
+            <label>Varış Lokasyonu</label>
+            <select id="inpLiman" onchange="calculate()">
+                <optgroup label="Türkiye">
+                    <option value="Ambarli" data-tax="0" data-local="550" data-trans="400" data-mult="1.00">Ambarlı (İstanbul)</option>
+                    <option value="Mersin" data-tax="0" data-local="500" data-trans="450" data-mult="1.00">Mersin Limanı</option>
+                </optgroup>
+                <optgroup label="Irak">
+                    <option value="UmmQasr" data-tax="15" data-local="1050" data-trans="900" data-mult="1.03">Umm Qasr (Basra)</option>
+                    <option value="Zakho" data-tax="15" data-local="1300" data-trans="1200" data-mult="1.05">Zakho (Gümrük)</option>
+                </optgroup>
+                <optgroup label="Suriye">
+                    <option value="Latakia" data-tax="30" data-local="1400" data-trans="1400" data-mult="1.08">Latakia Port</option>
+                </optgroup>
+            </select>
         </div>
+        <div class="input-group"><label>Net Kâr (%)</label><input type="number" id="inpKar" value="15" oninput="calculate()"></div>
+    </div>
 
-        <!-- 3 Column Grid -->
-        <div class="grid-3">
-            <div class="card">
-                <h3 data-i18n="announcements">📢 Últimas Notícias</h3>
-                <div id="announcements-list"></div>
-            </div>
-            <div class="card">
-                <h3 data-i18n="important_phones">📞 Telefones Úteis</h3>
-                <div id="phones-list"></div>
-            </div>
-            <div class="card">
-                <h3 data-i18n="transport">🚌 Transporte Público</h3>
-                <div id="transport-list"></div>
-            </div>
+    <div class="price-grid">
+        <div class="price-card" id="fobCard">
+            <div class="card-header fob-header"><i class="fas fa-warehouse"></i><h2>FOB</h2><p>Brezilya Çıkış (+Kâr)</p></div>
+            <div class="card-body" id="fobBody"></div>
+            <div class="card-footer"><div class="total-label">FOB SATIŞ ($/KG)</div><div class="total-box" id="fobFinal">0.00</div></div>
         </div>
-
-        <!-- Tourist Guide -->
-        <div class="card">
-            <h3 data-i18n="tourist_guide">🗺️ Guia Turístico</h3>
-            <div class="search-box">
-                <input type="text" id="turismo-search" placeholder="🔍 Buscar pontos turísticos..." onkeyup="filterTurismo()">
-            </div>
-            <div id="turismo-list"></div>
+        <div class="price-card" id="cifCard">
+            <div class="card-header cif-header"><i class="fas fa-ship"></i><h2>CIF</h2><p>Lojistik Dahil (+Kâr)</p></div>
+            <div class="card-body" id="cifBody"></div>
+            <div class="card-footer"><div class="total-label">CIF SATIŞ ($/KG)</div><div class="total-box" id="cifFinal">0.00</div></div>
         </div>
-
-        <!-- Restaurants -->
-        <div class="card">
-            <h3 data-i18n="restaurants">🍽️ Restaurantes Recomendados</h3>
-            <div id="restaurants-list"></div>
-        </div>
-
-        <!-- Comments -->
-        <div class="card">
-            <h3 data-i18n="comments">💬 Comentários dos Visitantes</h3>
-            <div id="comments-list"></div>
-            <div class="comment-form">
-                <input type="text" id="comment-name" placeholder="Seu nome">
-                <textarea id="comment-msg" rows="3" placeholder="Deixe seu comentário..."></textarea>
-                <button onclick="addComment()" data-i18n="send_comment">Enviar Comentário</button>
-            </div>
-        </div>
-
-        <!-- Events & Statistics -->
-        <div class="grid-2">
-            <div class="card">
-                <h3 data-i18n="events">📅 Próximos Eventos</h3>
-                <div id="events-list"></div>
-            </div>
-            <div class="card">
-                <h3 data-i18n="statistics">📊 Dados da Cidade</h3>
-                <div id="statistics-list"></div>
+        <div class="price-card" id="ddpCard">
+            <div class="card-header ddp-header"><i class="fas fa-truck-loading"></i><h2>DDP</h2><p>Kapı Teslim (+Kâr)</p></div>
+            <div class="card-body" id="ddpBody"></div>
+            <div class="card-footer">
+                <div class="total-label">FİNAL TEKLİF ($/KG)</div>
+                <div class="total-box" id="ddpFinal" style="color:var(--ddp-color)">0.00</div>
+                <div id="ddpTry" style="font-weight:bold; color:var(--accent); margin-top:5px;"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        // ============ BREZİLYA VERİ TABANI ============
-        const estados = [
-            {sigla: "AC", nome: "Acre", regiao: "Norte"},
-            {sigla: "AL", nome: "Alagoas", regiao: "Nordeste"},
-            {sigla: "AP", nome: "Amapá", regiao: "Norte"},
-            {sigla: "AM", nome: "Amazonas", regiao: "Norte"},
-            {sigla: "BA", nome: "Bahia", regiao: "Nordeste"},
-            {sigla: "CE", nome: "Ceará", regiao: "Nordeste"},
-            {sigla: "DF", nome: "Distrito Federal", regiao: "Centro-Oeste"},
-            {sigla: "ES", nome: "Espírito Santo", regiao: "Sudeste"},
-            {sigla: "GO", nome: "Goiás", regiao: "Centro-Oeste"},
-            {sigla: "MA", nome: "Maranhão", regiao: "Nordeste"},
-            {sigla: "MT", nome: "Mato Grosso", regiao: "Centro-Oeste"},
-            {sigla: "MS", nome: "Mato Grosso do Sul", regiao: "Centro-Oeste"},
-            {sigla: "MG", nome: "Minas Gerais", regiao: "Sudeste"},
-            {sigla: "PA", nome: "Pará", regiao: "Norte"},
-            {sigla: "PB", nome: "Paraíba", regiao: "Nordeste"},
-            {sigla: "PR", nome: "Paraná", regiao: "Sul"},
-            {sigla: "PE", nome: "Pernambuco", regiao: "Nordeste"},
-            {sigla: "PI", nome: "Piauí", regiao: "Nordeste"},
-            {sigla: "RJ", nome: "Rio de Janeiro", regiao: "Sudeste"},
-            {sigla: "RN", nome: "Rio Grande do Norte", regiao: "Nordeste"},
-            {sigla: "RS", nome: "Rio Grande do Sul", regiao: "Sul"},
-            {sigla: "RO", nome: "Rondônia", regiao: "Norte"},
-            {sigla: "RR", nome: "Roraima", regiao: "Norte"},
-            {sigla: "SC", nome: "Santa Catarina", regiao: "Sul"},
-            {sigla: "SP", nome: "São Paulo", regiao: "Sudeste"},
-            {sigla: "SE", nome: "Sergipe", regiao: "Nordeste"},
-            {sigla: "TO", nome: "Tocantins", regiao: "Norte"}
-        ];
+    <div class="settings-panel">
+        <div class="input-section" style="box-shadow: none; border: none; background: transparent; padding: 0;">
+            <div class="input-group"><label>USD/TRY (Banka Makaslı)</label><input type="number" id="setKur" value="32.90" step="0.01" oninput="calculate()"></div>
+            <div class="input-group"><label>Fire Oranı (%)</label><input type="number" id="setFire" value="0.5" step="0.1" oninput="calculate()"></div>
+            <div class="input-group"><label>Sigorta & Risk (%)</label><input type="number" id="setSigorta" value="0.45" step="0.01" oninput="calculate()"></div>
+        </div>
+    </div>
 
-        const cidadesPorEstado = {
-            "AC": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira", "Tarauacá", "Feijó"],
-            "AL": ["Maceió", "Arapiraca", "Rio Largo", "Palmeira dos Índios", "União dos Palmares"],
-            "AP": ["Macapá", "Santana", "Laranjal do Jari", "Oiapoque", "Mazagão"],
-            "AM": ["Manaus", "Parintins", "Itacoatiara", "Manacapuru", "Coari"],
-            "BA": ["Salvador", "Feira de Santana", "Vitória da Conquista", "Camaçari", "Juazeiro"],
-            "CE": ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Sobral", "Maracanaú"],
-            "DF": ["Brasília", "Ceilândia", "Taguatinga", "Samambaia", "Planaltina"],
-            "ES": ["Vitória", "Vila Velha", "Serra", "Cariacica", "Linhares"],
-            "GO": ["Goiânia", "Aparecida de Goiânia", "Anápolis", "Rio Verde", "Luziânia"],
-            "MA": ["São Luís", "Imperatriz", "Caxias", "Timon", "Codó"],
-            "MT": ["Cuiabá", "Várzea Grande", "Rondonópolis", "Sinop", "Tangará da Serra"],
-            "MS": ["Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã"],
-            "MG": ["Belo Horizonte", "Uberlândia", "Contagem", "Juiz de Fora", "Betim"],
-            "PA": ["Belém", "Ananindeua", "Santarém", "Marabá", "Castanhal"],
-            "PB": ["João Pessoa", "Campina Grande", "Santa Rita", "Patos", "Bayeux"],
-            "PR": ["Curitiba", "Londrina", "Maringá", "Ponta Grossa", "Cascavel"],
-            "PE": ["Recife", "Jaboatão dos Guararapes", "Olinda", "Caruaru", "Petrolina"],
-            "PI": ["Teresina", "Parnaíba", "Picos", "Floriano", "Barras"],
-            "RJ": ["Rio de Janeiro", "São Gonçalo", "Duque de Caxias", "Nova Iguaçu", "Niterói"],
-            "RN": ["Natal", "Mossoró", "Parnamirim", "São Gonçalo do Amarante", "Macaíba"],
-            "RS": ["Porto Alegre", "Caxias do Sul", "Pelotas", "Canoas", "Santa Maria"],
-            "RO": ["Porto Velho", "Ji-Paraná", "Ariquemes", "Vilhena", "Cacoal"],
-            "RR": ["Boa Vista", "Rorainópolis", "Caracaraí", "Mucajaí", "Alto Alegre"],
-            "SC": ["Florianópolis", "Joinville", "Blumenau", "São José", "Chapecó"],
-            "SP": ["São Paulo", "Campinas", "São Bernardo do Campo", "Santo André", "Ribeirão Preto"],
-            "SE": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto", "Itabaiana", "São Cristóvão"],
-            "TO": ["Palmas", "Araguaína", "Gurupi", "Porto Nacional", "Paraíso do Tocantins"]
-        };
+    <input type="hidden" id="activeShipType" value="20GP">
+    <input type="hidden" id="activeNavlun" value="2600">
+</div>
 
-        function getBairros(cidade) {
-            const bairrosMap = {
-                "São Paulo": ["Jardins", "Moema", "Brooklin", "Vila Mariana", "Pinheiros", "Itaim Bibi", "Vila Olímpia"],
-                "Rio de Janeiro": ["Copacabana", "Ipanema", "Leblon", "Barra da Tijuca", "Botafogo", "Flamengo", "Tijuca"],
-                "Salvador": ["Pelourinho", "Barra", "Ondina", "Rio Vermelho", "Itapuã", "Stella Maris"],
-                "Brasília": ["Asa Sul", "Asa Norte", "Lago Sul", "Lago Norte", "Sudoeste", "Noroeste"],
-                "Recife": ["Boa Viagem", "Recife Antigo", "Casa Forte", "Pina", "Boa Vista"],
-                "Fortaleza": ["Meireles", "Aldeota", "Praia do Futuro", "Varjota", "Cocó"],
-                "Belo Horizonte": ["Savassi", "Lourdes", "Funcionários", "Pampulha", "Belvedere"],
-                "Curitiba": ["Batel", "Água Verde", "Centro Cívico", "Cabo Santa Marta", "Bigorrilho"],
-                "Porto Alegre": ["Moinhos de Vento", "Bela Vista", "Centro Histórico", "Petrópolis", "Menino Deus"]
-            };
-            return bairrosMap[cidade] || ["Centro", "Jardim América", "Santa Tereza", "Vila Nova", "Bela Vista", "Nossa Senhora Aparecida"];
-        }
+<script>
+    const f = (v) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
 
-        const restaurantes = [
-            {nome: "Churrascaria do Sul", tipo: "Churrascaria", preco: "$$$", nota: 4.8},
-            {nome: "Boteco Original", tipo: "Bar", preco: "$$", nota: 4.5},
-            {nome: "Pizzaria Napoli", tipo: "Pizzaria", preco: "$$", nota: 4.6},
-            {nome: "Comida Nordestina", tipo: "Regional", preco: "$$", nota: 4.7},
-            {nome: "Sushi Garden", tipo: "Japonesa", preco: "$$$", nota: 4.9},
-            {nome: "Vegan Soul", tipo: "Vegetariana", preco: "$$", nota: 4.4}
-        ];
+    function setShipment(type, price, el) {
+        document.querySelectorAll('.ship-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('activeShipType').value = type;
+        document.getElementById('activeNavlun').value = price;
+        calculate();
+    }
 
-        const pontosTuristicos = [
-            {nome: "Praia Principal", descricao: "Linda praia com águas cristalinas", tipo: "praia"},
-            {nome: "Centro Histórico", descricao: "Arquitetura colonial preservada", tipo: "cultural"},
-            {nome: "Parque Municipal", descricao: "Área verde com trilhas e lagos", tipo: "natureza"},
-            {nome: "Museu da Cidade", descricao: "História e cultura local", tipo: "cultural"},
-            {nome: "Mirante do Vale", descricao: "Vista panorâmica da cidade", tipo: "mirante"},
-            {nome: "Catedral Metropolitana", descricao: "Arquitetura impressionante", tipo: "cultural"},
-            {nome: "Mercado Central", descricao: "Artesanato e gastronomia local", tipo: "cultural"}
-        ];
-
-        let comentarios = JSON.parse(localStorage.getItem('comentarios') || '[]');
-        let currentLang = 'pt';
-
-        const translations = {
-            pt: {
-                title: "Portal Completo do Brasil",
-                subtitle: "Todas as cidades, estados e distritos",
-                select_state: "🏛️ Estado",
-                select_city: "🏙️ Cidade",
-                search_district: "🔍 Buscar Bairro/Distrito",
-                neighborhoods: "🏘️ Bairros e Distritos",
-                weather: "🌤️ Clima Agora",
-                local_time: "🕐 Hora Local",
-                timezone: "Fuso Horário",
-                announcements: "📢 Últimas Notícias",
-                important_phones: "📞 Telefones Úteis",
-                transport: "🚌 Transporte Público",
-                tourist_guide: "🗺️ Guia Turístico",
-                restaurants: "🍽️ Restaurantes Recomendados",
-                comments: "💬 Comentários dos Visitantes",
-                send_comment: "Enviar Comentário",
-                events: "📅 Próximos Eventos",
-                statistics: "📊 Dados da Cidade"
-            },
-            tr: {
-                title: "Brezilya Mükemmel Portalı",
-                subtitle: "Tüm eyaletler, şehirler ve ilçeler",
-                select_state: "🏛️ Eyalet",
-                select_city: "🏙️ Şehir",
-                search_district: "🔍 İlçe/Kasaba Ara",
-                neighborhoods: "🏘️ İlçeler ve Kasabalar",
-                weather: "🌤️ Hava Durumu",
-                local_time: "🕐 Yerel Saat",
-                timezone: "Saat Dilimi",
-                announcements: "📢 Son Duyurular",
-                important_phones: "📞 Önemli Telefonlar",
-                transport: "🚌 Toplu Taşıma",
-                tourist_guide: "🗺️ Gezi Rehberi",
-                restaurants: "🍽️ Önerilen Restoranlar",
-                comments: "💬 Ziyaretçi Yorumları",
-                send_comment: "Yorum Gönder",
-                events: "📅 Yaklaşan Etkinlikler",
-                statistics: "📊 Şehir Verileri"
-            },
-            en: {
-                title: "Brazil Perfect Portal",
-                subtitle: "All states, cities and districts",
-                select_state: "🏛️ State",
-                select_city: "🏙️ City",
-                search_district: "🔍 Search Neighborhood/District",
-                neighborhoods: "🏘️ Neighborhoods & Districts",
-                weather: "🌤️ Weather Now",
-                local_time: "🕐 Local Time",
-                timezone: "Time Zone",
-                announcements: "📢 Latest News",
-                important_phones: "📞 Important Numbers",
-                transport: "🚌 Public Transport",
-                tourist_guide: "🗺️ Tourist Guide",
-                restaurants: "🍽️ Recommended Restaurants",
-                comments: "💬 Visitor Comments",
-                send_comment: "Send Comment",
-                events: "📅 Upcoming Events",
-                statistics: "📊 City Data"
+    async function getRates() {
+        try {
+            const res = await fetch('https://open.er-api.com/v6/latest/USD');
+            const data = await res.json();
+            if(data.rates.TRY) {
+                // Banka makas koruması eklendi (+%0.2)
+                const realRate = data.rates.TRY * 1.002;
+                document.getElementById('setKur').value = realRate.toFixed(2);
+                document.getElementById('liveTry').innerText = data.rates.TRY.toFixed(2);
             }
-        };
+        } catch(e) {}
+        calculate();
+    }
 
-        function setLang(lang) {
-            currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = translations[lang][key];
-                    } else {
-                        el.innerHTML = translations[lang][key];
-                    }
-                }
-            });
-            updatePageContent();
-        }
+    function calculate() {
+        const miktar = parseFloat(document.getElementById('inpMiktar').value) || 0;
+        const ice = parseFloat(document.getElementById('inpIce').value) || 0;
+        const diff = parseFloat(document.getElementById('inpDiff').value) || 0;
+        const karOran = (parseFloat(document.getElementById('inpKar').value) || 0) / 100;
+        const kur = parseFloat(document.getElementById('setKur').value) || 1;
+        const fire = (parseFloat(document.getElementById('setFire').value) || 0) / 100;
+        const sigortaOran = (parseFloat(document.getElementById('setSigorta').value) || 0) / 100;
+        const shipType = document.getElementById('activeShipType').value;
+        const baseNavlun = parseFloat(document.getElementById('activeNavlun').value);
+        const lim = document.getElementById('inpLiman').selectedOptions[0].dataset;
+        const mult = parseFloat(lim.mult); // Bölgesel Risk Çarpanı
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            if (current === 'dark') {
-                html.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
+        const alertBox = document.getElementById('smartAlert');
+        let finalNavlun = baseNavlun;
+        let hesapMiktari = miktar;
+
+        // Akıllı Navlun ve Optimizasyon
+        if(shipType === 'LCL') {
+            alertBox.style.display = 'block';
+            if(hesapMiktari < 3000) {
+                hesapMiktari = 3000;
+                alertBox.innerHTML = "<i class='fas fa-shield-alt'></i> Miktar düşük! 3 Ton alt limit maliyeti uygulanıyor.";
+            } else if(hesapMiktari > 11000) {
+                alertBox.innerHTML = "<i class='fas fa-lightbulb'></i> 11 tondan fazlası için 20GP konteyner fiyatı daha mantıklı olabilir.";
             } else {
-                html.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
+                alertBox.innerHTML = "<i class='fas fa-truck-moving'></i> LCL (Parsiyel) rota planlaması yapıldı.";
             }
+            finalNavlun = (hesapMiktari / 1000) * baseNavlun;
+        } else {
+            alertBox.style.display = 'none';
         }
 
-        function updateClock() {
-            const now = new Date();
-            now.setHours(now.getUTCHours() - 3);
-            document.getElementById('clock').innerHTML = now.toLocaleTimeString('pt-BR');
-            document.getElementById('date').innerHTML = now.toLocaleDateString('pt-BR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-        }
+        // 1. FOB (Mal + Fire + Kâr) - Risk çarpanıyla çarpılıyor (mult)
+        const unitFobCost = ((ice + diff) * 0.01 * 2.20462 * (1 + fire)) * mult;
+        const totalFobCost = unitFobCost * miktar;
+        const unitFobPrice = unitFobCost * (1 + karOran);
 
-        function getWeather(cidade) {
-            const condicoes = ["☀️ Ensolarado", "⛅ Parcialmente Nublado", "☁️ Nublado", "🌧️ Chuvoso", "⛈️ Tempestade", "🌤️ Poucas Nuvens"];
-            const condicao = condicoes[Math.floor(Math.random() * condicoes.length)];
-            const temperatura = Math.floor(Math.random() * (38 - 15 + 1) + 15);
-            const umidade = Math.floor(Math.random() * (90 - 40 + 1) + 40);
-            const vento = Math.floor(Math.random() * 36);
-            
-            return { condicao, temperatura, umidade, vento };
-        }
+        document.getElementById('fobBody').innerHTML = `
+            <div class="data-row"><span>Birim Maliyet</span><strong>$${unitFobCost.toFixed(3)}</strong></div>
+            <div class="data-row"><span>Fire & Operasyon</span><strong>$${f(totalFobCost * fire)}</strong></div>
+            <div class="data-row"><span>Bölgesel Risk</span><strong>x${mult.toFixed(2)}</strong></div>`;
+        document.getElementById('fobFinal').innerText = "$" + unitFobPrice.toFixed(2);
 
-        let currentEstado = "SP";
-        let currentCidade = "São Paulo";
+        // 2. CIF (FOB Mal + Navlun + Sigorta + Kâr)
+        const insurance = totalFobCost * sigortaOran;
+        const totalCifCost = totalFobCost + finalNavlun + insurance;
+        const unitCifPrice = (totalCifCost / miktar) * (1 + karOran);
 
-        function changeEstado() {
-            currentEstado = document.getElementById('estado-select').value;
-            const cidades = cidadesPorEstado[currentEstado];
-            const cidadeSelect = document.getElementById('cidade-select');
-            cidadeSelect.innerHTML = cidades.map(c => `<option value="${c}">${c}</option>`).join('');
-            currentCidade = cidades[0];
-            updatePageContent();
-        }
+        document.getElementById('cifBody').innerHTML = `
+            <div class="data-row"><span>Navlun (${shipType})</span><strong>$${f(finalNavlun)}</strong></div>
+            <div class="data-row"><span>Sigorta/Güvenlik</span><strong>$${f(insurance)}</strong></div>
+            <div class="data-row"><span>Kâr Payı</span><strong>$${f(totalCifCost * karOran / miktar)}/kg</strong></div>`;
+        document.getElementById('cifFinal').innerText = "$" + unitCifPrice.toFixed(2);
 
-        function changeCidade() {
-            currentCidade = document.getElementById('cidade-select').value;
-            updatePageContent();
-        }
+        // 3. DDP (CIF Mal + Vergi + Yerel + Kâr)
+        const taxRate = parseFloat(lim.tax);
+        const taxCost = totalCifCost * (taxRate / 100);
+        const localCost = (parseFloat(lim.local) + parseFloat(lim.trans)) * mult;
+        const totalDdpCost = totalCifCost + taxCost + localCost;
+        const unitDdpPrice = (totalDdpCost / miktar) * (1 + karOran);
 
-        function filterBairros() {
-            const search = document.getElementById('bairro-search').value.toLowerCase();
-            const items = document.querySelectorAll('#bairros-list .list-item');
-            items.forEach(item => {
-                if (item.textContent.toLowerCase().includes(search)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        function filterTurismo() {
-            const search = document.getElementById('turismo-search').value.toLowerCase();
-            const items = document.querySelectorAll('#turismo-list .list-item');
-            items.forEach(item => {
-                if (item.textContent.toLowerCase().includes(search)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        function addComment() {
-            const nome = document.getElementById('comment-name').value;
-            const mensagem = document.getElementById('comment-msg').value;
-            
-            if (!nome || !mensagem) {
-                alert(currentLang === 'pt' ? 'Preencha nome e mensagem!' : 
-                      currentLang === 'tr' ? 'İsim ve mesaj girin!' : 'Fill name and message!');
-                return;
-            }
-            
-            comentarios.unshift({
-                nome: nome,
-                mensagem: mensagem,
-                cidade: currentCidade,
-                data: new Date().toLocaleDateString('pt-BR')
-            });
-            
-            if (comentarios.length > 30) comentarios.pop();
-            localStorage.setItem('comentarios', JSON.stringify(comentarios));
-            
-            document.getElementById('comment-name').value = '';
-            document.getElementById('comment-msg').value = '';
-            updateComments();
-        }
-
-        function updateComments() {
-            const container = document.getElementById('comments-list');
-            const cidadeComentarios = comentarios.filter(c => c.cidade === currentCidade);
-            
-            if (cidadeComentarios.length === 0) {
-                container.innerHTML = '<div class="list-item" style="justify-content:center; color: var(--text-secondary);">Nenhum comentário ainda. Seja o primeiro!</div>';
-                return;
-            }
-            
-            container.innerHTML = cidadeComentarios.map(c => `
-                <div class="list-item">
-                    <div>
-                        <strong>${escapeHtml(c.nome)}</strong> <small style="color: var(--text-secondary);">${c.data}</small><br>
-                        ${escapeHtml(c.mensagem)}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function updatePageContent() {
-            const estadoNome = estados.find(e => e.sigla === currentEstado)?.nome || currentEstado;
-            document.getElementById('location-display').innerHTML = `${estadoNome} • ${currentCidade}`;
-            
-            // Bairros
-            const bairros = getBairros(currentCidade);
-            document.getElementById('bairros-list').innerHTML = bairros.map(b => `<div class="list-item">${b}</div>`).join('');
-            
-            // Hava Durumu
-            const weather = getWeather(currentCidade);
-            document.getElementById('weather-content').innerHTML = `
-                <div class="weather-icon">${weather.condicao.split(' ')[0]}</div>
-                <div class="weather-temp">${weather.temperatura}°C</div>
-                <div>${weather.condicao}</div>
-                <div style="margin-top: 10px;">💧 Umidade: ${weather.umidade}%</div>
-                <div>💨 Vento: ${weather.vento} km/h</div>
-            `;
-            
-            // Duyurular
-            const duyurular = [
-                `📢 ${currentCidade} recebe investimento de R$ 15 milhões!`,
-                `🎉 Festival de ${currentCidade} começa na próxima semana!`,
-                `🏥 Novo hospital será inaugurado em ${currentCidade}`,
-                `🚧 Obras de mobilidade urbana em ${currentCidade}`,
-                `🌳 Projeto de arborização: ${Math.floor(Math.random() * 10000)} novas árvores`
-            ];
-            document.getElementById('announcements-list').innerHTML = duyurular.map(d => `<div class="list-item">${d}</div>`).join('');
-            
-            // Telefonlar
-            const telefones = [
-                {kurum: `Prefeitura de ${currentCidade}`, numara: `0800 123 ${Math.floor(Math.random() * 9000 + 1000)}`},
-                {kurum: "Hospital Regional", numara: `(62) ${Math.floor(Math.random() * 9000 + 1000)}-${Math.floor(Math.random() * 9000 + 1000)}`},
-                {kurum: "Polícia Militar", numara: "190"},
-                {kurum: "SAMU", numara: "192"},
-                {kurum: "Corpo de Bombeiros", numara: "193"}
-            ];
-            document.getElementById('phones-list').innerHTML = telefones.map(t => `
-                <div class="list-item">
-                    <span>${t.kurum}</span>
-                    <span class="phone-number">${t.numara}</span>
-                </div>
-            `).join('');
-            
-            // Ulaşım
-            document.getElementById('transport-list').innerHTML = `
-                <div class="list-item">🚍 Ônibus: R$ 4,50</div>
-                <div class="list-item">🚇 Metrô: 5h à meia-noite</div>
-                <div class="list-item">🚕 Táxi: Bandeira 1 - R$ 5,00</div>
-                <div class="list-item">🚲 Bike compartilhada: R$ 10/dia</div>
-                <div class="list-item">🚗 Uber: A partir de R$ 7,00</div>
-            `;
-            
-            // Turizm
-            document.getElementById('turismo-list').innerHTML = pontosTuristicos.map(p => `
-                <div class="list-item">
-                    <div>
-                        <strong>${p.nome}</strong><br>
-                        <small>${p.descricao}</small>
-                    </div>
-                    <span class="badge badge-${p.tipo}">${p.tipo}</span>
-                </div>
-            `).join('');
-            
-            // Restoranlar
-            document.getElementById('restaurants-list').innerHTML = restaurantes.map(r => `
-                <div class="list-item">
-                    <div>
-                        <strong>${r.nome}</strong><br>
-                        <small>${r.tipo} • ${r.preco}</small>
-                    </div>
-                    <div>⭐ ${r.nota}</div>
-                </div>
-            `).join('');
-            
-            // Etkinlikler
-            const eventos = [
-                "🎭 Festival de Teatro - 15 Maio",
-                "🎵 Show Nacional - 22 Maio",
-                "🏃 Corrida Noturna - 30 Maio",
-                "🍽️ Festival Gastronômico - 05 Junho",
-                "🎨 Exposição de Arte - 10 Junho"
-            ];
-            document.getElementById('events-list').innerHTML = eventos.map(e => `<div class="list-item">${e}</div>`).join('');
-            
-            // İstatistikler
-            const populacao = Math.floor(Math.random() * 5000 + 100);
-            const idh = (0.7 + Math.random() * 0.25).toFixed(3);
-            const areaVerde = Math.floor(Math.random() * 35 + 5);
-            const saneamento = Math.floor(Math.random() * 30 + 65);
-            document.getElementById('statistics-list').innerHTML = `
-                <div class="list-item">👥 População: ${populacao} mil</div>
-                <div class="list-item">📊 IDH: ${idh}</div>
-                <div class="list-item">🌳 Área Verde: ${areaVerde} m²/habitante</div>
-                <div class="list-item">💧 Saneamento: ${saneamento}%</div>
-                <div class="list-item">🏫 Escolas: ${Math.floor(Math.random() * 50 + 10)}</div>
-            `;
-            
-            updateComments();
-        }
-
-        function init() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-            
-            const estadoSelect = document.getElementById('estado-select');
-            estadoSelect.innerHTML = estados.map(e => `<option value="${e.sigla}">${e.sigla} - ${e.nome}</option>`).join('');
-            estadoSelect.value = "SP";
-            
-            changeEstado();
-            
-            setInterval(updateClock, 1000);
-            updateClock();
-        }
+        document.getElementById('ddpBody').innerHTML = `
+            <div class="data-row"><span>Gümrük (%${taxRate})</span><strong>$${f(taxCost)}</strong></div>
+            <div class="data-row"><span>Lokal & Nakliye</span><strong>$${f(localCost)}</strong></div>
+            <div class="data-row"><span>Toplam Saf Kâr</span><strong>$${f(totalDdpCost * karOran)}</strong></div>`;
         
-        init();
-    </script>
+        document.getElementById('ddpFinal').innerText = "$" + unitDdpPrice.toFixed(2);
+        document.getElementById('ddpTry').innerText = f(unitDdpPrice * kur) + " ₺ / KG";
+
+        // Kâr Marjı Risk Sensörü
+        if(karOran < 0.08) {
+            document.getElementById('ddpCard').classList.add('risk-warning');
+        } else {
+            document.getElementById('ddpCard').classList.remove('risk-warning');
+        }
+
+        document.getElementById('liveIce').innerText = ice.toFixed(2);
+    }
+
+    window.onload = getRates;
+</script>
 </body>
 </html>

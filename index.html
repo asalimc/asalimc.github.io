@@ -1,22 +1,25 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brasília Digital City Portal</title>
+    <title>Portal Brasília | Yaşarbey Kahve</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-main: #ffffff;
-            --bg-soft: #f8fafc;
-            --primary: #009c3b; /* Brezilya Yeşili */
-            --accent: #ffdf00;  /* Brezilya Sarısı */
-            --text-main: #0f172a;
-            --text-light: #64748b;
-            --border: #f1f5f9;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --pure-white: #ffffff;
+            --soft-gray: #f9fafb;
+            --border-color: #f1f5f9;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --brasil-green: #009c3b;
+            --brasil-yellow: #ffdf00;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         * {
@@ -24,312 +27,355 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            font-style: normal !important; /* İtalik kullanımı kesinlikle engellendi */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            line-height: 1.5;
-            overflow-x: hidden;
-            padding-bottom: 80px; /* Alt menü boşluğu */
+            background-color: var(--pure-white);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 90px;
         }
 
         /* Üst Header */
         header {
-            background: var(--bg-main);
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            background: var(--pure-white);
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 1000;
-        }
-
-        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo h1 {
-            font-size: 1.2rem;
+        .brand h1 {
+            font-size: 1.1rem;
             font-weight: 800;
-            color: var(--primary);
             letter-spacing: -0.5px;
+            color: var(--brasil-green);
         }
 
-        .live-status {
+        .live-indicator {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: #ecfdf5;
-            color: var(--primary);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
+            background: #f0fdf4;
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: var(--brasil-green);
         }
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--brasil-green);
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
         }
 
-        /* Ana Konteyner */
         .container {
             padding: 16px;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
-        /* Hızlı Bilgi Şeridi (Horizontal Scroll) */
-        .ticker-wrap {
+        /* Yatay Kayan Bilgi Şeridi (Ticker) */
+        .scrolling-wrapper {
             display: flex;
             overflow-x: auto;
             gap: 12px;
-            padding-bottom: 8px;
+            padding: 4px 0 16px;
             scrollbar-width: none;
         }
-        .ticker-wrap::-webkit-scrollbar { display: none; }
+        .scrolling-wrapper::-webkit-scrollbar { display: none; }
 
-        .ticker-card {
-            background: var(--bg-soft);
-            padding: 12px 20px;
-            border-radius: 16px;
-            min-width: 140px;
-            border: 1px solid var(--border);
+        .ticker-item {
+            background: var(--soft-gray);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 14px;
+            min-width: 130px;
+            flex-shrink: 0;
         }
 
-        .ticker-label { font-size: 0.7rem; color: var(--text-light); font-weight: 600; display: block; }
-        .ticker-value { font-size: 0.9rem; font-weight: 700; color: var(--text-main); }
+        .ticker-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 600; display: block; }
+        .ticker-val { font-size: 0.85rem; font-weight: 700; }
 
-        /* Bölüm Başlıkları */
-        .section-title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 24px 0 16px;
+        /* Kart Yapısı */
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin: 20px 0 12px;
         }
 
-        .section-title a { font-size: 0.75rem; color: var(--primary); text-decoration: none; }
+        .section-header h2 { font-size: 0.9rem; font-weight: 800; color: var(--text-dark); }
+        .section-header span { font-size: 0.7rem; color: var(--brasil-green); font-weight: 600; }
 
-        /* Kart Yapısı */
         .card {
-            background: var(--bg-main);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            background: var(--pure-white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        /* Borsa Satırları */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-row:last-child { border-bottom: none; }
+        .data-label { font-size: 0.8rem; font-weight: 500; }
+        .data-value { font-size: 0.8rem; font-weight: 700; }
 
-        .stat-item {
-            padding: 12px;
-            background: var(--bg-soft);
+        /* Izgara Düzeni (Mobilite & Sağlık) */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .grid-card {
+            background: var(--soft-gray);
+            padding: 14px;
             border-radius: 16px;
             text-align: center;
         }
 
-        .stat-label { font-size: 0.65rem; color: var(--text-light); font-weight: 600; display: block; margin-bottom: 4px; }
-        .stat-value { font-size: 0.9rem; font-weight: 800; }
+        .grid-icon { font-size: 1.2rem; margin-bottom: 4px; display: block; }
+        .grid-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; display: block; }
+        .grid-val { font-size: 0.8rem; font-weight: 800; display: block; margin-top: 2px; }
 
-        /* Borsa Listesi */
-        .list-row {
+        /* Acil Durum Butonları */
+        .emergency-btn {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fee2e2;
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-decoration: none;
             display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .list-row:last-child { border-bottom: none; }
 
-        .trend-up { color: #10b981; font-weight: 700; }
-        .trend-down { color: #ef4444; font-weight: 700; }
+        /* Sponsor Alanı */
+        .sponsor-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border: 2px solid var(--brasil-green);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+        }
 
-        /* Alt Navigasyon (Mobil Öncelikli) */
-        .bottom-nav {
+        .sponsor-tag { font-size: 0.6rem; font-weight: 800; color: var(--brasil-green); text-transform: uppercase; }
+        .sponsor-name { font-size: 1.2rem; font-weight: 800; margin: 4px 0; }
+        .sponsor-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Sabit Alt Navigasyon */
+        .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-around;
-            padding: 12px 10px 24px;
-            border-top: 1px solid var(--border);
+            padding: 12px 0 25px;
+            border-top: 1px solid var(--border-color);
             z-index: 2000;
         }
 
-        .nav-item {
+        .nav-link {
+            text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.65rem;
-            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            font-weight: 700;
         }
 
-        .nav-item.active { color: var(--primary); }
+        .nav-link.active { color: var(--brasil-green); }
         .nav-icon { font-size: 1.4rem; }
-
-        /* Sponsor Banner */
-        .sponsor-box {
-            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-            border: 2px solid var(--primary);
-            padding: 16px;
-            border-radius: 20px;
-            text-align: center;
-            margin-top: 10px;
-        }
 
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-top">
-        <div class="logo">
+    <header>
+        <div class="brand">
             <h1>BRASÍLIA PORTAL</h1>
         </div>
-        <div class="live-status">
-            <div class="dot"></div>
-            <span>LIVE BSB</span>
+        <div class="live-indicator">
+            <div class="pulse-dot"></div>
+            <span>LIVE</span>
         </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="scrolling-wrapper">
+            <div class="ticker-item">
+                <span class="ticker-label">Dolar (BRL)</span>
+                <span class="ticker-val">R$ 5,42 <span style="color:var(--success)">+0.2%</span></span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-label">ICE Arabica</span>
+                <span class="ticker-val">245.80 <span style="color:var(--success)">+1.3%</span></span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-label">Umidade (Nem)</span>
+                <span class="ticker-val">%45 <span style="color:var(--warning)">Alerta</span></span>
+            </div>
+        </div>
+
+        <div class="sponsor-card">
+            <span class="sponsor-tag">Parceiro Oficial</span>
+            <h2 class="sponsor-name">Yaşarbey Kahve</h2>
+            <p class="sponsor-desc">Importador de Café Arábica & Robusta do Brasil</p>
+        </div>
+
+        <div class="section-header">
+            <h2>BOLSA DE CAFÉ (ICE)</h2>
+            <span>Ver Tudo</span>
+        </div>
+        <div class="card">
+            <div class="data-row">
+                <span class="data-label">Arabica NY (Dez)</span>
+                <span class="data-value" style="color:var(--success)">248.30</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Robusta LND (Dez)</span>
+                <span class="data-value" style="color:var(--success)">178.50</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">BRL / Saca (Arabica 6)</span>
+                <span class="data-value">R$ 1.450,00</span>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>STATUS DA CIDADE</h2>
+        </div>
+        <div class="grid-layout">
+            <div class="grid-card">
+                <span class="grid-icon">🚇</span>
+                <span class="grid-label">METRÔ-DF</span>
+                <span class="grid-val" style="color:var(--success)">OPERANDO</span>
+            </div>
+            <div class="grid-card">
+                <span class="grid-icon">🚗</span>
+                <span class="grid-label">EIXÃO SUL</span>
+                <span class="grid-val" style="color:var(--warning)">MÉDIO</span>
+            </div>
+            <div class="grid-card">
+                <span class="grid-icon">✈️</span>
+                <span class="grid-label">AEROPORTO BSB</span>
+                <span class="grid-val">NORMAL</span>
+            </div>
+            <div class="grid-card">
+                <span class="grid-icon">⛽</span>
+                <span class="grid-label">GASOLINA (L)</span>
+                <span class="grid-val">R$ 5,79</span>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>SAÚDE & EMERGÊNCIA</h2>
+        </div>
+        <div class="grid-layout" style="margin-bottom: 12px;">
+            <a href="tel:193" class="emergency-btn">📞 193 BOMBEIROS</a>
+            <a href="tel:190" class="emergency-btn">📞 190 POLÍCIA</a>
+        </div>
+        <div class="card">
+            <div class="data-row">
+                <span class="data-label">Farmácia de Plantão</span>
+                <span class="data-value">Drogasil (Asa Sul)</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Qualidade do Ar</span>
+                <span class="data-value" style="color:var(--success)">Boa (32 AQI)</span>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>NOTÍCIAS BRASÍLIA</h2>
+        </div>
+        <div class="card">
+            <p style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">GDF anuncia novas ciclovias no Eixo Monumental.</p>
+            <span style="font-size: 0.65rem; color:var(--text-muted);">Há 15 minutos • Mobilidade</span>
+        </div>
+
     </div>
-</header>
 
-<div class="container">
-    
-    <div class="ticker-wrap">
-        <div class="ticker-card">
-            <span class="ticker-label">USD / BRL</span>
-            <span class="ticker-value">5.42</span>
-        </div>
-        <div class="ticker-card">
-            <span class="ticker-label">ICE ARABICA</span>
-            <span class="ticker-value">245.80</span>
-        </div>
-        <div class="ticker-card">
-            <span class="ticker-label">TEMP</span>
-            <span class="ticker-value">28°C</span>
-        </div>
-        <div class="ticker-card">
-            <span class="ticker-label">BITCOIN</span>
-            <span class="ticker-value">$62.5k</span>
-        </div>
-    </div>
+    <nav class="nav-bar">
+        <a href="#" class="nav-link active">
+            <span class="nav-icon">🏠</span>
+            <span>Início</span>
+        </a>
+        <a href="#" class="nav-link">
+            <span class="nav-icon">📈</span>
+            <span>Bolsa</span>
+        </a>
+        <a href="#" class="nav-link">
+            <span class="nav-icon">📍</span>
+            <span>Mapa</span>
+        </a>
+        <a href="#" class="nav-link">
+            <span class="nav-icon">🚨</span>
+            <span>Saúde</span>
+        </a>
+        <a href="#" class="nav-link">
+            <span class="nav-icon">⚙️</span>
+            <span>Ajustes</span>
+        </a>
+    </nav>
 
-    <div class="sponsor-box">
-        <span style="font-size: 0.7rem; color: var(--primary); font-weight: 800; display: block;">OFFICIAL SPONSOR</span>
-        <p style="font-weight: 800; font-size: 1.1rem; color: #1a2a3a;">Yaşarbey Kahve</p>
-        <p style="font-size: 0.75rem; color: var(--text-light);">Brezilya'nın En Seçkin Çekirdekleri Türkiye'de</p>
-    </div>
+    <script>
+        // Portal Güncelleme Fonksiyonu
+        function refreshData() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            console.log("Dados atualizados às: " + timeStr);
+            // Burada gerçek API entegrasyonları (Borsa, Trafik vb.) yapılacaktır.
+        }
 
-    <div class="section-title">
-        <span>KAHVE BORSASI (ICE)</span>
-        <a href="#">Detaylar</a>
-    </div>
-    <div class="card">
-        <div class="list-row">
-            <span>Arabica (Aralık)</span>
-            <span class="trend-up">245.80 (+1.32%)</span>
-        </div>
-        <div class="list-row">
-            <span>Robusta (Aralık)</span>
-            <span class="trend-up">178.50 (+1.05%)</span>
-        </div>
-        <div class="list-row">
-            <span>Brezilya Yeşil (kg)</span>
-            <span class="trend-up">12.80 BRL</span>
-        </div>
-    </div>
+        // 60 saniyede bir otomatik güncelleme
+        setInterval(refreshData, 60000);
 
-    <div class="section-title">
-        <span>ŞEHİR MOBİLİTE</span>
-    </div>
-    <div class="grid-2">
-        <div class="card stat-item">
-            <span class="stat-label">METRÔ-DF</span>
-            <span class="stat-value" style="color: #10b981;">AKTİF</span>
-        </div>
-        <div class="card stat-item">
-            <span class="stat-label">HAVA DURUMU</span>
-            <span class="stat-value">GÜNEŞLİ</span>
-        </div>
-        <div class="card stat-item">
-            <span class="stat-label">EIXÃO TRAFİK</span>
-            <span class="stat-value" style="color: #f59e0b;">ORTA</span>
-        </div>
-        <div class="card stat-item">
-            <span class="stat-label">NEM ORANI</span>
-            <span class="stat-value">%45</span>
-        </div>
-    </div>
-
-    <div class="section-title">
-        <span>SON DAKİKA</span>
-    </div>
-    <div class="card">
-        <p style="font-weight: 700; font-size: 0.9rem; margin-bottom: 8px;">Brasília Havaalanı yeni uçuş rotalarını duyurdu.</p>
-        <span style="font-size: 0.7rem; color: var(--text-light);">2 dakika önce • Yerel Haberler</span>
-    </div>
-
-</div>
-
-<nav class="bottom-nav">
-    <a href="#" class="nav-item active">
-        <span class="nav-icon">🏠</span>
-        <span>Anasayfa</span>
-    </a>
-    <a href="#" class="nav-item">
-        <span class="nav-icon">☕</span>
-        <span>Borsa</span>
-    </a>
-    <a href="#" class="nav-item">
-        <span class="nav-icon">🚗</span>
-        <span>Ulaşım</span>
-    </a>
-    <a href="#" class="nav-item">
-        <span class="nav-icon">🏥</span>
-        <span>Sağlık</span>
-    </a>
-</nav>
-
-<script>
-    // Dinamik Saat ve Güncelleme Simülasyonu
-    function updatePortal() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-        console.log("Portal Güncellendi: " + timeString);
-        // Burada gerçek API fetch işlemleri yapılabilir
-    }
-
-    // Her 30 saniyede bir verileri tazele
-    setInterval(updatePortal, 30000);
-
-    // Soft Kaydırma ve Mobil Dokunuş Efektleri
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelector('.nav-item.active').classList.remove('active');
-            this.classList.add('active');
+        // Navigasyon Aktiflik Değişimi
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelector('.nav-link.active').classList.remove('active');
+                this.classList.add('active');
+            });
         });
-    });
-</script>
 
+        // Pull to refresh simülasyonu veya dokunmatik iyileştirmeler eklenebilir.
+    </script>
 </body>
 </html>

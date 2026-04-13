@@ -3,188 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRİZ GÖZLEM - Türkiye Risk Analizi</title>
+    <title>Brasília Anlık Bölge Paneli</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background: linear-gradient(135deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
             min-height: 100vh;
             padding: 20px;
             color: white;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .header h1 {
-            font-size: 2.5em;
+            font-size: 2em;
             margin-bottom: 10px;
         }
-        
-        .risk-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+
+        .brasilia-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 15px;
             border-radius: 30px;
-            padding: 30px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 14px;
+            margin-bottom: 15px;
         }
-        
-        .risk-score {
-            font-size: 80px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        
-        .risk-critical { color: #ff4444; text-shadow: 0 0 20px rgba(255,68,68,0.5); }
-        .risk-high { color: #ff8800; text-shadow: 0 0 20px rgba(255,136,0,0.5); }
-        .risk-medium { color: #ffcc00; text-shadow: 0 0 20px rgba(255,204,0,0.5); }
-        .risk-low { color: #44ff44; text-shadow: 0 0 20px rgba(68,255,68,0.5); }
-        
-        .category {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            transition: transform 0.3s;
-        }
-        
-        .category:hover {
-            transform: translateX(5px);
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .warning-box {
-            background: rgba(255,68,68,0.2);
-            border-left: 4px solid #ff4444;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 10px;
-        }
-        
-        .update-time {
-            text-align: center;
-            color: #888;
-            margin-top: 30px;
-            font-size: 12px;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-        
+
         .live-badge {
             background: #ff4444;
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
-            margin-bottom: 15px;
             animation: pulse 1s infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-content {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+        }
+
+        .update-time {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 20px;
+        }
+
+        .bairro-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .bairro-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+        }
+
+        hr {
+            border-color: rgba(255,255,255,0.2);
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="live-badge">🔴 CANLI ANALİZ</div>
-            <h1>⚠️ KRİZ GÖZLEM</h1>
-            <p>Türkiye için anlık risk analizi ve erken uyarı sistemi</p>
+            <div class="brasilia-badge">🇧🇷 BRASÍLIA - DF</div>
+            <h1>📡 Bölge Paneli</h1>
+            <p>Anlık bölge haberleri ve duyurular</p>
         </div>
-        
-        <div class="risk-card" id="riskCard">
-            <h2>📊 GENEL RİSK SKORU</h2>
-            <div class="risk-score" id="riskScore">--/100</div>
-            <div class="warning-box" id="topRisk">
-                🔴 EN YÜKSEK RİSK: <strong id="topRiskText">--</strong>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>🕐 Son Güncelleme</span>
+                <span class="live-badge" id="liveBadge">CANLI</span>
             </div>
+            <div id="updateTime" style="margin-top: 10px; font-size: 14px;">Yükleniyor...</div>
         </div>
-        
-        <h3>📋 KATEGORİ BAZLI RİSKLER</h3>
-        <div id="categories"></div>
-        
-        <div class="update-time" id="updateTime">
-            🕐 Son güncelleme bekleniyor...
-            <br>Her 30 dakikada bir otomatik güncellenir.
+
+        <div class="card" id="haberlerCard">
+            <div class="info-title">📰 Bölge Haberleri</div>
+            <div id="haberlerContent">Yükleniyor...</div>
         </div>
-        
-        <div class="footer">
-            🔍 Kaynaklar: Sözcü, Hürriyet, Milliyet, T24, BirGün, Dünya, BBC Türkçe ve diğer 30+ haber sitesi
+
+        <div class="card" id="bairroCard">
+            <div class="info-title">🏘️ Bölgeler</div>
+            <div class="bairro-list" id="bairroList"></div>
+        </div>
+
+        <div class="card" id="durumCard">
+            <div class="info-title">📍 Bölge Durumu</div>
+            <div id="durumContent">Yükleniyor...</div>
+        </div>
+
+        <div class="update-time">
+            🔄 Her 10 dakikada bir otomatik güncellenir<br>
+            📱 Telegram: @Krizgozlem_bot
         </div>
     </div>
-    
+
     <script>
         async function loadData() {
             try {
-                const response = await fetch('son_rapor.json?v=' + Date.now());
+                const response = await fetch('brasilia_data.json?v=' + Date.now());
                 const data = await response.json();
                 
-                const score = data.toplam_risk;
-                const scoreDiv = document.getElementById('riskScore');
-                scoreDiv.textContent = score + '/100';
+                document.getElementById('updateTime').innerHTML = data.son_guncelleme || 'Veri alınamadı';
                 
-                scoreDiv.className = 'risk-score ';
-                if (score >= 70) scoreDiv.classList.add('risk-critical');
-                else if (score >= 50) scoreDiv.classList.add('risk-high');
-                else if (score >= 30) scoreDiv.classList.add('risk-medium');
-                else scoreDiv.classList.add('risk-low');
-                
-                document.getElementById('topRiskText').textContent = data.en_yuksek.toUpperCase();
-                
-                const categoriesDiv = document.getElementById('categories');
-                categoriesDiv.innerHTML = '';
-                
-                const kategoriIcons = {
-                    'ekonomi': '💰', 'siyaset': '🏛️', 'deprem_afet': '🌋', 
-                    'saglik': '🏥', 'gida': '🍞', 'guvenlik': '🔒',
-                    'enerji': '⚡', 'goc': '🚶'
-                };
-                
-                for (const [kat, skor] of Object.entries(data.kategoriler)) {
-                    const icon = kategoriIcons[kat] || '📌';
-                    let renk = '';
-                    if (skor > 50) renk = '🔴';
-                    else if (skor > 30) renk = '🟠';
-                    else if (skor > 10) renk = '🟡';
-                    else renk = '🟢';
-                    
-                    const div = document.createElement('div');
-                    div.className = 'category';
-                    div.innerHTML = `<span>${renk} ${icon} ${kat.toUpperCase()}</span><span>${skor}/100</span>`;
-                    categoriesDiv.appendChild(div);
+                if (data.haberler && data.haberler.length > 0) {
+                    let haberHtml = '';
+                    for (const haber of data.haberler.slice(0, 10)) {
+                        haberHtml += `
+                            <div class="info-card">
+                                <div style="font-weight: bold;">📍 ${haber.bairro || 'Brasília'}</div>
+                                <div style="font-size: 13px; margin-top: 5px;">${haber.baslik || haber.metin}</div>
+                                <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 8px;">🕐 ${haber.zaman || 'Şimdi'}</div>
+                            </div>
+                        `;
+                    }
+                    document.getElementById('haberlerContent').innerHTML = haberHtml;
+                } else {
+                    document.getElementById('haberlerContent').innerHTML = '<div class="info-card">Henüz haber alınamadı</div>';
                 }
                 
-                const date = new Date(data.tarih);
-                document.getElementById('updateTime').innerHTML = `🕐 Son güncelleme: ${date.toLocaleString('tr-TR')}<br>Her 30 dakikada bir otomatik güncellenir.`;
+                if (data.bairrolar && data.bairrolar.length > 0) {
+                    let bairroHtml = '';
+                    for (const b of data.bairrolar) {
+                        bairroHtml += `<span class="bairro-tag">${b}</span>`;
+                    }
+                    document.getElementById('bairroList').innerHTML = bairroHtml;
+                }
+                
+                if (data.durum) {
+                    document.getElementById('durumContent').innerHTML = `
+                        <div class="info-card">
+                            <div>🌡️ ${data.durum.hava || 'Bilinmiyor'}</div>
+                            <div>🚦 ${data.durum.trafik || 'Veri yok'}</div>
+                            <div>🔒 ${data.durum.guvenlik || 'Normal'}</div>
+                        </div>
+                    `;
+                }
                 
             } catch(e) {
-                document.getElementById('updateTime').innerHTML = '⏳ İlk rapor hazırlanıyor... 30 dakika içinde gelecek.';
+                console.log('Veri bekleniyor...');
+                document.getElementById('haberlerContent').innerHTML = '<div class="info-card">⏳ İlk veriler hazırlanıyor... 10 dakika içinde gelecek.</div>';
             }
         }
         

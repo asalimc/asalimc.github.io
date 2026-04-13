@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="description" content="Brasília - Brezilya için anlık veri paneli. 25+ kategori, hava durumu, döviz, deprem, haberler ve daha fazlası.">
-    <title>Brasília Paneli | Anlık Veri | Brezilya</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Brasília Paneli | Kahve Borsası | Dünya Trendleri | ICE Emtia</title>
     <style>
         * {
             margin: 0;
@@ -18,10 +16,25 @@
             background: #f5f7fb;
             color: #1a2a3a;
             line-height: 1.4;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Header - Mobil dostu */
+        /* Sponsor Banner */
+        .sponsor-banner {
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%);
+            color: #ffdf00;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #ffdf00;
+        }
+
+        .sponsor-banner a {
+            color: #ffdf00;
+            text-decoration: none;
+        }
+
+        /* Header */
         .header {
             background: white;
             padding: 16px 20px;
@@ -29,7 +42,6 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid #e0e6ed;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
         .header-top {
@@ -41,13 +53,13 @@
         }
 
         .header h1 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #009c3b;
         }
 
         .header p {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #6c7a8a;
             margin-top: 4px;
         }
@@ -57,10 +69,9 @@
             color: white;
             padding: 4px 12px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             animation: pulse 1.5s infinite;
-            white-space: nowrap;
         }
 
         @keyframes pulse {
@@ -69,13 +80,21 @@
             100% { opacity: 1; }
         }
 
-        /* Ana container - mobil padding */
+        .lang-selector {
+            background: #f0f4f9;
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            border: none;
+        }
+
+        /* Container */
         .container {
             max-width: 100%;
             padding: 12px;
         }
 
-        /* Grid - Mobil öncelikli */
+        /* Grid */
         .grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -89,11 +108,6 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #eef2f8;
-            transition: transform 0.2s;
-        }
-
-        .card:active {
-            transform: scale(0.99);
         }
 
         .card-header {
@@ -101,14 +115,11 @@
             padding: 14px 16px;
             border-bottom: 2px solid #009c3b;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .card-header-icon {
-            font-size: 1.2rem;
+            flex-wrap: wrap;
         }
 
         .card-content {
@@ -117,7 +128,7 @@
             overflow-y: auto;
         }
 
-        /* Liste stilleri */
+        /* Liste */
         .list-item {
             display: flex;
             justify-content: space-between;
@@ -135,120 +146,63 @@
         .item-label {
             font-weight: 600;
             color: #2c3e50;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .item-value {
             color: #009c3b;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .item-sub {
-            font-size: 0.65rem;
-            color: #94a3b8;
-        }
-
-        .change-up {
+        .trend-up {
             color: #27ae60;
-            font-size: 0.7rem;
         }
 
-        .change-down {
+        .trend-down {
             color: #e74c3c;
-            font-size: 0.7rem;
         }
 
-        /* 3'lu grid mobilde 1'e düşüyor */
-        .status-grid {
+        /* Kahve Özel Kart */
+        .coffee-card {
+            background: linear-gradient(135deg, #fef8e7 0%, #fff 100%);
+            border-left: 4px solid #ff8c00;
+        }
+
+        /* Emtia grid */
+        .commodity-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 10px;
         }
 
-        .status-item {
+        .commodity-item {
             background: #f8fafc;
             border-radius: 14px;
             padding: 12px;
-            text-align: center;
-            border: 1px solid #eef2f8;
-        }
-
-        .status-icon {
-            font-size: 28px;
-            margin-bottom: 6px;
-        }
-
-        .status-value {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1a2a3a;
-        }
-
-        .status-label {
-            font-size: 0.65rem;
-            color: #6c7a8a;
-            margin-top: 4px;
-        }
-
-        /* Etiketler */
-        .tag-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .tag {
-            background: #f0f4f9;
-            padding: 5px 12px;
-            border-radius: 25px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        /* ANMA BÖLÜMÜ - VEFAT EDENLER ÖZEL */
-        .anma-card {
-            background: linear-gradient(135deg, #fef9f0 0%, #fff 100%);
-            border-left: 4px solid #e74c3c;
-        }
-
-        .vefat-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0e6d2;
             flex-wrap: wrap;
             gap: 8px;
         }
 
-        .vefat-item:last-child {
-            border-bottom: none;
+        /* Trend kelimeler */
+        .trend-tag {
+            background: #f0f4f9;
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin: 3px;
         }
 
-        .vefat-name {
-            font-weight: 700;
-            color: #2c3e50;
-            font-size: 0.9rem;
-        }
-
-        .vefat-detail {
-            font-size: 0.65rem;
-            color: #7f8c8d;
-            margin-top: 2px;
-        }
-
-        .vefat-age {
+        .trend-tag.hot {
             background: #e74c3c;
             color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
         }
 
-        /* Arama çubuğu */
+        /* Arama */
         .search-bar {
             background: white;
             border-radius: 30px;
@@ -264,65 +218,8 @@
             flex: 1;
             border: none;
             outline: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             background: transparent;
-        }
-
-        .search-bar button {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        /* Bildirim badge */
-        .notification-badge {
-            background: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.6rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: -5px;
-            right: -5px;
-        }
-
-        /* Bottom navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 16px;
-            border-top: 1px solid #e0e6ed;
-            z-index: 100;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.6rem;
-            color: #6c7a8a;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #009c3b;
-        }
-
-        .nav-item span:first-child {
-            font-size: 1.2rem;
         }
 
         /* Footer */
@@ -334,20 +231,14 @@
             text-align: center;
             font-size: 0.6rem;
             color: #94a3b8;
-            border: 1px solid #eef2f8;
         }
 
-        /* Tablet ve üzeri */
         @media (min-width: 600px) {
-            .container {
-                padding: 20px;
-            }
             .grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
             }
-            .status-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .commodity-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -356,119 +247,184 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-
-        /* Scrollbar */
-        .card-content::-webkit-scrollbar {
-            width: 3px;
-        }
     </style>
 </head>
 <body>
+    <!-- Sponsor Banner -->
+    <div class="sponsor-banner">
+        ☕ SPONSORUMUZ: <a href="#">YAŞARBEY KAHVE</a> | Türkiye'nin En Kaliteli Toptan Kahvesi | Brezilya'dan Direkt İthalat ☕
+    </div>
+
     <div class="header">
         <div class="header-top">
             <div>
                 <h1>🇧🇷 Brasília Paneli</h1>
-                <p>Anlık Veri | 25+ Kategori | Brezilya</p>
+                <p>Anlık Veri | Kahve Borsası | ICE Emtia | Dünya Trendleri | Brezilya</p>
             </div>
-            <div class="live-badge" id="liveBadge">🔴 CANLI</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select id="langSelect" class="lang-selector">
+                    <option value="tr">🇹🇷 Türkçe</option>
+                    <option value="pt">🇧🇷 Português</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                </select>
+                <div class="live-badge" id="liveBadge">🔴 CANLI</div>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <!-- Arama -->
         <div class="search-bar">
             <span>🔍</span>
-            <input type="text" id="searchInput" placeholder="Kategori, haber veya bölge ara...">
-            <button onclick="clearSearch()">✖</button>
+            <input type="text" id="searchInput" placeholder="Ara...">
         </div>
 
         <div class="grid" id="panelGrid"></div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <button class="nav-item active" onclick="scrollToTop()"><span>🏠</span><span>Ana</span></button>
-        <button class="nav-item" onclick="showAnma()"><span>🕯️</span><span>Anma</span></button>
-        <button class="nav-item" onclick="showFavorites()"><span>⭐</span><span>Favoriler</span></button>
-        <button class="nav-item" onclick="showSettings()"><span>⚙️</span><span>Ayarlar</span></button>
-    </div>
-
-    <div class="footer" id="footer">
-        🕐 <span id="updateTime"></span> • Her 10 dakikada güncellenir
+    <div class="footer">
+        🕐 <span id="updateTime"></span> • Her 10 dakikada otomatik güncellenir • Veriler: ICE, Google Trends, Reuters
     </div>
 
     <script>
-        // ============ SON GÜNCELLEME ============
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('updateTime').innerHTML = now.toLocaleString('tr-TR');
-            document.getElementById('liveBadge').innerHTML = `🔴 CANLI ${now.toLocaleTimeString('tr-TR')}`;
-        }
-
-        // ============ VEFAT EDENLER (ANMA) ============
-        const vefatEdenler = [
-            { ad: "Oscar Niemeyer", meslek: "Mimar", tarih: "5 Aralık 2012", yas: 104, aciklama: "Brasília'nın mimarı, UNESCO Dünya Mirası" },
-            { ad: "Juscelino Kubitschek", meslek: "Cumhurbaşkanı", tarih: "22 Ağustos 1976", yas: 73, aciklama: "Brasília'nın kurucusu, 50 yılda 50 yıl kalkınma" },
-            { ad: "Lucio Costa", meslek: "Şehir Plancısı", tarih: "13 Haziran 1998", yas: 96, aciklama: "Brasília şehir planının mimarı" },
-            { ad: "Ayrton Senna", meslek: "Formula 1 Pilotu", tarih: "1 Mayıs 1994", yas: 34, aciklama: "3 kez Dünya Şampiyonu, Brezilya efsanesi" },
-            { ad: "Pelé", meslek: "Futbolcu", tarih: "29 Aralık 2022", yas: 82, aciklama: "3 kez Dünya Kupası şampiyonu, efsane 10 numara" },
-            { ad: "Carmen Miranda", meslek: "Şarkıcı/Aktris", tarih: "5 Ağustos 1955", yas: 46, aciklama: "Brezilya kültür ikonu, Hollywood yıldızı" },
-            { ad: "Roberto Burle Marx", meslek: "Peyzaj Mimarı", tarih: "4 Haziran 1994", yas: 84, aciklama: "Brasília bahçeleri ve modern peyzaj" },
-            { ad: "Tom Jobim", meslek: "Besteci", tarih: "8 Aralık 1994", yas: 67, aciklama: "Bossa nova'nın yaratıcısı, 'The Girl from Ipanema'" },
-            { ad: "Gal Costa", meslek: "Şarkıcı", tarih: "9 Kasım 2022", yas: 77, aciklama: "Tropicalia hareketinin ikonu" },
-            { ad: "Chico Xavier", meslek: "Medyum/Yazar", tarih: "30 Haziran 2002", yas: 92, aciklama: "Brezilya'nın ruhani lideri, 400+ kitap" }
-        ];
-
-        // ============ TÜM VERİLER ============
-        const panelData = {
-            doviz: { baslik: "Döviz & Kripto", ikon: "💰", veri: { Dolar: "5.42 BRL ▲", Euro: "5.88 BRL ▲", Sterlin: "6.90 BRL ▼", Bitcoin: "312.500 BRL ▲+2.3%", Ethereum: "16.800 BRL ▲+1.1%" } },
-            hava: { baslik: "Hava Durumu", ikon: "🌤️", veri: { Brasília: "🌞 28°C | Nem %45", Taguatinga: "☀️ 27°C | Nem %47", Ceilândia: "🌞 29°C | Nem %43", Rüzgar: "12 km/h GB", UV: "Yüksek - Korunun" } },
-            haberler: { baslik: "Bölge Haberleri", ikon: "📰", veri: ["Yeni metro hattı açılıyor", "Eğitime 100M BRL bütçe", "Eixão'da gece bakımı", "Ceilândia'da su kesintisi", "Taguatinga'da yeni hastane"] },
-            deprem: { baslik: "Deprem & Afet", ikon: "🌋", veri: { SonDeprem: "Brasília 120km - 2.1", RiskliBolgeler: "Planaltina, Sobradinho", Uyari: "Acil durum çantası hazırlayın" } },
-            ekonomi: { baslik: "Ekonomi", ikon: "📈", veri: { Enflasyon: "4.2%", Faiz: "10.75%", İsizlik: "6.8%", Büyüme: "2.9%", IçBorç: "6.2 trilyon BRL" } },
-            akaryakit: { baslik: "Akaryakıt", ikon: "⛽", veri: { Benzin: "5.79 BRL/L", Motorin: "6.12 BRL/L", Etanol: "3.89 BRL/L", LPG: "3.45 BRL/L", Tavsiye: "Etanol %70 altında avantajlı" } },
-            altin: { baslik: "Altın & Emtia", ikon: "🥇", veri: { GramAltın: "412.50 BRL", Çeyrek: "665 BRL", Ons: "2.350 USD", Gümüş: "28.50 BRL" } },
-            borsa: { baslik: "Borsa", ikon: "📊", veri: { Bovespa: "127.850 ▲0.45%", SP500: "5.200", Nasdaq: "16.400", Ibovespa: "+0.45%" } },
-            saglik: { baslik: "Sağlık", ikon: "🏥", veri: { Acil: "Hospital de Base - 193", Eczane: "Farmácia Brasil - (61) 3224-1234", Asi: "Covid-19 %85 tamamlandı", Dengue: "1.245 vaka" } },
-            egitim: { baslik: "Eğitim", ikon: "📚", veri: { EnIyiUni: "UnB - 1. sırada", OkulSayisi: "1.250", OgrenciSayisi: "450.000", EnIyiOkul: "Colégio Militar" } },
-            spor: { baslik: "Spor", ikon: "⚽", veri: { Takimlar: "Brasília FC, Gama, Ceilândia", Mac: "Brasília FC x Gama - Pazar", Stadyum: "Mané Garrincha - 72.788" } },
-            ulasim: { baslik: "Ulaşım", ikon: "🚗", veri: { Trafik: "Hafif yoğunluk %45", Metro: "06:00 - 23:30", Otobus: "Eixão Güney aktif", Havalimani: "BSB - 182 uçuş/gün" } },
-            emlak: { baslik: "Emlak", ikon: "🏠", veri: { MetreKare: "8.250 BRL", Kira: "1.850 BRL", EnPahali: "Lago Sul - 18.500", EnUcuz: "Ceilândia - 3.200" } },
-            otomotiv: { baslik: "Otomotiv", ikon: "🚘", veri: { EnCokSatan: "Fiat Strada", IkinciEl: "+1.2%", SifirArac: "85.000 BRL", Ehliyet: "285 BRL" } },
-            din: { baslik: "Din & İbadet", ikon: "🕌", veri: { CamiSayisi: "8", EnBuyukCami: "Mesquita do Centro", Namaz: "Öğle 12:15, İkindi 15:30", Ramazan: "18 Şubat 2026" } },
-            seyahat: { baslik: "Seyahat", ikon: "✈️", veri: { OtelDoluluk: "72%", EnPopuler: "Eixo Monumental", Ucak: "BSB-GRU: 450 BRL", Turist: "185.000" } },
-            teknoloji: { baslik: "Teknoloji", ikon: "💻", veri: { Internet: "95 Mbps", 5G: "%65 kapsama", Startup: "320", EnHizliWifi: "Park Shopping - 250 Mbps" } },
-            tarim: { baslik: "Tarım", ikon: "🌾", veri: { Soya: "145 BRL/saca", Misir: "62 BRL/saca", Kuraklik: "Normal seviyede", Hasat: "Soya hasadı devam ediyor" } },
-            alisveris: { baslik: "Alışveriş", ikon: "🛒", veri: { AVMler: "Park Shopping, Conjunto Nacional, Taguatinga", Indirim: "Sezon sonu %30", EnIyiMarka: "Havan" } },
-            guvenlik: { baslik: "Güvenlik", ikon: "🔒", veri: { SucOrani: "-2.5% düşüş", EnGuvenli: "Lago Sul", Polis: "190 - PMDF", Ihbar: "181 - Disque Denúncia" } },
-            eglence: { baslik: "Eğlence", ikon: "🎭", veri: { Sinema: "Cinemark - 12 film", Konser: "Anitta - 25 Mayıs", Tiyatro: "Teatro Nacional - Hamlet", Barlar: "Asa Sul: 30+ mekan" } },
-            gocmen: { baslik: "Göçmen", ikon: "🚶", veri: { GocmenSayisi: "185.000", EnCok: "Venezuela, Haiti, Kolombiya", OturumIzni: "45 gün", DilKursu: "Portekizce ücretsiz" } },
-            araclar: { baslik: "Araçlar", ikon: "🧮", veri: { KDV: "12%", Faiz: "Selic 10.75%", Enflasyon: "IPCA 4.2%" } },
-            istatistik: { baslik: "İstatistik", ikon: "📊", veri: { Nufus: "3.050.000", Yuzolcumu: "5.802 km²", GSYIH: "285 milyar BRL", Gelir: "4.250 BRL/ay" } },
-            harita: { baslik: "Harita", ikon: "🗺️", veri: { Merkez: "Praça dos Três Poderes", Noktalar: "Congresso, Catedral, Planalto", Ulasim: "Rodoviária, Aeroporto BSB" } }
+        // ============ DİL ÇEVİRİLERİ ============
+        const translations = {
+            tr: { ara: "Kategori, haber veya kelime ara..." },
+            pt: { ara: "Buscar categoria, notícia ou palavra..." },
+            en: { ara: "Search category, news or word..." },
+            es: { ara: "Buscar categoría, noticia o palabra..." }
         };
 
+        // ============ GOOGLE TRENDLERİ (Dünya Geneli İlk 10) ============
+        const googleTrends = [
+            { kelime: "Brasília", artis: "+45%", sicak: true },
+            { kelime: "Kahve fiyatları", artis: "+32%", sicak: true },
+            { kelime: "ICE Coffee", artis: "+28%", sicak: true },
+            { kelime: "Brezilya ekonomisi", artis: "+18%", sicak: true },
+            { kelime: "Emtia borsası", artis: "+22%", sicak: true },
+            { kelime: "Dolar/TL", artis: "+5%", sicak: false },
+            { kelime: "Kahve üretimi", artis: "+25%", sicak: true },
+            { kelime: "Toptan kahve", artis: "+40%", sicak: true },
+            { kelime: "ICE Arabica", artis: "+35%", sicak: true },
+            { kelime: "Yaşarbey Kahve", artis: "+999%", sicak: true }
+        ];
+
+        // ============ ICE KAHVE EMTİA BORSA VERİLERİ ============
+        const iceCoffeeData = [
+            { ad: "ICE Arabica (Kontrat)", fiyat: "245.80 USc/lb", degisim: "+3.20", yuzde: "+1.32%", durum: "yükseliyor" },
+            { ad: "ICE Robusta (Kontrat)", fiyat: "178.50 USc/lb", degisim: "+1.85", yuzde: "+1.05%", durum: "yükseliyor" },
+            { ad: "ICE Futures (Aralık)", fiyat: "248.30 USc/lb", degisim: "+2.90", yuzde: "+1.18%", durum: "yükseliyor" },
+            { ad: "Günlük En Yüksek", fiyat: "249.20 USc/lb", degisim: "", yuzde: "", durum: "" },
+            { ad: "Günlük En Düşük", fiyat: "243.50 USc/lb", degisim: "", yuzde: "", durum: "" },
+            { ad: "İşlem Hacmi", fiyat: "12,450 sözleşme", degisim: "", yuzde: "", durum: "" }
+        ];
+
+        // ============ BREZİLYA TOPLAM KAHVE FİYATLARI ============
+        const brasilCoffeePrices = [
+            { ad: "Arabica Kategori 6", fiyat: "1.450 BRL/saca", degisim: "+2.1%" },
+            { ad: "Arabica Kategori 4", fiyat: "1.520 BRL/saca", degisim: "+1.8%" },
+            { ad: "Robusta", fiyat: "1.120 BRL/saca", degisim: "+1.2%" },
+            { ad: "Yeşil Kahve", fiyat: "1.380 BRL/saca", degisim: "+1.5%" },
+            { ad: "Organik Kahve", fiyat: "1.650 BRL/saca", degisim: "+2.5%" },
+            { ad: "Toptan Fiyat (kg)", fiyat: "12.80 BRL/kg", degisim: "+0.9%" },
+            { ad: "İhracat Fiyatı", fiyat: "245 USD/saca", degisim: "+1.3%" }
+        ];
+
+        // ============ DİĞER EMTİALAR ============
+        const otherCommodities = [
+            { ad: "Altın (Ons)", fiyat: "2.350 USD", degisim: "+0.8%", durum: "up" },
+            { ad: "Gümüş (Ons)", fiyat: "28.50 USD", degisim: "+0.3%", durum: "up" },
+            { ad: "Petrol (Brent)", fiyat: "85.40 USD", degisim: "-0.5%", durum: "down" },
+            { ad: "Buğday (Ton)", fiyat: "245 USD", degisim: "+1.2%", durum: "up" },
+            { ad: "Mısır (Ton)", fiyat: "185 USD", degisim: "+0.7%", durum: "up" },
+            { ad: "Soya (Ton)", fiyat: "425 USD", degisim: "+1.5%", durum: "up" }
+        ];
+
+        // ============ DÖVİZ & KRİPTO ============
+        const currencyData = [
+            { ad: "USD/BRL", fiyat: "5.42", degisim: "+0.02" },
+            { ad: "EUR/BRL", fiyat: "5.88", degisim: "-0.01" },
+            { ad: "BTC/USD", fiyat: "62.500", degisim: "+2.3%" },
+            { ad: "ETH/USD", fiyat: "3.120", degisim: "+1.1%" }
+        ];
+
+        // ============ HAVA DURUMU ============
+        const weatherData = [
+            { ad: "Brasília", durum: "🌞 Güneşli", sicaklik: "28°C", nem: "%45" },
+            { ad: "Taguatinga", durum: "☀️ Açık", sicaklik: "27°C", nem: "%47" },
+            { ad: "Ceilândia", durum: "🌞 Güneşli", sicaklik: "29°C", nem: "%43" }
+        ];
+
+        // ============ HABERLER ============
+        const newsData = [
+            "Brasília'da yeni metro hattı açılıyor",
+            "ICE kahve fiyatları 2 ayın zirvesinde",
+            "Yaşarbey Kahve Brezilya'da yeni üretici ile anlaştı",
+            "Brezilya kahve ihracatı rekor kırdı",
+            "Emtia borsasında kahve öncü yükselişte"
+        ];
+
+        // ============ EKONOMİ ============
+        const economyData = [
+            { ad: "Enflasyon (IPCA)", fiyat: "4.2%", degisim: "-0.1%" },
+            { ad: "Faiz Oranı (Selic)", fiyat: "10.75%", degisim: "sabit" },
+            { ad: "İşsizlik", fiyat: "6.8%", degisim: "-0.2%" },
+            { ad: "GSYİH Büyüme", fiyat: "2.9%", degisim: "+0.3%" }
+        ];
+
+        // ============ AKARYAKIT ============
+        const fuelData = [
+            { ad: "Benzin Comum", fiyat: "5.79 BRL/L", degisim: "+0.05" },
+            { ad: "Motorin S10", fiyat: "6.12 BRL/L", degisim: "+0.03" },
+            { ad: "Etanol", fiyat: "3.89 BRL/L", degisim: "-0.02" },
+            { ad: "LPG", fiyat: "3.45 BRL/L", degisim: "sabit" }
+        ];
+
+        // ============ TRAFİK ============
+        const trafficData = [
+            { ad: "Eixão Kuzey", durum: "🟢 Hafif yoğun" },
+            { ad: "Eixão Güney", durum: "🟡 Orta yoğun" },
+            { ad: "Metrô-DF", durum: "✅ Normal çalışıyor" },
+            { ad: "BSB Havalimanı", durum: "✅ 182 uçuş/gün" }
+        ];
+
+        // ============ SAĞLIK ============
+        const healthData = [
+            { ad: "Acil Durum", deger: "Hospital de Base - 193" },
+            { ad: "Nöbetçi Eczane", deger: "Farmácia Brasil - (61) 3224-1234" },
+            { ad: "COVID-19 Aşılama", deger: "%85 tamamlandı" },
+            { ad: "Dengue Vakaları", deger: "1.245 (bu yıl)" }
+        ];
+
+        // ============ BORSA ============
+        const stockData = [
+            { ad: "Bovespa", fiyat: "127.850", degisim: "+0.45%" },
+            { ad: "Ibovespa", fiyat: "+0.45%", degisim: "yükseliş" },
+            { ad: "S&P 500", fiyat: "5.200", degisim: "+0.12%" },
+            { ad: "Nasdaq", fiyat: "16.400", degisim: "+0.08%" }
+        ];
+
         // ============ PANEL OLUŞTURMA ============
-        function renderCard(id, item) {
-            let content = '';
-            const data = item.veri;
-            
-            if (Array.isArray(data)) {
-                content = data.map(d => `<div class="list-item"><span class="item-label">📌</span><span class="item-value">${d}</span></div>`).join('');
+        function renderCard(title, icon, data, isArray = true, specialClass = "") {
+            let content = "";
+            if (isArray) {
+                content = data.map(item => {
+                    const keys = Object.keys(item);
+                    return `
+                        <div class="list-item">
+                            <span class="item-label">${item[keys[0]]}</span>
+                            <span class="item-value">${item[keys[1]]} ${item[keys[2]] ? `(${item[keys[2]]})` : ""}</span>
+                        </div>
+                    `;
+                }).join("");
             } else {
-                content = Object.entries(data).map(([k, v]) => `
-                    <div class="list-item">
-                        <span class="item-label">${k}</span>
-                        <span class="item-value">${v}</span>
-                    </div>
-                `).join('');
+                content = data;
             }
-            
             return `
-                <div class="card" data-category="${id}" data-name="${item.baslik}">
+                <div class="card ${specialClass}">
                     <div class="card-header">
-                        <span class="card-header-icon">${item.ikon}</span>
-                        <span>${item.baslik}</span>
+                        <span>${icon}</span>
+                        <span>${title}</span>
                     </div>
                     <div class="card-content">
                         ${content}
@@ -477,49 +433,74 @@
             `;
         }
 
-        function renderAnmaCard() {
+        function renderTrendsCard() {
+            let content = '<div class="tag-group">';
+            googleTrends.forEach(t => {
+                content += `<span class="trend-tag ${t.sicak ? 'hot' : ''}">🔥 ${t.kelime} ${t.artis}</span>`;
+            });
+            content += '</div>';
             return `
-                <div class="card anma-card" data-category="anma" data-name="Anma Paneli">
-                    <div class="card-header">
-                        <span class="card-header-icon">🕯️</span>
-                        <span>Anma Paneli - Vefat Edenler</span>
-                    </div>
-                    <div class="card-content">
-                        ${vefatEdenler.map(v => `
-                            <div class="vefat-item">
-                                <div>
-                                    <div class="vefat-name">${v.ad}</div>
-                                    <div class="vefat-detail">${v.meslek} | ${v.tarih} | ${v.aciklama}</div>
-                                </div>
-                                <div class="vefat-age">${v.yas} yaş</div>
-                            </div>
-                        `).join('')}
-                    </div>
+                <div class="card">
+                    <div class="card-header"><span>📈</span><span>Google Trendler - Dünya Geneli İlk 10</span></div>
+                    <div class="card-content">${content}</div>
                 </div>
             `;
         }
 
-        function renderAllCards() {
-            let html = renderAnmaCard();
-            for (const [id, item] of Object.entries(panelData)) {
-                html += renderCard(id, item);
-            }
+        function renderCommodityCard(title, icon, data) {
+            let content = '<div class="commodity-grid">';
+            data.forEach(item => {
+                const trendClass = item.durum === "up" ? "trend-up" : (item.durum === "down" ? "trend-down" : "");
+                content += `
+                    <div class="commodity-item">
+                        <span class="item-label">${item.ad}</span>
+                        <span class="item-value ${trendClass}">${item.fiyat} ${item.degisim ? `(${item.degisim})` : ""}</span>
+                    </div>
+                `;
+            });
+            content += '</div>';
+            return `
+                <div class="card coffee-card">
+                    <div class="card-header"><span>${icon}</span><span>${title}</span></div>
+                    <div class="card-content">${content}</div>
+                </div>
+            `;
+        }
+
+        function renderAll() {
+            let html = "";
+            
+            // Sponsor Kahve Kartı (Özel)
+            html += renderCommodityCard("ICE Kahve Emtia Borsası", "☕", iceCoffeeData);
+            html += renderCommodityCard("Brezilya Toptan Kahve Fiyatları", "🇧🇷", brasilCoffeePrices);
+            html += renderCommodityCard("Diğer Emtialar", "📊", otherCommodities);
+            html += renderTrendsCard();
+            html += renderCard("Döviz & Kripto", "💰", currencyData);
+            html += renderCard("Hava Durumu", "🌤️", weatherData);
+            html += renderCard("Bölge Haberleri", "📰", newsData, true);
+            html += renderCard("Ekonomi", "📈", economyData);
+            html += renderCard("Akaryakıt Fiyatları", "⛽", fuelData);
+            html += renderCard("Trafik & Ulaşım", "🚦", trafficData);
+            html += renderCard("Sağlık", "🏥", healthData);
+            html += renderCard("Borsa", "📊", stockData);
+            
             document.getElementById('panelGrid').innerHTML = html;
         }
 
-        // ============ ARAMA ============
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            filterCards('');
+        // ============ ZAMAN GÜNCELLEME ============
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('updateTime').innerHTML = now.toLocaleString('tr-TR');
+            document.getElementById('liveBadge').innerHTML = `🔴 CANLI ${now.toLocaleTimeString('tr-TR')}`;
         }
 
+        // ============ ARAMA ============
         function filterCards(searchTerm) {
             const term = searchTerm.toLowerCase();
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
-                const name = card.getAttribute('data-name') || '';
-                const category = card.getAttribute('data-category') || '';
-                if (name.toLowerCase().includes(term) || category.toLowerCase().includes(term)) {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(term)) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -527,35 +508,25 @@
             });
         }
 
+        // ============ DİL DEĞİŞTİRME ============
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            const lang = e.target.value;
+            const t = translations[lang];
+            if (t) {
+                document.getElementById('searchInput').placeholder = t.ara;
+            }
+        });
+
         document.getElementById('searchInput').addEventListener('input', (e) => {
             filterCards(e.target.value);
         });
 
-        // ============ BOTTOM NAV ============
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showAnma() {
-            const anmaCard = document.querySelector('.anma-card');
-            if (anmaCard) {
-                anmaCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        function showFavorites() {
-            alert("⭐ Favoriler özelliği: Beğendiğiniz kartları yıldızlayarak buradan görüntüleyebilirsiniz. Yakında!");
-        }
-
-        function showSettings() {
-            alert("⚙️ Ayarlar: Tema değiştirme, bildirim tercihleri ve dil seçenekleri yakında eklenecek.");
-        }
-
         // ============ SAYFA BAŞLATMA ============
         function init() {
-            renderAllCards();
+            renderAll();
             updateTime();
             setInterval(updateTime, 60000);
+            document.getElementById('searchInput').placeholder = translations.tr.ara;
         }
 
         init();

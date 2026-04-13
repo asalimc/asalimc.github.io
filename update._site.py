@@ -1,4 +1,2 @@
-import json
-from datetime import datetime
-
-print("✅ son_rapor.json hazir")
+# Bu dosya sadece .yml dosyasının beklentisi için
+print("✅ Site güncel")

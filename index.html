@@ -3,67 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-<title>Brezilya Robusta | Kurumsal Satış Platformu</title>
+<meta name="theme-color" content="#0066cc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Brezilya Robusta | Ultimate Trading Platform</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f4f6f9;
-  color: #1a2a3e;
-  line-height: 1.5;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --primary: #0a2540;
-  --primary-light: #1a3a5c;
-  --gold: #d4af37;
-  --gold-light: #e8c857;
-  --white: #ffffff;
+  --primary: #0066cc;
+  --primary-dark: #0052a3;
+  --primary-light: #e8f0fe;
   --gray-50: #f8f9fc;
   --gray-100: #f1f3f8;
   --gray-200: #e4e8f0;
   --gray-300: #d1d8e6;
   --gray-600: #5a6e8a;
+  --gray-700: #3a4a66;
+  --gray-900: #1a2a3e;
+  --white: #ffffff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --gold: #d4af37;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --cyan: #06b6d4;
 }
 
-/* RESPONSIVE - MOBIL FIRST */
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 16px;
-  padding-bottom: 100px;
+[data-theme="dark"] {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #1e3a5f;
+  --gray-50: #1a1a2e;
+  --gray-100: #16213e;
+  --gray-200: #2d2d44;
+  --gray-300: #3a3a5a;
+  --gray-600: #a0a0c0;
+  --gray-700: #c0c0e0;
+  --gray-900: #e0e0f0;
+  --white: #0f0f23;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
 }
 
-/* Telefon için padding düzenlemesi */
-@media (min-width: 768px) {
-  .container {
-    padding: 24px;
-    padding-bottom: 100px;
-  }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-900);
+  transition: background 0.3s, color 0.3s;
 }
 
-/* Header - Mobil */
+/* TEMA GEÇİŞİ */
+.theme-transition {
+  transition: all 0.3s ease;
+}
+
+/* HEADER */
 .header {
   background: var(--white);
   border-bottom: 1px solid var(--gray-200);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.header-top {
+.header-content {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 12px 16px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -71,475 +87,232 @@ body {
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .header-top {
-    padding: 16px 24px;
-  }
-}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; }
+.logo-text h1 { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+.logo-text p { font-size: 0.55rem; color: var(--gray-600); }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.header-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-outline { background: transparent; border: 1px solid var(--gray-300); padding: 8px 14px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; color: var(--gray-700); cursor: pointer; transition: all 0.2s; }
+.btn-outline:hover { background: var(--gray-100); border-color: var(--primary); color: var(--primary); }
+.btn-primary { background: var(--primary); border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { background: var(--primary-dark); transform: scale(1.02); }
+.btn-success { background: var(--success); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
+.btn-warning { background: var(--warning); color: var(--gray-900); border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
 
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
+/* CONTAINER */
+.container { max-width: 1280px; margin: 0 auto; padding: 20px; padding-bottom: 90px; }
 
-@media (min-width: 768px) {
-  .logo-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    font-size: 1.4rem;
-  }
-}
+/* STATS BANNER */
+.stats-banner { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 20px; margin-bottom: 24px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; animation: fadeIn 0.5s ease; }
+.stats-info h3 { font-size: 0.7rem; font-weight: 500; opacity: 0.8; letter-spacing: 0.5px; }
+.stats-info h2 { font-size: 1.3rem; font-weight: 700; }
+.stats-info p { font-size: 0.65rem; opacity: 0.8; margin-top: 6px; }
+.update-badge { background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; }
 
-.logo-text h1 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--primary);
-}
+/* DASHBOARD KARTLARI */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.dash-card { background: var(--white); border-radius: 16px; padding: 16px; text-align: center; border: 1px solid var(--gray-200); transition: transform 0.2s; cursor: pointer; }
+.dash-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+.dash-card .value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.dash-card .label { font-size: 0.6rem; color: var(--gray-600); margin-top: 6px; text-transform: uppercase; }
 
-@media (min-width: 768px) {
-  .logo-text h1 {
-    font-size: 1.2rem;
-  }
-}
+/* AYARLAR MODALI */
+.settings-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: flex-end; justify-content: center; z-index: 200; visibility: hidden; opacity: 0; transition: all 0.3s; }
+.settings-modal.open { visibility: visible; opacity: 1; }
+.settings-panel { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; max-width: 600px; padding: 24px 20px; transform: translateY(100%); transition: transform 0.3s ease; max-height: 85vh; overflow-y: auto; }
+.settings-modal.open .settings-panel { transform: translateY(0); }
+.settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--gray-200); }
+.params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-.logo-text p {
-  font-size: 0.55rem;
-  color: var(--gray-600);
-}
+/* FİLTRE */
+.filter-section { margin-bottom: 20px; }
+.filter-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 8px; }
+.filter-chip { background: var(--white); border: 1px solid var(--gray-200); padding: 8px 18px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: var(--gray-700); white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+.filter-chip:hover { border-color: var(--primary); color: var(--primary); }
+.filter-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
 
-@media (min-width: 768px) {
-  .logo-text p {
-    font-size: 0.65rem;
-  }
-}
+/* AKSİYON BAR */
+.action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.sort-group { display: flex; gap: 8px; }
+.sort-btn { background: var(--white); border: 1px solid var(--gray-200); padding: 6px 14px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; color: var(--gray-700); cursor: pointer; }
+.fav-btn { background: var(--white); border: 1px solid var(--gray-200); padding: 6px 14px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
+.fav-btn.active { background: var(--gold); border-color: var(--gold); }
 
-.header-actions {
-  display: flex;
-  gap: 8px;
-}
+/* ÜRÜN GRID */
+.products-grid { display: grid; grid-template-columns: 1fr; gap: 16px; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 768px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
 
-.btn-outline, .btn-primary {
-  padding: 6px 12px;
-  font-size: 0.6rem;
-  border-radius: 30px;
-}
+.product-card { background: var(--white); border-radius: 16px; padding: 20px; border: 1px solid var(--gray-200); transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); cursor: pointer; position: relative; overflow: hidden; }
+.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.1); }
+.product-card.p1 { border-top: 3px solid var(--gold); }
+.product-card.p2 { border-top: 3px solid var(--success); }
+.product-card.p3 { border-top: 3px solid var(--purple); }
+.product-card.p4 { border-top: 3px solid var(--warning); }
+.product-card.p5 { border-top: 3px solid var(--error); }
 
-@media (min-width: 768px) {
-  .btn-outline, .btn-primary {
-    padding: 8px 18px;
-    font-size: 0.7rem;
-  }
-}
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.coc-name { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+.fav-star { font-size: 1rem; cursor: pointer; color: var(--gray-300); transition: all 0.2s; }
+.fav-star.active { color: var(--gold); text-shadow: 0 0 4px rgba(212,175,55,0.5); }
+.priority-badge { font-size: 0.55rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: var(--gray-100); color: var(--gray-700); }
 
-/* STATS BANNER - Mobil */
-.stats-banner {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  color: var(--white);
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  gap: 12px;
-}
+.price-main { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin: 12px 0; }
+.price-main small { font-size: 0.65rem; font-weight: 500; color: var(--gray-600); }
 
-@media (min-width: 768px) {
-  .stats-banner {
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 32px;
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
-}
+.price-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; padding: 12px 0; border-top: 1px solid var(--gray-200); border-bottom: 1px solid var(--gray-200); }
+.detail-item { display: flex; justify-content: space-between; align-items: center; }
+.detail-item .label { font-size: 0.6rem; font-weight: 500; color: var(--gray-600); }
+.detail-item .value { font-size: 0.7rem; font-weight: 700; color: var(--gray-900); }
 
-.stats-info h3 {
-  font-size: 0.65rem;
-  opacity: 0.7;
-}
+.total-badge { background: var(--gray-50); padding: 10px; border-radius: 12px; margin-top: 12px; text-align: center; font-size: 0.7rem; font-weight: 600; color: var(--primary); }
 
-.stats-info h2 {
-  font-size: 1.3rem;
-  margin: 6px 0;
-}
+/* ALT NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--gray-200); padding: 8px 16px; z-index: 100; }
+.nav-container { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-around; }
+.nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.55rem; font-weight: 600; color: var(--gray-600); cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all 0.2s; }
+.nav-item:hover { background: var(--gray-100); color: var(--primary); }
 
-@media (min-width: 768px) {
-  .stats-info h2 {
-    font-size: 1.8rem;
-  }
-}
+/* MODAL */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
+.modal-container { background: var(--white); border-radius: 20px; padding: 24px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+.modal-container input, .modal-container select, .modal-container textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200); border-radius: 10px; margin: 8px 0; font-family: inherit; background: var(--white); color: var(--gray-900); }
 
-/* PARAMETRE KARTI - Mobil */
-.params-card {
-  background: var(--white);
-  border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-@media (min-width: 768px) {
-  .params-card {
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-}
-
-.params-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (min-width: 768px) {
-  .params-grid {
-    gap: 16px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .params-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.param-field label {
-  font-size: 0.55rem;
-}
-
-.param-field input {
-  padding: 10px 12px;
-  font-size: 0.8rem;
-}
-
-@media (min-width: 768px) {
-  .param-field input {
-    padding: 12px 14px;
-    font-size: 0.85rem;
-  }
-}
-
-/* FİLTRE TABS - Mobil (yatay kaydırma) */
-.filter-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-}
-
-.filter-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.filter-tab {
-  padding: 6px 16px;
-  font-size: 0.65rem;
-  white-space: nowrap;
-}
-
-@media (min-width: 768px) {
-  .filter-tab {
-    padding: 8px 20px;
-    font-size: 0.7rem;
-  }
-}
-
-/* ACTION BAR - Mobil */
-.action-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-@media (min-width: 480px) {
-  .action-bar {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-
-.sort-group {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.sort-btn, .action-chip {
-  padding: 6px 12px;
-  font-size: 0.6rem;
-}
-
-@media (min-width: 768px) {
-  .sort-btn, .action-chip {
-    padding: 8px 16px;
-    font-size: 0.65rem;
-  }
-}
-
-/* ÜRÜN GRID - Mobil (1 kolon) */
-.products-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.product-card {
-  padding: 16px;
-  border-radius: 18px;
-}
-
-@media (min-width: 768px) {
-  .product-card {
-    padding: 20px;
-    border-radius: 20px;
-  }
-}
-
-.coc-code {
-  font-size: 1rem;
-}
-
-@media (min-width: 768px) {
-  .coc-code {
-    font-size: 1.1rem;
-  }
-}
-
-.price-main {
-  font-size: 1.3rem;
-}
-
-@media (min-width: 768px) {
-  .price-main {
-    font-size: 1.6rem;
-  }
-}
-
-/* BOTTOM NAV - Mobil */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--white);
-  border-top: 1px solid var(--gray-200);
-  padding: 8px 12px;
-  z-index: 100;
-}
-
-@media (min-width: 768px) {
-  .bottom-nav {
-    padding: 10px 24px;
-  }
-}
-
-.nav-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-around;
-}
-
-.nav-item {
-  padding: 6px 10px;
-  font-size: 0.5rem;
-}
-
-@media (min-width: 768px) {
-  .nav-item {
-    padding: 8px 16px;
-    font-size: 0.55rem;
-  }
-}
-
-.nav-item span:first-child {
-  font-size: 0.9rem;
-}
-
-@media (min-width: 768px) {
-  .nav-item span:first-child {
-    font-size: 1.1rem;
-  }
-}
-
-/* MODAL - Mobil */
-.modal-container {
-  padding: 20px;
-  border-radius: 24px;
-  max-width: 90%;
-}
-
-@media (min-width: 768px) {
-  .modal-container {
-    padding: 28px;
-    border-radius: 28px;
-    max-width: 500px;
-  }
-}
-
-/* PDF PREVIEW - Mobil */
-.pdf-header {
-  padding: 12px;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-@media (min-width: 768px) {
-  .pdf-header {
-    padding: 16px;
-    gap: 12px;
-  }
-}
-
-.pdf-content {
-  padding: 20px;
-}
-
-@media (min-width: 768px) {
-  .pdf-content {
-    padding: 32px;
-  }
-}
+/* GRAFİK MODAL */
+.chart-container { max-width: 400px; margin: 0 auto; }
 
 /* TOAST */
-.toast {
-  bottom: 80px;
-  padding: 10px 20px;
-  font-size: 0.7rem;
-}
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: white; padding: 10px 20px; border-radius: 10px; font-size: 0.7rem; z-index: 500; animation: fadeOut 2s ease forwards; }
+@keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 
-@media (min-width: 768px) {
-  .toast {
-    bottom: 90px;
-    padding: 12px 24px;
-    font-size: 0.75rem;
-  }
-}
+/* SESLİ KOMUT */
+.voice-active { background: var(--success); color: white; animation: pulse 1s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-.hidden {
-  display: none !important;
-}
+/* ROZET */
+.badge-earned { position: absolute; top: -5px; right: -5px; background: var(--gold); color: var(--gray-900); border-radius: 20px; padding: 4px 8px; font-size: 0.6rem; font-weight: bold; animation: bounce 0.5s ease; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+/* PULL-TO-REFRESH */
+.pull-indicator { text-align: center; padding: 10px; font-size: 0.6rem; color: var(--gray-600); display: none; }
+
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <header class="header">
-  <div class="header-top">
+  <div class="header-content">
     <div class="logo">
       <div class="logo-icon">🇧🇷</div>
       <div class="logo-text">
         <h1>Brezilya Robusta</h1>
-        <p>PREMIUM COFFEE TRADING</p>
+        <p id="dailyQuote">☕ Premium kahve ticaret platformu</p>
       </div>
     </div>
-    <div class="header-actions">
-      <button class="btn-outline" onclick="fetchLiveRates()">🔄</button>
+    <div class="header-buttons">
+      <button class="btn-outline" onclick="toggleTheme()">🌙 Tema</button>
+      <button class="btn-outline" onclick="openSettings()">⚙️ Ayarlar</button>
       <button class="btn-primary" id="modeBtn" onclick="toggleMode()">👤 Müşteri</button>
     </div>
   </div>
 </header>
 
 <div class="container">
+  <!-- STATS BANNER -->
   <div class="stats-banner">
     <div class="stats-info">
-      <h3>HOŞ GELDİNİZ</h3>
+      <h3 id="greeting">HOŞ GELDİNİZ</h3>
       <h2>Brezilya <span style="color: var(--gold);">Robusta</span></h2>
-      <p>Premium kahve ticaret platformu</p>
+      <p>Güney Amerika'nın en kaliteli robusta kahveleri</p>
     </div>
-    <div class="stats-update">
-      <div class="update-badge" id="lastUpdate">--</div>
+    <div class="update-badge" id="bannerLastUpdate">--</div>
+  </div>
+
+  <!-- DASHBOARD KARTLARI -->
+  <div class="dashboard-grid">
+    <div class="dash-card" onclick="showMostViewed()">
+      <div class="value" id="mostViewedCount">0</div>
+      <div class="label">👁️ En Çok Bakılan</div>
+    </div>
+    <div class="dash-card" onclick="showMostProfitable()">
+      <div class="value" id="mostProfitable">0%</div>
+      <div class="label">💰 En Karlı Ürün</div>
+    </div>
+    <div class="dash-card" onclick="showGoalStatus()">
+      <div class="value" id="goalProgress">0%</div>
+      <div class="label">🎯 Hedef Durumu</div>
+    </div>
+    <div class="dash-card" onclick="showTodayDeal()">
+      <div class="value" id="todayDeal">-</div>
+      <div class="label">⭐ Günün Fırsatı</div>
     </div>
   </div>
 
-  <div class="params-card" id="paramsCard">
-    <div class="card-header-section" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="width:3px; height:16px; background:var(--gold); border-radius:2px;"></div>
-        <h3 style="font-size:0.7rem; font-weight:600;">PARAMETRELER</h3>
-      </div>
-      <button class="btn-gold" onclick="openBulkUpdate()" style="background:var(--gold); border:none; padding:6px 12px; border-radius:30px; font-size:0.6rem; font-weight:600;">📊 Toplu</button>
-    </div>
-    <div class="params-grid">
-      <div class="param-field"><label>USD/BRL</label><input type="number" id="usdbrl" value="5.10" step="0.01"></div>
-      <div class="param-field"><label>USD/TRY</label><input type="number" id="usdtry" value="44.70" step="0.01"></div>
-      <div class="param-field"><label>Navlun $/kg</label><input type="number" id="freight" value="0.47" step="0.01"></div>
-      <div class="param-field"><label>Vergi %</label><input type="number" id="taxRate" value="10.5" step="0.5"></div>
-      <div class="param-field"><label>Kar ₺/kg</label><input type="number" id="profit" value="20" step="1"></div>
-      <div class="param-field"><label>Miktar ton</label><input type="number" id="ton" value="20" step="0.1"></div>
+  <!-- FİLTRE -->
+  <div class="filter-section">
+    <div class="filter-scroll" id="filterTabs">
+      <div class="filter-chip active" data-priority="all">Tümü</div>
+      <div class="filter-chip" data-priority="1">P1 ⭐</div>
+      <div class="filter-chip" data-priority="2">P2</div>
+      <div class="filter-chip" data-priority="3">P3</div>
+      <div class="filter-chip" data-priority="4">P4</div>
+      <div class="filter-chip" data-priority="5">P5</div>
     </div>
   </div>
 
-  <div class="filter-tabs" id="filterTabs">
-    <div class="filter-tab active" data-priority="all">Tümü</div>
-    <div class="filter-tab" data-priority="1">P1</div>
-    <div class="filter-tab" data-priority="2">P2</div>
-    <div class="filter-tab" data-priority="3">P3</div>
-    <div class="filter-tab" data-priority="4">P4</div>
-    <div class="filter-tab" data-priority="5">P5</div>
-  </div>
-
+  <!-- AKSİYON BAR -->
   <div class="action-bar">
     <div class="sort-group">
       <button class="sort-btn" onclick="setSort('priority')">📌 Öncelik</button>
       <button class="sort-btn" onclick="setSort('price')">💰 Fiyat</button>
+      <button class="sort-btn" onclick="setSort('profit')">📈 Karlılık</button>
     </div>
-    <div class="action-group">
-      <button class="action-chip" id="favFilterBtn" onclick="toggleFavFilter()">⭐ Favoriler</button>
+    <div>
+      <button class="fav-btn" id="favFilterBtn" onclick="toggleFavFilter()">⭐ Favoriler</button>
+      <button class="fav-btn" onclick="openRandomProduct()">🎲 Rastgele</button>
+      <button class="fav-btn" onclick="startVoiceCommand()">🎤 Sesli</button>
     </div>
   </div>
 
+  <!-- ÜRÜN GRID -->
   <div class="products-grid" id="productsGrid"></div>
+  <div class="pull-indicator" id="pullIndicator">⬇️ Aşağı çekerek yenileyin</div>
 </div>
 
+<!-- ALT NAV -->
 <div class="bottom-nav">
   <div class="nav-container">
     <button class="nav-item" onclick="scrollToTop()"><span>🏠</span><span>Ana</span></button>
     <button class="nav-item" onclick="scrollToProducts()"><span>☕</span><span>Ürünler</span></button>
     <button class="nav-item" onclick="generatePDF()"><span>📄</span><span>PDF</span></button>
     <button class="nav-item" onclick="openHistory()"><span>📜</span><span>Geçmiş</span></button>
-    <button class="nav-item" onclick="openEditor()"><span>✎</span><span>Yönet</span></button>
+    <button class="nav-item" onclick="openDashboard()"><span>📊</span><span>Analiz</span></button>
+    <button class="nav-item" onclick="openEditor()"><span>✎</span><span>Yönetim</span></button>
   </div>
 </div>
 
 <script>
+// ============ VERİLER ============
 let cocData = [
-  { coc: 'COC-01', p: 1, rs: 1915 }, { coc: 'COC-02', p: 1, rs: 1905 }, { coc: 'COC-03', p: 1, rs: 1895 },
-  { coc: 'COC-04', p: 2, rs: 1885 }, { coc: 'COC-05', p: 2, rs: 1845 }, { coc: 'COC-06', p: 2, rs: 1662 },
-  { coc: 'COC-07', p: 3, rs: 1630 }, { coc: 'COC-08', p: 3, rs: 1615 },
-  { coc: 'COC-09', p: 4, rs: 1477 }, { coc: 'COC-10', p: 4, rs: 1442 }, { coc: 'COC-11', p: 4, rs: 1320 }, { coc: 'COC-12', p: 4, rs: 1257 },
-  { coc: 'COC-13', p: 5, rs: 870 }, { coc: 'COC-14', p: 5, rs: 870 }, { coc: 'COC-15', p: 5, rs: 750 }, { coc: 'COC-16', p: 5, rs: 630 }
+  { coc: 'COC-01', p: 1, rs: 1915, viewCount: 0, tags: ['premium', 'yeni'] },
+  { coc: 'COC-02', p: 1, rs: 1905, viewCount: 0, tags: ['premium'] },
+  { coc: 'COC-03', p: 1, rs: 1895, viewCount: 0, tags: ['kampanya'] },
+  { coc: 'COC-04', p: 2, rs: 1885, viewCount: 0, tags: [] },
+  { coc: 'COC-05', p: 2, rs: 1845, viewCount: 0, tags: [] },
+  { coc: 'COC-06', p: 2, rs: 1662, viewCount: 0, tags: ['fırsat'] },
+  { coc: 'COC-07', p: 3, rs: 1630, viewCount: 0, tags: [] },
+  { coc: 'COC-08', p: 3, rs: 1615, viewCount: 0, tags: [] },
+  { coc: 'COC-09', p: 4, rs: 1477, viewCount: 0, tags: [] },
+  { coc: 'COC-10', p: 4, rs: 1442, viewCount: 0, tags: [] },
+  { coc: 'COC-11', p: 4, rs: 1320, viewCount: 0, tags: [] },
+  { coc: 'COC-12', p: 4, rs: 1257, viewCount: 0, tags: [] },
+  { coc: 'COC-13', p: 5, rs: 870, viewCount: 0, tags: [] },
+  { coc: 'COC-14', p: 5, rs: 870, viewCount: 0, tags: [] },
+  { coc: 'COC-15', p: 5, rs: 750, viewCount: 0, tags: ['limited'] },
+  { coc: 'COC-16', p: 5, rs: 630, viewCount: 0, tags: [] }
 ];
 
 let salesMode = false;
@@ -548,7 +321,13 @@ let currentSort = 'priority';
 let showOnlyFav = false;
 let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 let offerHistory = JSON.parse(localStorage.getItem('offerHistory') || '[]');
+let viewHistory = JSON.parse(localStorage.getItem('viewHistory') || '[]');
+let monthlyTarget = JSON.parse(localStorage.getItem('monthlyTarget') || '{"target":500000,"current":0}');
+let badges = JSON.parse(localStorage.getItem('badges') || '[]');
+let lastVoiceCommand = '';
+let recognition = null;
 
+// ============ FİYAT HESAPLAMA ============
 function calcPrices(rs, usdbrl, usdtry, freight, taxRate, profit) {
   let usdkg = (rs / 60) / usdbrl;
   let fobTon = (usdkg * usdtry) * 1000;
@@ -559,21 +338,71 @@ function calcPrices(rs, usdbrl, usdtry, freight, taxRate, profit) {
   return { fobTon, cifTon, ddpTon, sellTon, marginPct };
 }
 
+// ============ TEMA ============
+function toggleTheme() {
+  const html = document.documentElement;
+  const currentTheme = html.getAttribute('data-theme');
+  if (currentTheme === 'dark') {
+    html.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+    showToast('🌞 Aydınlık tema aktif');
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    showToast('🌙 Karanlık tema aktif');
+  }
+}
+
+// ============ GÜNÜN SÖZÜ ============
+const quotes = [
+  "☕ Kahve, düşüncenin kahvesidir.",
+  "🌟 Her fincan yeni bir başlangıçtır.",
+  "💪 Robusta, gücün ve enerjinin kaynağıdır.",
+  "🌱 Kaliteli kahve, kaliteli hayattır.",
+  "🤝 Brezilya'dan dünyaya kahve sevgisi.",
+  "📈 Fırsatları kaçırmayın, hemen teklif alın!",
+  "🎯 Hedeflerinize ulaşmak için doğru adres.",
+  "✨ Premium kalite, uygun fiyat."
+];
+setInterval(() => {
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  document.getElementById('dailyQuote').innerHTML = randomQuote;
+}, 30000);
+
+// ============ KARŞILAMA MESAJI ============
+const hour = new Date().getHours();
+let greeting = '';
+if (hour < 12) greeting = '🌅 GÜNAYDIN';
+else if (hour < 18) greeting = '☀️ İYİ GÜNLER';
+else greeting = '🌙 İYİ AKŞAMLAR';
+document.getElementById('greeting').innerHTML = greeting;
+
+// ============ CANLI DÖVİZ ============
 async function fetchLiveRates() {
-  showToast('Güncelleniyor...');
+  showToast('Döviz kurları güncelleniyor...');
   try {
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const data = await response.json();
     if (data.rates.BRL) document.getElementById('usdbrl').value = data.rates.BRL.toFixed(4);
     if (data.rates.TRY) document.getElementById('usdtry').value = data.rates.TRY.toFixed(4);
-    document.getElementById('lastUpdate').innerHTML = new Date().toLocaleTimeString('tr-TR');
+    const timeStr = new Date().toLocaleTimeString('tr-TR');
+    document.getElementById('lastUpdate').innerHTML = `Son güncelleme: ${timeStr}`;
+    document.getElementById('bannerLastUpdate').innerHTML = timeStr;
     showToast('Kurlar güncellendi');
     render();
-  } catch(e) { showToast('API hatası'); }
+    checkAndAwardBadge('firstUpdate');
+  } catch(e) { showToast('API hatası, manuel giriş yapabilirsiniz'); }
 }
+setInterval(fetchLiveRates, 300000);
 
+// ============ FAVORİ ============
 function toggleFavorite(cocName) {
-  favorites.includes(cocName) ? favorites = favorites.filter(f => f !== cocName) : favorites.push(cocName);
+  if (favorites.includes(cocName)) {
+    favorites = favorites.filter(f => f !== cocName);
+  } else {
+    favorites.push(cocName);
+    checkAndAwardBadge('firstFavorite');
+  }
   localStorage.setItem('favorites', JSON.stringify(favorites));
   render();
 }
@@ -584,40 +413,60 @@ function toggleFavFilter() {
   render();
 }
 
-function openBulkUpdate() {
-  let modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.right = '0';
-  modal.style.bottom = '0';
-  modal.style.background = 'rgba(10,37,64,0.9)';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.zIndex = '1000';
-  modal.style.padding = '16px';
-  modal.innerHTML = `<div class="modal-container" style="background:white; border-radius:24px; padding:20px; max-width:90%; width:100%;"><h3 style="margin-bottom:16px;">Toplu Güncelleme</h3><div class="param-field"><label>Yüzde (%)</label><input type="number" id="bulkPercent" value="0" step="1" style="width:100%; padding:10px; border-radius:12px; border:1px solid #e4e8f0; margin:8px 0;"></div><div class="param-field"><label>Alan</label><select id="bulkAction" style="width:100%; padding:10px; border-radius:12px; margin:8px 0;"><option value="profit">Kar Hedefi</option><option value="rs">RS Değeri</option></select></div><div class="modal-buttons" style="display:flex; gap:10px; margin-top:16px;"><button class="btn-gold" onclick="applyBulkUpdate()" style="flex:1; padding:10px; background:#d4af37; border:none; border-radius:30px; font-weight:600;">Uygula</button><button class="btn-outline" onclick="closeModal(this)" style="flex:1; padding:10px; background:transparent; border:1px solid #e4e8f0; border-radius:30px;">İptal</button></div></div>`;
-  document.body.appendChild(modal);
-  window.applyBulkUpdate = () => {
-    let percent = parseFloat(document.getElementById('bulkPercent').value) || 0;
-    let action = document.getElementById('bulkAction').value;
-    let multiplier = 1 + (percent / 100);
-    if (action === 'profit') {
-      let p = parseFloat(document.getElementById('profit').value) || 0;
-      document.getElementById('profit').value = (p * multiplier).toFixed(2);
-      showToast(`Kar %${percent} güncellendi`);
-    } else {
-      cocData.forEach(c => c.rs = Math.round(c.rs * multiplier));
-      localStorage.setItem('cocData', JSON.stringify(cocData));
-      showToast(`RS %${percent} güncellendi`);
-    }
-    modal.remove();
-    render();
+// ============ ROZET SİSTEMİ ============
+function checkAndAwardBadge(badgeId) {
+  const badgeMap = {
+    firstUpdate: { name: '📡 İlk Güncelleme', desc: 'Döviz kurunu ilk kez güncelledin' },
+    firstFavorite: { name: '⭐ İlk Favori', desc: 'İlk ürününü favoriledin' },
+    firstPDF: { name: '📄 İlk Teklif', desc: 'İlk PDF teklifini oluşturdun' },
+    tenProducts: { name: '🏆 10 Ürün', desc: '10 farklı ürünü favoriledin' },
+    master: { name: '👑 Master', desc: 'Tüm rozetleri topladın' }
   };
+  if (!badges.includes(badgeId)) {
+    badges.push(badgeId);
+    localStorage.setItem('badges', JSON.stringify(badges));
+    showToast(`🎉 Yeni rozet kazandın: ${badgeMap[badgeId]?.name || badgeId}`);
+    canvasConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+  }
 }
 
+// ============ AYARLAR ============
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+// ============ PDF ============
+function getPDFHTML() {
+  let usdbrl = parseFloat(document.getElementById('usdbrl').value) || 1;
+  let usdtry = parseFloat(document.getElementById('usdtry').value) || 1;
+  let freight = parseFloat(document.getElementById('freight').value) || 0;
+  let taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+  let profit = parseFloat(document.getElementById('profit').value) || 0;
+  let ton = parseFloat(document.getElementById('ton').value) || 0;
+  let totalSell = 0, rows = '';
+  cocData.forEach(c => {
+    let p = calcPrices(c.rs, usdbrl, usdtry, freight, taxRate, profit);
+    totalSell += p.sellTon * ton;
+    rows += `<tr><td style="padding:10px;"><b>${c.coc}</b></td><td style="text-align:center">${c.p}</td><td style="text-align:right">₺ ${Math.round(p.fobTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.cifTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.ddpTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.sellTon).toLocaleString()}</td><td style="text-align:center">${p.marginPct.toFixed(1)}%</td></tr>`;
+  });
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Brezilya Robusta Teklif</title><style>body{font-family:Inter,Arial;margin:0;padding:40px;background:#f5f7fa;}table{border-collapse:collapse;width:100%;}th,td{padding:10px;border-bottom:1px solid #e4e8f0;}th{background:#0066cc;color:white;}</style></head><body><div style="max-width:1000px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;"><div style="background:#0066cc;padding:30px;text-align:center;"><h1 style="color:white;">BREZİLYA ROBUSTA</h1><p style="color:rgba(255,255,255,0.8);">RESMİ TEKLİF MEKTUBU</p></div><div style="padding:24px;"><div style="background:#f8f9fc;padding:16px;border-radius:12px;margin-bottom:24px;"><h3>HESAPLAMA PARAMETRELERİ</h3><table><tr><td>USD/BRL: <b>${usdbrl}</b></td><td>USD/TRY: <b>${usdtry}</b></td><td>Navlun: <b>$${freight}</b></td></tr><tr><td>Vergi: <b>${taxRate}%</b></td><td>Kar: <b>₺${profit}</b></td><td>Miktar: <b>${ton} ton</b></td></tr></table></div><h3>ÜRÜN BAZLI TEKLİFLER</h3><table style="width:100%"><thead><tr><th>COC</th><th>P</th><th>FOB</th><th>CIF</th><th>DDP</th><th>SATIŞ</th><th>KAR%</th></tr></thead><tbody>${rows}</tbody><tfoot><tr style="background:#e8f0fe;"><td colspan="5"><b>TOPLAM (${ton} TON):</b></td><td><b>₺ ${Math.round(totalSell).toLocaleString()}</b></td><td></tr></tfoot></table><div style="margin-top:24px;padding:12px;background:#f8f9fc;border-left:4px solid #0066cc;"><p>📌 FOB: Mal bedeli | CIF: Navlun dahil | DDP: Vergi dahil</p><p>📌 Geçerlilik: ${new Date(Date.now()+7*24*60*60*1000).toLocaleDateString('tr-TR')}</p></div></div></div></body></html>`;
+}
+
+async function generatePDF() {
+  let content = getPDFHTML();
+  let preview = document.createElement('div');
+  preview.className = 'pdf-preview';
+  preview.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:400;overflow:auto;padding:16px;';
+  preview.innerHTML = `<div style="position:sticky;top:0;background:white;padding:12px;border-radius:12px;display:flex;gap:10px;justify-content:center;margin-bottom:16px;"><button class="btn-primary" onclick="window.dlPDF()">📥 PDF İndir</button><button class="btn-outline" onclick="window.closePDF()">✖ Kapat</button></div><div style="background:white;max-width:800px;margin:0 auto;padding:24px;border-radius:16px;" id="pdfContent">${content}</div>`;
+  document.body.appendChild(preview);
+  window.dlPDF = () => { html2pdf().set({ margin: 0.5, filename: `BrezilyaRobusta_Teklif_${new Date().toLocaleDateString('tr-TR')}.pdf` }).from(document.getElementById('pdfContent')).save(); saveToHistory(); canvasConfetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } }); checkAndAwardBadge('firstPDF'); };
+  window.closePDF = () => preview.remove();
+}
+
+// ============ GEÇMİŞ ============
 function saveToHistory() {
   let usdbrl = parseFloat(document.getElementById('usdbrl').value);
   let usdtry = parseFloat(document.getElementById('usdtry').value);
@@ -625,29 +474,21 @@ function saveToHistory() {
   let total = 0;
   cocData.forEach(c => total += calcPrices(c.rs, usdbrl, usdtry, parseFloat(document.getElementById('freight').value), parseFloat(document.getElementById('taxRate').value), parseFloat(document.getElementById('profit').value)).sellTon * ton);
   offerHistory.unshift({ date: new Date().toISOString(), total, usdbrl, usdtry, ton });
-  if (offerHistory.length > 10) offerHistory.pop();
+  if (offerHistory.length > 20) offerHistory.pop();
   localStorage.setItem('offerHistory', JSON.stringify(offerHistory));
+  monthlyTarget.current += total;
+  localStorage.setItem('monthlyTarget', JSON.stringify(monthlyTarget));
 }
 
 function openHistory() {
-  if (!offerHistory.length) { showToast('Geçmiş yok'); return; }
+  if (!offerHistory.length) { showToast('Henüz teklif geçmişi bulunmuyor'); return; }
   let modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.right = '0';
-  modal.style.bottom = '0';
-  modal.style.background = 'rgba(10,37,64,0.9)';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.zIndex = '1000';
-  modal.style.padding = '16px';
-  let html = `<div class="modal-container" style="background:white; border-radius:24px; padding:20px; max-width:90%; width:100%; max-height:80vh; overflow-y:auto;"><h3 style="margin-bottom:16px;">Teklif Geçmişi</h3>`;
+  modal.className = 'modal-overlay';
+  let html = `<div class="modal-container"><h3>📜 Teklif Geçmişi (Son 20)</h3>`;
   offerHistory.forEach((h, idx) => {
-    html += `<div style="background:#f8f9fc; padding:12px; border-radius:16px; margin-bottom:12px; cursor:pointer;" onclick="loadHistory(${idx})"><div style="font-size:0.65rem; color:#d4af37;">${new Date(h.date).toLocaleString('tr-TR')}</div><div style="font-size:0.9rem; font-weight:700;">₺ ${Math.round(h.total).toLocaleString()}</div><div style="font-size:0.6rem;">USD/BRL:${h.usdbrl} | ${h.ton} ton</div></div>`;
+    html += `<div style="background:var(--gray-100);padding:12px;border-radius:12px;margin-bottom:10px;cursor:pointer;" onclick="loadHistory(${idx})"><div style="font-size:0.65rem;color:var(--primary);">${new Date(h.date).toLocaleString('tr-TR')}</div><div style="font-weight:700;">₺ ${Math.round(h.total).toLocaleString()}</div><div style="font-size:0.6rem;">USD/BRL: ${h.usdbrl} | ${h.ton} ton</div></div>`;
   });
-  html += `<button class="btn-outline" onclick="closeModal(this)" style="width:100%; padding:10px; background:transparent; border:1px solid #e4e8f0; border-radius:30px; margin-top:8px;">Kapat</button></div>`;
+  html += `<div class="modal-buttons"><button class="btn-outline" onclick="closeModal(this)">Kapat</button></div></div>`;
   modal.innerHTML = html;
   document.body.appendChild(modal);
   window.loadHistory = (idx) => {
@@ -661,40 +502,111 @@ function openHistory() {
   };
 }
 
-function getPDFHTML() {
-  let usdbrl = parseFloat(document.getElementById('usdbrl').value);
-  let usdtry = parseFloat(document.getElementById('usdtry').value);
-  let freight = parseFloat(document.getElementById('freight').value);
-  let taxRate = parseFloat(document.getElementById('taxRate').value);
-  let profit = parseFloat(document.getElementById('profit').value);
-  let ton = parseFloat(document.getElementById('ton').value);
-  let totalSell = 0, rows = '';
-  cocData.forEach(c => {
-    let p = calcPrices(c.rs, usdbrl, usdtry, freight, taxRate, profit);
-    totalSell += p.sellTon * ton;
-    rows += `<tr><td style="padding:10px;"><b>${c.coc}</b></td><td style="text-align:center">${c.p}</td><td style="text-align:right">₺ ${Math.round(p.fobTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.cifTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.ddpTon).toLocaleString()}</td><td style="text-align:right">₺ ${Math.round(p.sellTon).toLocaleString()}</td><td style="text-align:center">${p.marginPct.toFixed(1)}%</td></tr>`;
-  });
-  return `<div style="font-family:Inter; max-width:800px; margin:0 auto;"><div style="background:#0a2540; padding:24px; text-align:center;"><h1 style="color:#d4af37;">BREZİLYA ROBUSTA</h1><p style="color:white;">RESMİ TEKLİF</p></div><div style="padding:24px;"><div style="background:#f8f9fc; padding:16px; border-radius:12px;"><h3>PARAMETRELER</h3><table style="width:100%"><tr><td>USD/BRL: ${usdbrl}</td><td>USD/TRY: ${usdtry}</td><td>Navlun: $${freight}</td></tr><tr><td>Vergi: ${taxRate}%</td><td>Kar: ₺${profit}</td><td>Miktar: ${ton} ton</td></tr></table></div><h3>ÜRÜNLER</h3><table style="width:100%; border-collapse:collapse;"><thead><tr style="background:#d4af37;"><th>COC</th><th>P</th><th>FOB</th><th>CIF</th><th>DDP</th><th>SATIŞ</th><th>KAR%</th></tr></thead><tbody>${rows}</tbody><tfoot><tr style="background:#0a2540; color:#d4af37;"><td colspan="5"><b>TOPLAM</b></td><td><b>₺ ${Math.round(totalSell).toLocaleString()}</b></td><td></td></tr></tfoot></table><div style="margin-top:20px; padding:12px; background:#f8f9fc; border-left:4px solid #d4af37;"><p>Geçerlilik: ${new Date(Date.now()+7*24*60*60*1000).toLocaleDateString('tr-TR')}</p></div></div></div>`;
+// ============ DASHBOARD ============
+function showMostViewed() {
+  let mostViewed = [...cocData].sort((a,b) => b.viewCount - a.viewCount)[0];
+  showToast(`👁️ En çok bakılan: ${mostViewed.coc} (${mostViewed.viewCount} görüntülenme)`);
 }
 
-async function generatePDF() {
-  let content = getPDFHTML();
-  let preview = document.createElement('div');
-  preview.style.position = 'fixed';
-  preview.style.top = '0';
-  preview.style.left = '0';
-  preview.style.right = '0';
-  preview.style.bottom = '0';
-  preview.style.background = 'rgba(10,37,64,0.95)';
-  preview.style.zIndex = '2000';
-  preview.style.overflow = 'auto';
-  preview.style.padding = '16px';
-  preview.innerHTML = `<div style="position:sticky; top:0; background:white; padding:12px; border-radius:30px; display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap;"><button class="btn-gold" onclick="window.dlPDF()" style="background:#d4af37; border:none; padding:8px 16px; border-radius:30px; font-weight:600;">📥 İndir</button><button class="btn-primary" onclick="window.clPDF()" style="background:#0a2540; color:white; border:none; padding:8px 16px; border-radius:30px;">✖ Kapat</button></div><div style="background:white; max-width:800px; margin:0 auto; padding:20px; border-radius:20px;" id="pdfContent">${content}</div>`;
-  document.body.appendChild(preview);
-  window.dlPDF = () => { html2pdf().set({ margin: 0.5, filename: `Teklif_${new Date().toLocaleDateString('tr-TR')}.pdf` }).from(document.getElementById('pdfContent')).save(); saveToHistory(); };
-  window.clPDF = () => preview.remove();
+function showMostProfitable() {
+  let usdbrl = parseFloat(document.getElementById('usdbrl').value) || 1;
+  let usdtry = parseFloat(document.getElementById('usdtry').value) || 1;
+  let freight = parseFloat(document.getElementById('freight').value) || 0;
+  let taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+  let profit = parseFloat(document.getElementById('profit').value) || 0;
+  let mostProf = [...cocData].sort((a,b) => calcPrices(b.rs, usdbrl, usdtry, freight, taxRate, profit).marginPct - calcPrices(a.rs, usdbrl, usdtry, freight, taxRate, profit).marginPct)[0];
+  let p = calcPrices(mostProf.rs, usdbrl, usdtry, freight, taxRate, profit);
+  showToast(`💰 En karlı: ${mostProf.coc} (%${p.marginPct.toFixed(1)} kar)`);
 }
 
+function showGoalStatus() {
+  let progress = (monthlyTarget.current / monthlyTarget.target * 100).toFixed(1);
+  showToast(`🎯 Aylık hedef: ₺${monthlyTarget.target.toLocaleString()} | Tamamlanan: %${progress}`);
+}
+
+function showTodayDeal() {
+  let usdbrl = parseFloat(document.getElementById('usdbrl').value) || 1;
+  let usdtry = parseFloat(document.getElementById('usdtry').value) || 1;
+  let freight = parseFloat(document.getElementById('freight').value) || 0;
+  let taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+  let profit = parseFloat(document.getElementById('profit').value) || 0;
+  let cheapest = [...cocData].sort((a,b) => calcPrices(a.rs, usdbrl, usdtry, freight, taxRate, profit).sellTon - calcPrices(b.rs, usdbrl, usdtry, freight, taxRate, profit).sellTon)[0];
+  let p = calcPrices(cheapest.rs, usdbrl, usdtry, freight, taxRate, profit);
+  document.getElementById('todayDeal').innerHTML = cheapest.coc;
+  showToast(`⭐ Günün fırsatı: ${cheapest.coc} - ₺${Math.round(p.sellTon).toLocaleString()}/ton`);
+}
+
+function openDashboard() {
+  let modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="modal-container"><h3>📊 Analitik Dashboard</h3>
+    <div style="margin:16px 0;"><canvas id="priceChart" width="300" height="200"></canvas></div>
+    <div><h4>🏆 Kazanılan Rozetler</h4><div id="badgesList"></div></div>
+    <div class="modal-buttons"><button class="btn-outline" onclick="closeModal(this)">Kapat</button></div></div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => {
+    let ctx = document.getElementById('priceChart').getContext('2d');
+    let usdbrl = parseFloat(document.getElementById('usdbrl').value) || 1;
+    let usdtry = parseFloat(document.getElementById('usdtry').value) || 1;
+    let freight = parseFloat(document.getElementById('freight').value) || 0;
+    let taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    let profit = parseFloat(document.getElementById('profit').value) || 0;
+    let prices = cocData.map(c => calcPrices(c.rs, usdbrl, usdtry, freight, taxRate, profit).sellTon);
+    new Chart(ctx, { type: 'bar', data: { labels: cocData.map(c => c.coc), datasets: [{ label: 'Fiyat (₺/TON)', data: prices, backgroundColor: '#0066cc' }] }, options: { responsive: true, maintainAspectRatio: true } });
+    let badgesHtml = badges.map(b => `<span style="display:inline-block;background:var(--gold);padding:4px 12px;border-radius:20px;margin:4px;font-size:0.65rem;">${b}</span>`).join('');
+    document.getElementById('badgesList').innerHTML = badgesHtml || 'Henüz rozet yok';
+  }, 100);
+}
+
+function openRandomProduct() {
+  let random = cocData[Math.floor(Math.random() * cocData.length)];
+  showToast(`🎲 Rastgele ürün: ${random.coc}`);
+  document.getElementById(random.coc).scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============ SESLİ KOMUT ============
+function startVoiceCommand() {
+  if (!('webkitSpeechRecognition' in window)) { showToast('Sesli komut tarayıcınızda desteklenmiyor'); return; }
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = 'tr-TR';
+  recognition.onresult = (event) => {
+    let command = event.results[0][0].transcript.toLowerCase();
+    showToast(`🎤 "${command}"`);
+    if (command.includes('fiyat') || command.includes('göster')) { showToast('Fiyatlar gösteriliyor'); scrollToProducts(); }
+    else if (command.includes('karanlık') || command.includes('dark')) { toggleTheme(); }
+    else if (command.includes('aydınlık') || command.includes('light')) { toggleTheme(); }
+    else if (command.includes('pdf') || command.includes('teklif')) { generatePDF(); }
+    else if (command.includes('favori') || command.includes('yıldız')) { toggleFavFilter(); }
+    else { showToast('Komut anlaşılamadı. Deneyebileceğiniz komutlar: fiyat göster, karanlık tema, pdf oluştur, favorileri göster'); }
+  };
+  recognition.start();
+  document.getElementById('modeBtn').classList.add('voice-active');
+  setTimeout(() => document.getElementById('modeBtn').classList.remove('voice-active'), 5000);
+}
+
+// ============ HAPTIC FEEDBACK ============
+function hapticFeedback() {
+  if (window.navigator && window.navigator.vibrate) {
+    window.navigator.vibrate(50);
+  }
+}
+
+// ============ PULL-TO-REFRESH ============
+let touchStartY = 0;
+document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
+document.addEventListener('touchmove', (e) => {
+  let touchEndY = e.touches[0].clientY;
+  if (touchEndY - touchStartY > 80 && window.scrollY === 0) {
+    document.getElementById('pullIndicator').style.display = 'block';
+  }
+});
+document.addEventListener('touchend', () => {
+  if (document.getElementById('pullIndicator').style.display === 'block') {
+    location.reload();
+  }
+});
+
+// ============ RENDER ============
 function render() {
   let usdbrl = parseFloat(document.getElementById('usdbrl').value) || 1;
   let usdtry = parseFloat(document.getElementById('usdtry').value) || 1;
@@ -707,78 +619,106 @@ function render() {
   if (currentFilter !== 'all') filtered = filtered.filter(c => c.p == currentFilter);
   if (showOnlyFav) filtered = filtered.filter(c => favorites.includes(c.coc));
   if (currentSort === 'price') filtered.sort((a, b) => calcPrices(a.rs, usdbrl, usdtry, freight, taxRate, profit).sellTon - calcPrices(b.rs, usdbrl, usdtry, freight, taxRate, profit).sellTon);
+  else if (currentSort === 'profit') filtered.sort((a, b) => calcPrices(b.rs, usdbrl, usdtry, freight, taxRate, profit).marginPct - calcPrices(a.rs, usdbrl, usdtry, freight, taxRate, profit).marginPct);
   else filtered.sort((a, b) => a.p - b.p || b.rs - a.rs);
 
   let container = document.getElementById('productsGrid');
   container.innerHTML = '';
   filtered.forEach(c => {
+    c.viewCount++;
     let p = calcPrices(c.rs, usdbrl, usdtry, freight, taxRate, profit);
     let isFav = favorites.includes(c.coc);
-    container.innerHTML += `<div class="product-card p${c.p}" style="background:white; border-radius:18px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid #e4e8f0;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <span style="font-weight:800;">${c.coc}</span>
-        <div style="display:flex; gap:8px;"><span class="fav-star" style="cursor:pointer; color:${isFav ? '#d4af37' : '#ccc'};" onclick="toggleFavorite('${c.coc}')">${isFav ? '★' : '☆'}</span><span style="font-size:0.55rem; padding:4px 10px; background:#f1f3f8; border-radius:30px;">P${c.p}</span></div>
+    let totalAmount = p.sellTon * ton;
+    container.innerHTML += `
+      <div class="product-card p${c.p}" id="${c.coc}" onclick="hapticFeedback();showToast('${c.coc} seçildi')">
+        <div class="card-header">
+          <span class="coc-name">${c.coc} ${c.tags.includes('fırsat') ? '🔥' : ''} ${c.tags.includes('yeni') ? '🆕' : ''}</span>
+          <div class="card-actions">
+            <span class="fav-star ${isFav ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${c.coc}')">${isFav ? '★' : '☆'}</span>
+            <span class="priority-badge">PRIORITY ${c.p}</span>
+          </div>
+        </div>
+        <div class="price-main">₺ ${Math.round(p.sellTon).toLocaleString()}<small> / TON</small></div>
+        <div class="price-details ${salesMode ? 'hidden' : ''}">
+          <div class="detail-item"><span class="label">📦 FOB</span><span class="value">₺ ${Math.round(p.fobTon).toLocaleString()}</span></div>
+          <div class="detail-item"><span class="label">🚢 CIF</span><span class="value">₺ ${Math.round(p.cifTon).toLocaleString()}</span></div>
+          <div class="detail-item"><span class="label">🏭 DDP</span><span class="value">₺ ${Math.round(p.ddpTon).toLocaleString()}</span></div>
+          <div class="detail-item"><span class="label">📈 Kâr Marjı</span><span class="value">%${p.marginPct.toFixed(1)}</span></div>
+        </div>
+        ${ton > 0 ? `<div class="total-badge">💰 ${ton} TON TOPLAM: ₺ ${Math.round(totalAmount).toLocaleString()}</div>` : ''}
       </div>
-      <div style="font-size:1.3rem; font-weight:800;">₺ ${Math.round(p.sellTon).toLocaleString()}<small style="font-size:0.65rem;">/TON</small></div>
-      <div class="${salesMode ? 'hidden' : ''}" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; padding:10px 0; border-top:1px solid #e4e8f0; border-bottom:1px solid #e4e8f0;">
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:0.6rem;">FOB</span><span style="font-size:0.7rem; font-weight:600;">₺ ${Math.round(p.fobTon).toLocaleString()}</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:0.6rem;">CIF</span><span style="font-size:0.7rem; font-weight:600;">₺ ${Math.round(p.cifTon).toLocaleString()}</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:0.6rem;">DDP</span><span style="font-size:0.7rem; font-weight:600;">₺ ${Math.round(p.ddpTon).toLocaleString()}</span></div>
-        <div style="display:flex; justify-content:space-between;"><span style="font-size:0.6rem;">Kâr</span><span style="font-size:0.7rem; font-weight:600;">%${p.marginPct.toFixed(1)}</span></div>
-      </div>
-      ${ton > 0 ? `<div style="background:#f8f9fc; padding:10px; border-radius:14px; text-align:center; font-size:0.7rem; font-weight:600;">💰 ${ton} TON: ₺ ${Math.round(p.sellTon * ton).toLocaleString()}</div>` : ''}
-    </div>`;
+    `;
   });
-  document.getElementById('paramsCard').classList.toggle('hidden', salesMode);
-  document.getElementById('modeBtn').innerHTML = salesMode ? '👑 Satış' : '👤 Müşteri';
+  localStorage.setItem('viewHistory', JSON.stringify(cocData.map(c => ({ coc: c.coc, viewCount: c.viewCount }))));
+  let mostViewedCount = Math.max(...cocData.map(c => c.viewCount));
+  document.getElementById('mostViewedCount').innerHTML = mostViewedCount;
+  let mostProfitable = Math.max(...filtered.map(c => calcPrices(c.rs, usdbrl, usdtry, freight, taxRate, profit).marginPct));
+  document.getElementById('mostProfitable').innerHTML = mostProfitable.toFixed(1) + '%';
+  let goalProgress = (monthlyTarget.current / monthlyTarget.target * 100).toFixed(1);
+  document.getElementById('goalProgress').innerHTML = goalProgress + '%';
+  showTodayDeal();
+  document.getElementById('modeBtn').innerHTML = salesMode ? '👑 Satış Modu' : '👤 Müşteri Modu';
 }
 
-function toggleMode() { salesMode = !salesMode; render(); }
-function setSort(type) { currentSort = type; render(); }
-function setFilter(priority) {
-  currentFilter = priority;
-  document.querySelectorAll('.filter-tab').forEach(el => el.classList.toggle('active', el.dataset.priority === priority));
-  render();
-}
-function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function scrollToProducts() { document.getElementById('productsGrid').scrollIntoView({ behavior: 'smooth' }); }
-function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.style.position = 'fixed'; t.style.bottom = '80px'; t.style.left = '50%'; t.style.transform = 'translateX(-50%)'; t.style.background = '#0a2540'; t.style.color = '#d4af37'; t.style.padding = '10px 20px'; t.style.borderRadius = '50px'; t.style.fontSize = '0.7rem'; t.style.zIndex = '1100'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
-function closeModal(btn) { btn.closest('.modal-overlay')?.remove(); }
+function toggleMode() { salesMode = !salesMode; render(); hapticFeedback(); }
+function setSort(type) { currentSort = type; render(); hapticFeedback(); }
+function setFilter(priority) { currentFilter = priority; document.querySelectorAll('.filter-chip').forEach(el => el.classList.toggle('active', el.dataset.priority === priority)); render(); hapticFeedback(); }
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); hapticFeedback(); }
+function scrollToProducts() { document.getElementById('productsGrid').scrollIntoView({ behavior: 'smooth' }); hapticFeedback(); }
+function showToast(msg) { let t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
+function closeModal(btn) { btn.closest('.modal-overlay').remove(); }
 
+// ============ YÖNETİM PANELİ ============
 function openEditor() {
   let modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.right = '0';
-  modal.style.bottom = '0';
-  modal.style.background = 'rgba(10,37,64,0.9)';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.zIndex = '1000';
-  modal.style.padding = '16px';
+  modal.className = 'modal-overlay';
   let listHtml = '';
   cocData.forEach((c, idx) => {
-    listHtml += `<div style="margin-bottom:12px; padding:12px; background:#f8f9fc; border-radius:16px;"><b>${c.coc}</b><div style="display:flex; gap:8px; margin-top:8px;"><input type="number" id="p_${idx}" value="${c.p}" min="1" max="5" style="width:70px; padding:8px; border-radius:12px; border:1px solid #e4e8f0;"><input type="number" id="rs_${idx}" value="${c.rs}" step="1" style="width:100px; padding:8px; border-radius:12px; border:1px solid #e4e8f0;"><button onclick="window.delCoc(${idx})" style="background:#d4af37; border:none; padding:6px 12px; border-radius:20px;">Sil</button></div></div>`;
+    listHtml += `<div style="margin-bottom:12px;padding:12px;background:var(--gray-100);border-radius:12px;"><b>${c.coc}</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;"><input type="number" id="p_${idx}" value="${c.p}" min="1" max="5" style="width:70px;"><input type="number" id="rs_${idx}" value="${c.rs}" step="1" style="width:100px;"><input type="text" id="tags_${idx}" value="${c.tags.join(',')}" placeholder="etiketler" style="width:120px;"><button onclick="window.delCoc(${idx})" style="background:var(--error);border:none;padding:6px 12px;border-radius:8px;color:white;">Sil</button></div></div>`;
   });
-  modal.innerHTML = `<div style="background:white; border-radius:24px; padding:20px; max-width:90%; width:100%; max-height:80vh; overflow-y:auto;"><h3 style="margin-bottom:16px;">Ürün Yönetimi</h3>${listHtml}<div style="display:flex; flex-wrap:wrap; gap:8px; margin:12px 0;"><button class="btn-gold" onclick="window.addCoc()" style="flex:1; padding:10px; background:#d4af37; border:none; border-radius:30px;">+ Yeni</button><button class="btn-gold" onclick="window.importExcel()" style="flex:1; padding:10px; background:#d4af37; border:none; border-radius:30px;">📎 İçe Aktar</button><button class="btn-gold" onclick="window.exportExcel()" style="flex:1; padding:10px; background:#d4af37; border:none; border-radius:30px;">📎 Dışa Aktar</button></div><div style="display:flex; gap:8px;"><button class="btn-primary" onclick="window.saveCoc()" style="flex:1; padding:10px; background:#0a2540; color:white; border:none; border-radius:30px;">💾 Kaydet</button><button class="btn-outline" onclick="window.resetCoc()" style="flex:1; padding:10px; background:transparent; border:1px solid #e4e8f0; border-radius:30px;">⟳ Sıfırla</button><button class="btn-outline" onclick="closeModal(this)" style="flex:1; padding:10px; background:transparent; border:1px solid #e4e8f0; border-radius:30px;">Kapat</button></div></div>`;
+  modal.innerHTML = `<div class="modal-container"><h3>✎ Ürün Yönetimi</h3><div style="max-height:400px;overflow-y:auto;">${listHtml}</div><div class="modal-buttons"><button class="btn-primary" onclick="window.addCoc()">+ Yeni Ürün</button><button class="btn-primary" onclick="window.importExcel()">📎 Excel İçe Aktar</button><button class="btn-primary" onclick="window.exportExcel()">📎 Excel Dışa Aktar</button><button class="btn-primary" onclick="window.setTarget()">🎯 Hedef Belirle</button></div><div class="modal-buttons"><button class="btn-success" onclick="window.saveCoc()">💾 Kaydet</button><button class="btn-outline" onclick="window.resetCoc()">⟳ Sıfırla</button><button class="btn-outline" onclick="window.backupData()">💾 Yedekle</button><button class="btn-outline" onclick="window.restoreData()">🔄 Geri Yükle</button></div><div class="modal-buttons"><button class="btn-outline" onclick="closeModal(this)">Kapat</button></div></div>`;
   document.body.appendChild(modal);
   
   window.delCoc = (idx) => { if(cocData.length>1) cocData.splice(idx,1); openEditor(); };
-  window.addCoc = () => { cocData.push({ coc: `COC-${String(cocData.length+1).padStart(2,'0')}`, p: 3, rs: 1500 }); openEditor(); };
-  window.importExcel = () => { let input = document.createElement('input'); input.type = 'file'; input.accept = '.xlsx'; input.onchange = (e) => { let file = e.target.files[0]; let reader = new FileReader(); reader.onload = (evt) => { let data = new Uint8Array(evt.target.result); let workbook = XLSX.read(data, { type: 'array' }); let sheet = workbook.Sheets[workbook.SheetNames[0]]; let rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }); let newData = []; for(let i=1;i<rows.length;i++) { if(rows[i][0] && rows[i][1] && rows[i][2]) newData.push({ coc: String(rows[i][0]), p: parseInt(rows[i][1])||3, rs: parseFloat(rows[i][2])||0 }); } if(newData.length) { cocData = newData; localStorage.setItem('cocData', JSON.stringify(cocData)); render(); showToast('İçe aktarıldı'); modal.remove(); } }; reader.readAsArrayBuffer(file); }; input.click(); };
-  window.exportExcel = () => { let wsData = [['COC','Priority','RS']]; cocData.forEach(c => wsData.push([c.coc, c.p, c.rs])); let ws = XLSX.utils.aoa_to_sheet(wsData); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'COC'); XLSX.writeFile(wb, `COC_${new Date().toLocaleDateString('tr-TR')}.xlsx`); };
-  window.saveCoc = () => { for(let i=0;i<cocData.length;i++) { let pv = document.getElementById(`p_${i}`); let rv = document.getElementById(`rs_${i}`); if(pv) cocData[i].p = parseInt(pv.value)||3; if(rv) cocData[i].rs = parseFloat(rv.value)||0; } localStorage.setItem('cocData', JSON.stringify(cocData)); render(); modal.remove(); showToast('Kaydedildi'); };
-  window.resetCoc = () => { cocData = [ { coc: 'COC-01', p: 1, rs: 1915 }, { coc: 'COC-02', p: 1, rs: 1905 }, { coc: 'COC-03', p: 1, rs: 1895 }, { coc: 'COC-04', p: 2, rs: 1885 }, { coc: 'COC-05', p: 2, rs: 1845 }, { coc: 'COC-06', p: 2, rs: 1662 }, { coc: 'COC-07', p: 3, rs: 1630 }, { coc: 'COC-08', p: 3, rs: 1615 }, { coc: 'COC-09', p: 4, rs: 1477 }, { coc: 'COC-10', p: 4, rs: 1442 }, { coc: 'COC-11', p: 4, rs: 1320 }, { coc: 'COC-12', p: 4, rs: 1257 }, { coc: 'COC-13', p: 5, rs: 870 }, { coc: 'COC-14', p: 5, rs: 870 }, { coc: 'COC-15', p: 5, rs: 750 }, { coc: 'COC-16', p: 5, rs: 630 } ]; localStorage.removeItem('cocData'); render(); modal.remove(); showToast('Sıfırlandı'); };
+  window.addCoc = () => { cocData.push({ coc: `COC-${String(cocData.length+1).padStart(2,'0')}`, p: 3, rs: 1500, viewCount: 0, tags: [] }); openEditor(); };
+  window.setTarget = () => { let newTarget = prompt('Aylık hedef (₺):', monthlyTarget.target); if(newTarget) { monthlyTarget.target = parseFloat(newTarget); localStorage.setItem('monthlyTarget', JSON.stringify(monthlyTarget)); showToast('Hedef güncellendi'); } };
+  window.importExcel = () => { let input = document.createElement('input'); input.type = 'file'; input.accept = '.xlsx'; input.onchange = (e) => { let file = e.target.files[0]; let reader = new FileReader(); reader.onload = (evt) => { let data = new Uint8Array(evt.target.result); let workbook = XLSX.read(data, { type: 'array' }); let sheet = workbook.Sheets[workbook.SheetNames[0]]; let rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }); let newData = []; for(let i=1;i<rows.length;i++) { if(rows[i][0] && rows[i][1] && rows[i][2]) newData.push({ coc: String(rows[i][0]), p: parseInt(rows[i][1])||3, rs: parseFloat(rows[i][2])||0, viewCount: 0, tags: [] }); } if(newData.length) { cocData = newData; localStorage.setItem('cocData', JSON.stringify(cocData)); render(); showToast('İçe aktarıldı'); modal.remove(); } }; reader.readAsArrayBuffer(file); }; input.click(); };
+  window.exportExcel = () => { let wsData = [['COC Kodu', 'Priority', 'RS (BRL/60kg)']]; cocData.forEach(c => wsData.push([c.coc, c.p, c.rs])); let ws = XLSX.utils.aoa_to_sheet(wsData); let wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'COC_Listesi'); XLSX.writeFile(wb, `COC_Listesi_${new Date().toLocaleDateString('tr-TR')}.xlsx`); showToast('Excel dışa aktarıldı'); };
+  window.saveCoc = () => { for(let i=0;i<cocData.length;i++) { let pv = document.getElementById(`p_${i}`); let rv = document.getElementById(`rs_${i}`); let tv = document.getElementById(`tags_${i}`); if(pv) cocData[i].p = parseInt(pv.value)||3; if(rv) cocData[i].rs = parseFloat(rv.value)||0; if(tv) cocData[i].tags = tv.value.split(',').map(t=>t.trim()); } localStorage.setItem('cocData', JSON.stringify(cocData)); render(); modal.remove(); showToast('Kaydedildi'); if(favorites.length>=10) checkAndAwardBadge('tenProducts'); };
+  window.resetCoc = () => { cocData = [ { coc: 'COC-01', p: 1, rs: 1915, viewCount: 0, tags: [] }, { coc: 'COC-02', p: 1, rs: 1905, viewCount: 0, tags: [] }, { coc: 'COC-03', p: 1, rs: 1895, viewCount: 0, tags: [] }, { coc: 'COC-04', p: 2, rs: 1885, viewCount: 0, tags: [] }, { coc: 'COC-05', p: 2, rs: 1845, viewCount: 0, tags: [] }, { coc: 'COC-06', p: 2, rs: 1662, viewCount: 0, tags: [] }, { coc: 'COC-07', p: 3, rs: 1630, viewCount: 0, tags: [] }, { coc: 'COC-08', p: 3, rs: 1615, viewCount: 0, tags: [] }, { coc: 'COC-09', p: 4, rs: 1477, viewCount: 0, tags: [] }, { coc: 'COC-10', p: 4, rs: 1442, viewCount: 0, tags: [] }, { coc: 'COC-11', p: 4, rs: 1320, viewCount: 0, tags: [] }, { coc: 'COC-12', p: 4, rs: 1257, viewCount: 0, tags: [] }, { coc: 'COC-13', p: 5, rs: 870, viewCount: 0, tags: [] }, { coc: 'COC-14', p: 5, rs: 870, viewCount: 0, tags: [] }, { coc: 'COC-15', p: 5, rs: 750, viewCount: 0, tags: [] }, { coc: 'COC-16', p: 5, rs: 630, viewCount: 0, tags: [] } ]; localStorage.removeItem('cocData'); render(); modal.remove(); showToast('Varsayılan verilere dönüldü'); };
+  window.backupData = () => { let backup = { cocData, favorites, offerHistory, monthlyTarget, badges }; let blob = new Blob([JSON.stringify(backup)], {type: 'application/json'}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = `backup_${new Date().toLocaleDateString('tr-TR')}.json`; a.click(); showToast('Yedek alındı'); };
+  window.restoreData = () => { let input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = (e) => { let file = e.target.files[0]; let reader = new FileReader(); reader.onload = (evt) => { let backup = JSON.parse(evt.target.result); if(backup.cocData) cocData = backup.cocData; if(backup.favorites) favorites = backup.favorites; if(backup.offerHistory) offerHistory = backup.offerHistory; if(backup.monthlyTarget) monthlyTarget = backup.monthlyTarget; if(backup.badges) badges = backup.badges; localStorage.setItem('cocData', JSON.stringify(cocData)); localStorage.setItem('favorites', JSON.stringify(favorites)); localStorage.setItem('offerHistory', JSON.stringify(offerHistory)); localStorage.setItem('monthlyTarget', JSON.stringify(monthlyTarget)); localStorage.setItem('badges', JSON.stringify(badges)); render(); showToast('Yedek geri yüklendi'); modal.remove(); }; reader.readAsText(file); }; input.click(); };
 }
 
+// ============ INIT ============
 let saved = localStorage.getItem('cocData');
 if (saved) cocData = JSON.parse(saved);
-document.querySelectorAll('.filter-tab').forEach(el => el.addEventListener('click', () => setFilter(el.dataset.priority)));
-['usdbrl','usdtry','freight','taxRate','profit','ton'].forEach(id => document.getElementById(id).addEventListener('input', () => render()));
+let savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+document.querySelectorAll('.filter-chip').forEach(el => el.addEventListener('click', () => setFilter(el.dataset.priority)));
+['usdbrl','usdtry','freight','taxRate','profit','ton'].forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('input', () => render()); });
 fetchLiveRates();
 render();
 </script>
+
+<!-- AYARLAR MODALI HTML -->
+<div id="settingsModal" class="settings-modal">
+  <div class="settings-panel">
+    <div class="settings-header">
+      <h3>⚙️ HESAPLAMA PARAMETRELERİ</h3>
+      <button class="close-settings" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="params-grid">
+      <div class="param-field"><label>USD / BRL</label><input type="number" id="usdbrl" value="5.10" step="0.01"></div>
+      <div class="param-field"><label>USD / TRY</label><input type="number" id="usdtry" value="44.70" step="0.01"></div>
+      <div class="param-field"><label>Navlun ($/kg)</label><input type="number" id="freight" value="0.47" step="0.01"></div>
+      <div class="param-field"><label>Vergi (%)</label><input type="number" id="taxRate" value="10.5" step="0.5"></div>
+      <div class="param-field"><label>Kar (₺/kg)</label><input type="number" id="profit" value="20" step="1"></div>
+      <div class="param-field"><label>Miktar (ton)</label><input type="number" id="ton" value="20" step="0.1"></div>
+    </div>
+    <button class="btn-primary" onclick="fetchLiveRates()" style="width:100%; margin-top:16px;">🔄 Canlı Döviz Kurunu Çek</button>
+    <div class="last-update" id="lastUpdate" style="margin-top:12px; text-align:center;"></div>
+  </div>
+</div>
 </body>
 </html>

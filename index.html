@@ -3,31 +3,33 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Flight Intelligence Calendar</title>
+<title>Flight Price Intelligence</title>
 
 <style>
 :root{
-  /* INVERTED THEME */
-  --bg:#0b1c2d;          /* Lacivert zemin */
-  --card:#ffffff;        /* Beyaz kart */
-  --text:#0b1c2d;        /* Kart içi ana metin */
-  --text-inv:#e5e7eb;    /* Zemin üstü metin */
-  --muted:#64748b;
-  --line:#e5e7eb;
+  /* HIGH READABILITY PALETTE */
+  --bg:#0e1624;
+  --card:#ffffff;
+  --text:#0f172a;
+  --text-soft:#475569;
+  --text-inv:#e5e7eb;
 
-  --navy:#0b1c2d;
-  --navy-soft:#1e3a5f;
-  --yellow:#facc15;
+  --accent:#2563eb;
+  --accent-soft:#dbeafe;
 
-  --up:#16a34a;
-  --down:#dc2626;
-  --cheap:#facc15;
+  --up:#15803d;
+  --down:#b91c1c;
+
+  --low:#dcfce7;
+  --mid:#f8fafc;
+  --high:#fee2e2;
 }
 
-/* MOBILE FIRST */
+*{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
   background:var(--bg);
   color:var(--text-inv);
 }
@@ -35,61 +37,57 @@ body{
 /* HEADER */
 .header{
   padding:14px;
-  background:var(--navy);
-  color:var(--text-inv);
+  background:#111827;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
 }
 
 .header h3{
   margin:0;
-  font-size:17px;
-  font-weight:800;
+  font-size:18px;
+  font-weight:900;
 }
 
 .small{
   font-size:12px;
-  color:#cbd5f5;
+  color:#cbd5e1;
 }
 
 .monthPicker{
-  padding:10px 14px;
+  width:100%;
+  padding:10px 12px;
   border-radius:12px;
   border:none;
+  font-weight:700;
   font-size:14px;
-  font-weight:600;
-  background:white;
-  color:var(--navy);
 }
 
 /* CONTENT */
-.container{
-  padding:12px;
-}
+.container{ padding:12px }
 
-/* CARD */
+/* ROUTE CARD */
 .routeCard{
   background:var(--card);
-  border-radius:16px;
+  border-radius:18px;
   padding:14px;
   margin-bottom:16px;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  box-shadow:0 12px 28px rgba(0,0,0,.3);
 }
 
 .title{
   font-weight:900;
   font-size:16px;
-  color:var(--navy);
+  color:var(--text);
 }
 
 .info{
-  margin-top:8px;
+  margin-top:6px;
   font-size:11px;
-  color:var(--muted);
+  color:var(--text-soft);
 }
 
-/* CALENDAR GRID */
+/* CALENDAR */
 .calendar{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -97,69 +95,45 @@ body{
   margin-top:12px;
 }
 
-/* TOUCH FRIENDLY */
 .day{
-  border-radius:12px;
+  border-radius:14px;
   padding:8px 6px;
-  font-size:12px;
   text-align:center;
   cursor:pointer;
-  transition:.2s;
+  transition:.15s;
   position:relative;
 }
 
 .day:hover{
-  outline:2px solid var(--yellow);
+  outline:2px solid var(--accent);
 }
+
+.hm-low{background:var(--low)}
+.hm-mid{background:var(--mid)}
+.hm-high{background:var(--high)}
 
 .price{
-  font-weight:800;
-  font-size:12px;
-  color:var(--navy);
-}
-
-/* HEATMAP – STRONG BUT CLEAN */
-.hm-low{ background:#dcfce7; }
-.hm-mid{ background:#f8fafc; }
-.hm-high{ background:#fee2e2; }
-
-/* CHEAPEST */
-.cheapest{
-  box-shadow:
-    0 0 0 2px var(--yellow),
-    0 0 18px rgba(250,204,21,.6);
-}
-.cheapest::after{
-  content:"CHEAPEST";
-  position:absolute;
-  top:6px;
-  right:6px;
-  font-size:9px;
   font-weight:900;
-  background:var(--yellow);
-  color:var(--navy);
-  padding:3px 6px;
-  border-radius:8px;
+  font-size:13px;
+  color:var(--text);
 }
 
-/* FLASH EFFECTS */
-.flash-up{ animation:flashUp .7s; }
-.flash-down{ animation:flashDown .7s; }
+.cheapest{
+  outline:2px solid var(--accent);
+}
 
-@keyframes flashUp{
-  0%{ box-shadow:0 0 0 4px rgba(220,38,38,.5); }
-  100%{}
-}
-@keyframes flashDown{
-  0%{ box-shadow:0 0 0 4px rgba(22,163,74,.5); }
-  100%{}
-}
+/* FLASH */
+.flash-up{animation:up .6s}
+.flash-down{animation:down .6s}
+
+@keyframes up{0%{box-shadow:0 0 0 4px rgba(185,28,28,.5)}}
+@keyframes down{0%{box-shadow:0 0 0 4px rgba(21,128,61,.5)}}
 
 /* MODAL */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(11,28,45,.75);
+  background:rgba(14,22,36,.75);
   display:none;
   align-items:center;
   justify-content:center;
@@ -167,36 +141,49 @@ body{
 
 .modalContent{
   background:white;
-  border-radius:18px;
-  padding:20px;
-  width:92%;
-  max-width:380px;
-  color:var(--navy);
+  border-radius:20px;
+  padding:16px;
+  width:94%;
+  max-width:520px;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-.modalContent h3{
-  margin-top:0;
+.modalHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.close{
-  margin-top:12px;
-  color:var(--navy-soft);
+.closeBtn{
+  font-size:20px;
   font-weight:900;
   cursor:pointer;
+  color:var(--text-soft);
 }
 
-/* RESPONSIVE BREAKPOINTS */
-@media(min-width:600px){
-  .calendar{ grid-template-columns:repeat(4,1fr); }
+.detailRow{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  font-size:14px;
 }
 
-@media(min-width:900px){
-  .header{
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .calendar{ grid-template-columns:repeat(7,1fr); }
+.priceBox{
+  background:var(--accent-soft);
+  border-radius:14px;
+  padding:12px;
+  font-size:18px;
+  font-weight:900;
+  text-align:center;
+}
+
+/* RESPONSIVE */
+@media(min-width:700px){
+  .calendar{grid-template-columns:repeat(7,1fr)}
+  .header{flex-direction:row;justify-content:space-between;align-items:center}
 }
 </style>
 </head>
@@ -206,7 +193,7 @@ body{
 <div class="header">
   <div>
     <h3>✈️ Flight Price Intelligence</h3>
-    <div class="small">Mobile-first • AI calendar • live price movement</div>
+    <div class="small">Readable • Live pricing • Mobile-first</div>
   </div>
   <input type="month" id="monthPicker" class="monthPicker"/>
 </div>
@@ -221,6 +208,9 @@ body{
 
 <script>
 let usdTry=0;
+let modalState=null;
+const memory={};
+
 async function fx(){
   const r=await fetch("https://open.er-api.com/v6/latest/USD");
   const d=await r.json();
@@ -232,26 +222,61 @@ const routes=[
  {name:"Brasília (BSB) → Istanbul (IST)",base:690,airline:"LATAM + Turkish",stop:"1 Stop Europe",demand:.95}
 ];
 
-const memory={};
 let activeDate=new Date();
 
-function price(base,day,d){
-  return base+
-    Math.sin(day/6)*25+
+function price(b,d,dm){
+  return b+
+    Math.sin(d/6)*25+
     (Math.random()-.5)*20+
-    d*Math.cos(day/10)*30;
+    dm*Math.cos(d/10)*30;
 }
+
+function openModal(state){
+  modalState=state;
+  renderModal();
+  modal.style.display="flex";
+}
+
+function renderModal(){
+  if(!modalState) return;
+  const {r,label,usd,tryP}=modalState;
+  modalContent.innerHTML=`
+    <div class="modalHeader">
+      <b>${r.name}</b>
+      <div class="closeBtn" onclick="closeModal()">✕</div>
+    </div>
+
+    <div class="detailRow">
+      <div>📅 ${label}</div>
+      <div>✈ ${r.airline}</div>
+      <div>🔁 ${r.stop}</div>
+      <div>🛂 Türkiye – Vize Yok</div>
+    </div>
+
+    <div class="detailRow">
+      <div class="priceBox">$${usd.toFixed(0)}</div>
+      <div class="priceBox">₺${tryP.toFixed(0)}</div>
+    </div>
+  `;
+}
+
+function closeModal(){
+  modal.style.display="none";
+  modalState=null;
+}
+
+modal.onclick=closeModal;
 
 function render(){
   const app=document.getElementById("app");
   app.innerHTML="";
   const y=activeDate.getFullYear();
   const m=activeDate.getMonth();
-  const daysInMonth=new Date(y,m+1,0).getDate();
+  const days=new Date(y,m+1,0).getDate();
 
   routes.forEach(r=>{
     const prices=[];
-    for(let i=1;i<=daysInMonth;i++) prices.push(price(r.base,i,r.demand));
+    for(let i=1;i<=days;i++) prices.push(price(r.base,i,r.demand));
     const min=Math.min(...prices);
     const max=Math.max(...prices);
 
@@ -259,9 +284,8 @@ function render(){
     card.className="routeCard";
     card.innerHTML=`
       <div class="title">${r.name}</div>
-      <div class="small">✈ ${r.airline} | 🔁 ${r.stop}</div>
+      <div class="info">${r.airline} • ${r.stop}</div>
       <div class="calendar"></div>
-      <div class="info">⬆⬇ live price • cheapest auto-detected</div>
     `;
     app.appendChild(card);
 
@@ -272,7 +296,6 @@ function render(){
       const date=new Date(y,m,d);
       const label=date.toLocaleDateString("en-US",{weekday:"short",day:"numeric"});
       const tryP=usd*usdTry;
-
       const key=r.name+y+m+d;
       const prev=memory[key];
       memory[key]=usd;
@@ -280,12 +303,6 @@ function render(){
       let heat="hm-mid";
       if(usd===min) heat="hm-low";
       if(usd===max) heat="hm-high";
-
-      let arrow="";
-      if(prev){
-        if(usd>prev) arrow="▲ ";
-        if(usd<prev) arrow="▼ ";
-      }
 
       const div=document.createElement("div");
       div.className=`day ${heat}`;
@@ -295,39 +312,31 @@ function render(){
         if(usd<prev) div.classList.add("flash-down");
       }
 
+      const arrow=prev?(usd>prev?"▲ ":usd<prev?"▼ ":""):"";
+
       div.innerHTML=`
         <div>${label}</div>
         <div class="price">${arrow}$${usd.toFixed(0)}</div>
-        <div class="price">${tryP.toFixed(0)}₺</div>
+        <div class="price">₺${tryP.toFixed(0)}</div>
       `;
 
-      div.onclick=()=>{
-        modalContent.innerHTML=`
-          <h3>${r.name}</h3>
-          <p>📅 ${label}</p>
-          <p>✈ ${r.airline}</p>
-          <p>🔁 ${r.stop}</p>
-          <p>🛂 Türkiye – Vize Yok</p>
-          <hr>
-          <p><b>$${usd.toFixed(0)}</b> / <b>₺${tryP.toFixed(0)}</b></p>
-          <div class="close" onclick="closeModal()">Kapat</div>
-        `;
-        modal.style.display="flex";
-      };
-
+      div.onclick=()=>openModal({r,label,usd,tryP});
       cal.appendChild(div);
+
+      if(modalState && modalState.label===label && modalState.r.name===r.name){
+        modalState.usd=usd;
+        modalState.tryP=tryP;
+        renderModal();
+      }
     });
   });
 }
 
-function closeModal(){ modal.style.display="none"; }
-modal.onclick=closeModal;
-
 const mp=document.getElementById("monthPicker");
 mp.value=new Date().toISOString().slice(0,7);
-mp.onchange=()=>{ activeDate=new Date(mp.value); render(); };
+mp.onchange=()=>{activeDate=new Date(mp.value);render();};
 
-async function start(){ await fx(); render(); }
+async function start(){await fx();render();}
 start();
 setInterval(start,30000);
 </script>

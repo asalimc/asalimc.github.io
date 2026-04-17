@@ -1,330 +1,310 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Brezilya Kahve Borsası | Kurumsal Portfolyo</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flight Intelligence Calendar</title>
 
-    <style>
-        :root {
-            --accent: #2c5282;
-            --bg: #f7fafc;
-            --card: #ffffff;
-            --text-dark: #1a202c;
-            --text-light: #718096;
-            --border: #e2e8f0;
-            --green: #38a169;
-            --radius-xl: 24px;
-            --radius-m: 12px;
-        }
+<style>
+:root{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0b1c2d;
+  --muted:#475569;
+  --line:#e5e7eb;
 
-        /* İtalik Tamamen Yasaklandı */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; font-style: normal !important; }
+  --navy:#0b1c2d;
+  --navy-soft:#1e3a5f;
+  --yellow:#facc15;
 
-        body { background: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+  --up:#16a34a;
+  --down:#dc2626;
+  --cheap:#facc15;
+}
 
-        /* Header */
-        .top-bar { background: var(--card); padding: 25px 20px; border-bottom: 2px solid var(--border); text-align: center; }
-        .logo-title { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
-        .logo-sub { font-size: 0.75rem; font-weight: 700; color: var(--text-light); margin-top: 4px; text-transform: uppercase; }
+/* MOBILE FIRST */
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:var(--text);
+}
 
-        .container { max-width: 550px; margin: 0 auto; padding: 20px; }
+.header{
+  padding:12px;
+  background:var(--navy);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 
-        /* Kur Kartları */
-        .rate-badges { display: flex; gap: 10px; margin-bottom: 20px; }
-        .rate-chip { flex: 1; background: var(--card); padding: 15px; border-radius: var(--radius-m); border: 2px solid var(--border); text-align: center; font-weight: 800; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+.header h3{ font-size:16px; }
 
-        /* Ürün Kartı */
-        .coffee-card {
-            background: var(--card); border-radius: var(--radius-xl); padding: 25px; border: 2px solid var(--border); margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05); position: relative;
-        }
-        .type-badge { position: absolute; top: 0; right: 0; background: var(--accent); color: white; padding: 10px 18px; border-radius: 0 0 0 var(--radius-m); font-size: 0.75rem; font-weight: 800; }
-        .coffee-name { font-size: 1.35rem; font-weight: 800; margin-bottom: 15px; color: var(--accent); }
-        
-        /* Teslimat Izgarası */
-        .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .delivery-box { background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: var(--radius-m); }
-        .delivery-box label { display: block; font-size: 0.65rem; font-weight: 800; color: var(--text-light); margin-bottom: 4px; }
-        .delivery-box span { font-weight: 800; font-size: 1rem; color: var(--text-dark); }
+.small{
+  font-size:12px;
+  color:#e5e7eb;
+}
 
-        /* Ana Fiyat Alanı */
-        .final-price-area { background: #ebf8ff; border-radius: var(--radius-m); padding: 20px; text-align: center; border: 2px solid #bee3f8; }
-        .final-price-label { font-size: 0.8rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
-        .final-price-val { font-size: 2.1rem; font-weight: 800; color: var(--accent); }
+.monthPicker{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
 
-        /* Butonlar */
-        .btn-action {
-            width: 100%; padding: 20px; border-radius: var(--radius-m); border: none; font-size: 1rem; font-weight: 800; cursor: pointer;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 6px 0 rgba(0,0,0,0.1); margin-bottom: 15px;
-        }
-        .btn-action:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.1); }
-        .btn-pdf { background: var(--accent); color: white; }
-        .btn-setup { background: var(--card); border: 2px solid var(--border); color: var(--text-dark); }
+.container{ padding:12px; }
 
-        /* TEKLİF ÖNİZLEME MODALI */
-        .modal-preview { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; overflow-y: auto; padding: 15px; }
-        .modal-preview.active { display: block; }
-        .preview-content { background: white; max-width: 850px; margin: 0 auto; border-radius: 12px; }
-        
-        .offer-paper { padding: 40px; color: #1a202c; line-height: 1.6; }
-        .offer-header { display: flex; justify-content: space-between; border-bottom: 4px solid var(--accent); padding-bottom: 25px; margin-bottom: 30px; }
-        
-        .offer-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9rem; }
-        .offer-table th { background: #edf2f7; padding: 12px; border: 1px solid #cbd5e0; font-weight: 800; text-align: left; }
-        .offer-table td { padding: 12px; border: 1px solid #cbd5e0; font-weight: 600; vertical-align: top; }
-        
-        .offer-footer { margin-top: 30px; background: #f7fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.85rem; }
-        
-        .preview-controls { position: sticky; top: 0; background: #1a202c; padding: 15px; display: flex; gap: 10px; justify-content: center; z-index: 2100; border-radius: 0 0 20px 20px; }
+.routeCard{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:14px;
+}
 
-        /* Ayarlar */
-        .sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; z-index: 1000; }
-        .sheet.active { display: flex; }
-        .sheet-content { background: var(--card); width: 100%; padding: 35px; border-radius: 35px 35px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
-        .input-row { margin-bottom: 18px; }
-        .input-row label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; color: var(--text-light); }
-        .input-row input { width: 100%; padding: 16px; border-radius: var(--radius-m); border: 2px solid var(--border); font-weight: 800; background: #f8fafc; font-size: 1rem; }
+.title{
+  font-weight:800;
+  font-size:15px;
+  color:var(--navy);
+}
 
-        /* Responsive Düzeltmeler */
-        @media (max-width: 600px) {
-            .offer-paper { padding: 20px; }
-            .offer-header { flex-direction: column; text-align: center; gap: 15px; }
-            .offer-header div { text-align: center !important; }
-            .offer-table { font-size: 0.75rem; }
-            .offer-table th, .offer-table td { padding: 8px; }
-        }
-    </style>
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-top:10px;
+}
+
+/* TABLET */
+@media(min-width:600px){
+  .calendar{ grid-template-columns:repeat(4,1fr); }
+}
+
+/* DESKTOP */
+@media(min-width:900px){
+  .header{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .calendar{ grid-template-columns:repeat(7,1fr); }
+}
+
+.day{
+  border-radius:10px;
+  padding:6px;
+  font-size:11px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s;
+  position:relative;
+}
+
+.day:hover{
+  outline:2px solid var(--yellow);
+}
+
+.price{
+  font-weight:700;
+  font-size:11px;
+}
+
+/* HEATMAP */
+.hm-low{ background:#ecfeff; }
+.hm-mid{ background:#ffffff; }
+.hm-high{ background:#fff7ed; }
+
+/* CHEAPEST */
+.cheapest{
+  box-shadow:0 0 0 2px var(--yellow),0 0 12px rgba(250,204,21,.5);
+}
+.cheapest::after{
+  content:"CHEAPEST";
+  position:absolute;
+  top:4px;
+  right:4px;
+  font-size:9px;
+  font-weight:800;
+  background:var(--yellow);
+  color:#0b1c2d;
+  padding:2px 5px;
+  border-radius:6px;
+}
+
+/* FLASH */
+.flash-up{ animation:flashUp .7s; }
+.flash-down{ animation:flashDown .7s; }
+
+@keyframes flashUp{
+  0%{ box-shadow:0 0 0 3px rgba(220,38,38,.4); }
+  100%{}
+}
+@keyframes flashDown{
+  0%{ box-shadow:0 0 0 3px rgba(22,163,74,.4); }
+  100%{}
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(11,28,45,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+.modalContent{
+  background:white;
+  border-radius:14px;
+  padding:20px;
+  width:90%;
+  max-width:360px;
+}
+.close{
+  margin-top:10px;
+  color:var(--navy-soft);
+  font-weight:800;
+  cursor:pointer;
+}
+
+.info{
+  margin-top:8px;
+  font-size:11px;
+  color:var(--muted);
+}
+</style>
 </head>
+
 <body>
 
-<header class="top-bar">
-    <div class="logo-title">BRAZIL COFFEE EXCHANGE</div>
-    <div class="logo-sub">GLOBAL TİCARET & LOJİSTİK YÖNETİMİ</div>
-</header>
+<div class="header">
+  <div>
+    <h3>✈️ Flight Price Intelligence</h3>
+    <div class="small">AI calendar • live FX • price movement</div>
+  </div>
+  <input type="month" id="monthPicker" class="monthPicker"/>
+</div>
 
 <div class="container">
-    <div class="rate-badges">
-        <div class="rate-chip" id="chipTry">TRY: --</div>
-        <div class="rate-chip" id="chipBrl">BRL: --</div>
-    </div>
-
-    <div id="productContainer"></div>
-
-    <button class="btn-action btn-pdf" onclick="showOfferPreview()">
-        <span>📄</span> RESMİ TEKLİFİ ÖNİZLE VE OLUŞTUR
-    </button>
-    <button class="btn-action btn-setup" onclick="openSheet()">
-        <span>⚙️</span> PARAMETRE AYARLARI
-    </button>
+  <div id="app"></div>
 </div>
 
-<div id="previewModal" class="modal-preview">
-    <div class="preview-controls">
-        <button class="btn-action btn-pdf" style="width:auto; margin:0; padding:12px 25px;" onclick="downloadPDF()">💾 PDF İNDİR</button>
-        <button class="btn-action btn-setup" style="width:auto; margin:0; background:#e53e3e; color:white; border:none; padding:12px 25px;" onclick="closePreview()">❌ KAPAT</button>
-    </div>
-    <div class="preview-content">
-        <div id="printableOffer" class="offer-paper">
-            </div>
-    </div>
-</div>
-
-<div id="configSheet" class="sheet">
-    <div class="sheet-content">
-        <h3 style="margin-bottom:25px; text-align:center; font-weight:800; color:var(--accent);">SİSTEM AYARLARI</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <div class="input-row"><label>USD / BRL</label><input type="number" id="inBrl" step="0.01"></div>
-            <div class="input-row"><label>USD / TRY</label><input type="number" id="inTry" step="0.01"></div>
-            <div class="input-row"><label>NAVLUN ($/T)</label><input type="number" id="inFreight"></div>
-            <div class="input-row"><label>GÜMRÜK (%)</label><input type="number" id="inTax"></div>
-            <div class="input-row"><label>KAR ($/T)</label><input type="number" id="inProfit"></div>
-            <div class="input-row"><label>MİKTAR (T)</label><input type="number" id="inQty"></div>
-        </div>
-        <button class="btn-action btn-pdf" style="background:var(--green); margin-top:15px;" onclick="saveConfig()">💾 GÜNCELLE VE UYGULA</button>
-        <button class="btn-action btn-setup" onclick="closeSheet()" style="box-shadow:none; border:none; background:transparent;">GERİ DÖN</button>
-    </div>
+<div id="modal" class="modal">
+  <div class="modalContent" id="modalContent"></div>
 </div>
 
 <script>
-    let state = {
-        products: [
-            { name: 'SANTOS NY2 ARABICA', type: 'PREMIUM ARABICA', rs: 2150 },
-            { name: 'CONILON G1 ROBUSTA', type: 'FINE ROBUSTA', rs: 1680 },
-            { name: 'RIO MINAS 17/18', type: 'TRADITIONAL ARABICA', rs: 1980 }
-        ],
-        cfg: JSON.parse(localStorage.getItem('br_config_v5')) || {
-            brl: 5.15, try: 32.70, freight: 420, tax: 10, profit: 450, qty: 20
-        }
-    };
+let usdTry=0;
+async function fx(){
+  const r=await fetch("https://open.er-api.com/v6/latest/USD");
+  const d=await r.json();
+  usdTry=d.rates.TRY;
+}
 
-    function calc(rs) {
-        const c = state.cfg;
-        const exwUsd = ((rs / 60) * 1000) / c.brl;
-        const fobUsd = exwUsd + 55; // Liman ve operasyon masrafı
-        const cifUsd = fobUsd + c.freight;
-        const ddpCostUsd = cifUsd * (1 + (c.tax / 100));
-        const finalSellUsd = ddpCostUsd + c.profit;
-        
-        return {
-            exw: exwUsd,
-            fob: fobUsd,
-            cif: cifUsd,
-            ddpTry: finalSellUsd * c.try,
-            total: (finalSellUsd * c.try) * c.qty
-        };
-    }
+const routes=[
+ {name:"São Paulo (GRU) → Istanbul (IST)",base:720,airline:"Turkish Airlines",stop:"Direct / DOH",demand:1.1},
+ {name:"Brasília (BSB) → Istanbul (IST)",base:690,airline:"LATAM + Turkish",stop:"1 Stop Europe",demand:.95}
+];
 
-    async function loadRates() {
-        try {
-            const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-            const data = await res.json();
-            state.cfg.try = data.rates.TRY;
-            state.cfg.brl = data.rates.BRL;
-            render();
-        } catch(e) { render(); }
-    }
+const memory={};
+let activeDate=new Date();
 
-    function render() {
-        const container = document.getElementById('productContainer');
-        container.innerHTML = '';
-        document.getElementById('chipTry').innerText = `₺${state.cfg.try.toFixed(2)}`;
-        document.getElementById('chipBrl').innerText = `${state.cfg.brl.toFixed(2)} R$`;
+function price(base,day,d){
+  return base+
+    Math.sin(day/6)*25+
+    (Math.random()-.5)*20+
+    d*Math.cos(day/10)*30;
+}
 
-        state.products.forEach(p => {
-            const v = calc(p.rs);
-            container.innerHTML += `
-                <div class="coffee-card">
-                    <span class="type-badge">${p.type}</span>
-                    <span class="coffee-name">${p.name}</span>
-                    <div class="delivery-grid">
-                        <div class="delivery-box"><label>EXW ($)</label><span>$${Math.round(v.exw).toLocaleString()}</span></div>
-                        <div class="delivery-box"><label>FOB ($)</label><span>$${Math.round(v.fob).toLocaleString()}</span></div>
-                        <div class="delivery-box"><label>CIF ($)</label><span>$${Math.round(v.cif).toLocaleString()}</span></div>
-                        <div class="delivery-box"><label>VERGİ</label><span>%${state.cfg.tax}</span></div>
-                    </div>
-                    <div class="final-price-area">
-                        <div class="final-price-label">DDP TÜRKİYE (ADRESE TESLİM)</div>
-                        <div class="final-price-val">₺${Math.round(v.ddpTry).toLocaleString()} <small style="font-size:0.9rem;">/ TON</small></div>
-                        <div style="font-weight:800; font-size:0.85rem; color:var(--text-light); margin-top:8px;">
-                            TOPLAM (${state.cfg.qty}T): ₺${Math.round(v.total).toLocaleString()} + KDV
-                        </div>
-                    </div>
-                </div>`;
-        });
-    }
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  const y=activeDate.getFullYear();
+  const m=activeDate.getMonth();
+  const daysInMonth=new Date(y,m+1,0).getDate();
 
-    function showOfferPreview() {
-        const dateStr = new Date().toLocaleDateString('tr-TR');
-        const offerNo = "QT-" + Math.floor(Math.random() * 900000 + 100000);
-        
-        let rows = '';
-        state.products.forEach(p => {
-            const v = calc(p.rs);
-            rows += `
-                <tr>
-                    <td><strong>${p.name}</strong><br><span style="font-size:11px; color:#4a5568;">Brezilya Menşeli ${p.type} Kahve</span></td>
-                    <td align="center">${state.cfg.qty} T</td>
-                    <td>
-                        EXW: $${Math.round(v.exw).toLocaleString()}<br>
-                        FOB: $${Math.round(v.fob).toLocaleString()}<br>
-                        CIF: $${Math.round(v.cif).toLocaleString()}
-                    </td>
-                    <td style="color:var(--accent); font-weight:800;">
-                        ₺${Math.round(v.ddpTry).toLocaleString()}<br>
-                        <span style="font-size:10px; color:#718096;">(DDP - Adrese Teslim)</span>
-                    </td>
-                </tr>`;
-        });
+  routes.forEach(r=>{
+    const prices=[];
+    for(let i=1;i<=daysInMonth;i++) prices.push(price(r.base,i,r.demand));
+    const min=Math.min(...prices);
+    const max=Math.max(...prices);
 
-        const template = `
-            <div class="offer-header">
-                <div>
-                    <h1 style="color:var(--accent); font-weight:800; font-size:26px;">RESMİ TİCARİ TEKLİF</h1>
-                    <p style="font-weight:700; margin-top:5px;">Teklif No: ${offerNo} | Tarih: ${dateStr}</p>
-                </div>
-                <div style="text-align:right;">
-                    <p style="font-weight:800; color:var(--accent); font-size:18px;">BRAZIL COFFEE EXCHANGE</p>
-                    <p style="font-size:12px; font-weight:600;">Global Logistics & Trade Center<br>İstanbul, Türkiye | São Paulo, Brazil</p>
-                </div>
-            </div>
+    const card=document.createElement("div");
+    card.className="routeCard";
+    card.innerHTML=`
+      <div class="title">${r.name}</div>
+      <div class="small">✈ ${r.airline} | 🔁 ${r.stop}</div>
+      <div class="calendar"></div>
+      <div class="info">⬆⬇ live price • cheapest auto-detected</div>
+    `;
+    app.appendChild(card);
 
-            <p style="margin-bottom:20px; font-weight:600;">Sayın Yetkili,</p>
-            <p style="margin-bottom:25px;">Talebiniz üzerine, Brezilya menşeli nitelikli kahve çeşitlerimize ait farklı teslimat seçeneklerini içeren güncel fiyat teklifimiz aşağıda bilgilerinize sunulmuştur:</p>
+    const cal=card.querySelector(".calendar");
 
-            <table class="offer-table">
-                <thead>
-                    <tr>
-                        <th>ÜRÜN DETAYI</th>
-                        <th>MİKTAR</th>
-                        <th>ULUSLARARASI BİRİM (USD)</th>
-                        <th>DDP TÜRKİYE BİRİM (TRY)</th>
-                    </tr>
-                </thead>
-                <tbody>${rows}</tbody>
-            </table>
+    prices.forEach((usd,i)=>{
+      const d=i+1;
+      const date=new Date(y,m,d);
+      const label=date.toLocaleDateString("en-US",{weekday:"short",day:"numeric"});
+      const tryP=usd*usdTry;
 
-            <div class="offer-footer">
-                <p style="margin-bottom:10px; font-weight:800; color:var(--accent);">TEKLİF KOŞULLARI VE YASAL NOTLAR:</p>
-                <p>1. <strong>Fiyatlar:</strong> Belirtilen DDP fiyatlarına %20 KDV dahil değildir.</p>
-                <p>2. <strong>Döviz Kuru:</strong> Teklif ${state.cfg.try} TRY/USD kuru üzerinden hazırlanmıştır. Fatura tarihindeki TCMB Döviz Satış Kuru uygulanacaktır.</p>
-                <p>3. <strong>Teslimat (DDP):</strong> Tüm gümrük vergileri, liman masrafları ve adrese nakliye fiyata dahildir.</p>
-                <p>4. <strong>Geçerlilik:</strong> İşbu teklif piyasa ve borsa dalgalanmaları nedeniyle 24 saat geçerlidir.</p>
-            </div>
+      const key=r.name+y+m+d;
+      const prev=memory[key];
+      memory[key]=usd;
 
-            <div style="margin-top:50px; display:flex; justify-content:space-between; text-align:center; font-size:13px;">
-                <div style="width:220px; border-top:2px solid #2d3748; padding-top:12px;"><strong>İhracat Birimi</strong><br>Dijital İmzalıdır</div>
-                <div style="width:220px; border-top:2px solid #2d3748; padding-top:12px;"><strong>Müşteri Onayı</strong><br>Kaşe / İmza</div>
-            </div>
+      let heat="hm-mid";
+      if(usd===min) heat="hm-low";
+      if(usd===max) heat="hm-high";
+
+      let arrow="";
+      if(prev){
+        if(usd>prev) arrow="▲ ";
+        if(usd<prev) arrow="▼ ";
+      }
+
+      const div=document.createElement("div");
+      div.className=`day ${heat}`;
+      if(usd===min) div.classList.add("cheapest");
+      if(prev){
+        if(usd>prev) div.classList.add("flash-up");
+        if(usd<prev) div.classList.add("flash-down");
+      }
+
+      div.innerHTML=`
+        <div>${label}</div>
+        <div class="price">${arrow}$${usd.toFixed(0)}</div>
+        <div class="price">${tryP.toFixed(0)}₺</div>
+      `;
+
+      div.onclick=()=>{
+        modalContent.innerHTML=`
+          <h3>${r.name}</h3>
+          <p>📅 ${label}</p>
+          <p>✈ ${r.airline}</p>
+          <p>🔁 ${r.stop}</p>
+          <p>🛂 Türkiye – Vize Yok</p>
+          <hr>
+          <p>$${usd.toFixed(0)} / ₺${tryP.toFixed(0)}</p>
+          <div class="close" onclick="closeModal()">Kapat</div>
         `;
+        modal.style.display="flex";
+      };
 
-        document.getElementById('printableOffer').innerHTML = template;
-        document.getElementById('previewModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+      cal.appendChild(div);
+    });
+  });
+}
 
-    function downloadPDF() {
-        const element = document.getElementById('printableOffer');
-        const opt = {
-            margin: [10, 10],
-            filename: 'Resmi_Kahve_Teklifi.pdf',
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
+function closeModal(){ modal.style.display="none"; }
+modal.onclick=closeModal;
 
-    function closePreview() { document.getElementById('previewModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
-    function openSheet() {
-        document.getElementById('configSheet').classList.add('active');
-        document.getElementById('inBrl').value = state.cfg.brl;
-        document.getElementById('inTry').value = state.cfg.try;
-        document.getElementById('inFreight').value = state.cfg.freight;
-        document.getElementById('inTax').value = state.cfg.tax;
-        document.getElementById('inProfit').value = state.cfg.profit;
-        document.getElementById('inQty').value = state.cfg.qty;
-    }
+const mp=document.getElementById("monthPicker");
+mp.value=new Date().toISOString().slice(0,7);
+mp.onchange=()=>{ activeDate=new Date(mp.value); render(); };
 
-    function saveConfig() {
-        state.cfg = {
-            brl: parseFloat(document.getElementById('inBrl').value) || 1,
-            try: parseFloat(document.getElementById('inTry').value) || 1,
-            freight: parseFloat(document.getElementById('inFreight').value) || 0,
-            tax: parseFloat(document.getElementById('inTax').value) || 0,
-            profit: parseFloat(document.getElementById('inProfit').value) || 0,
-            qty: parseFloat(document.getElementById('inQty').value) || 1
-        };
-        localStorage.setItem('br_config_v5', JSON.stringify(state.cfg));
-        closeSheet(); render();
-    }
-
-    function closeSheet() { document.getElementById('configSheet').classList.remove('active'); }
-
-    loadRates();
+async function start(){ await fx(); render(); }
+start();
+setInterval(start,30000);
 </script>
 
 </body>

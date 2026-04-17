@@ -7,10 +7,12 @@
 
 <style>
 :root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#0b1c2d;
-  --muted:#475569;
+  /* INVERTED THEME */
+  --bg:#0b1c2d;          /* Lacivert zemin */
+  --card:#ffffff;        /* Beyaz kart */
+  --text:#0b1c2d;        /* Kart içi ana metin */
+  --text-inv:#e5e7eb;    /* Zemin üstü metin */
+  --muted:#64748b;
   --line:#e5e7eb;
 
   --navy:#0b1c2d;
@@ -27,74 +29,79 @@ body{
   margin:0;
   font-family:system-ui;
   background:var(--bg);
-  color:var(--text);
+  color:var(--text-inv);
 }
 
+/* HEADER */
 .header{
-  padding:12px;
+  padding:14px;
   background:var(--navy);
-  color:white;
+  color:var(--text-inv);
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:12px;
 }
 
-.header h3{ font-size:16px; }
+.header h3{
+  margin:0;
+  font-size:17px;
+  font-weight:800;
+}
 
 .small{
   font-size:12px;
-  color:#e5e7eb;
+  color:#cbd5f5;
 }
 
 .monthPicker{
-  padding:8px 12px;
-  border-radius:10px;
+  padding:10px 14px;
+  border-radius:12px;
   border:none;
   font-size:14px;
-}
-
-.container{ padding:12px; }
-
-.routeCard{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:14px;
-}
-
-.title{
-  font-weight:800;
-  font-size:15px;
+  font-weight:600;
+  background:white;
   color:var(--navy);
 }
 
+/* CONTENT */
+.container{
+  padding:12px;
+}
+
+/* CARD */
+.routeCard{
+  background:var(--card);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+
+.title{
+  font-weight:900;
+  font-size:16px;
+  color:var(--navy);
+}
+
+.info{
+  margin-top:8px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* CALENDAR GRID */
 .calendar{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:6px;
-  margin-top:10px;
+  gap:8px;
+  margin-top:12px;
 }
 
-/* TABLET */
-@media(min-width:600px){
-  .calendar{ grid-template-columns:repeat(4,1fr); }
-}
-
-/* DESKTOP */
-@media(min-width:900px){
-  .header{
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .calendar{ grid-template-columns:repeat(7,1fr); }
-}
-
+/* TOUCH FRIENDLY */
 .day{
-  border-radius:10px;
-  padding:6px;
-  font-size:11px;
+  border-radius:12px;
+  padding:8px 6px;
+  font-size:12px;
   text-align:center;
   cursor:pointer;
   transition:.2s;
@@ -106,42 +113,45 @@ body{
 }
 
 .price{
-  font-weight:700;
-  font-size:11px;
+  font-weight:800;
+  font-size:12px;
+  color:var(--navy);
 }
 
-/* HEATMAP */
-.hm-low{ background:#ecfeff; }
-.hm-mid{ background:#ffffff; }
-.hm-high{ background:#fff7ed; }
+/* HEATMAP – STRONG BUT CLEAN */
+.hm-low{ background:#dcfce7; }
+.hm-mid{ background:#f8fafc; }
+.hm-high{ background:#fee2e2; }
 
 /* CHEAPEST */
 .cheapest{
-  box-shadow:0 0 0 2px var(--yellow),0 0 12px rgba(250,204,21,.5);
+  box-shadow:
+    0 0 0 2px var(--yellow),
+    0 0 18px rgba(250,204,21,.6);
 }
 .cheapest::after{
   content:"CHEAPEST";
   position:absolute;
-  top:4px;
-  right:4px;
+  top:6px;
+  right:6px;
   font-size:9px;
-  font-weight:800;
+  font-weight:900;
   background:var(--yellow);
-  color:#0b1c2d;
-  padding:2px 5px;
-  border-radius:6px;
+  color:var(--navy);
+  padding:3px 6px;
+  border-radius:8px;
 }
 
-/* FLASH */
+/* FLASH EFFECTS */
 .flash-up{ animation:flashUp .7s; }
 .flash-down{ animation:flashDown .7s; }
 
 @keyframes flashUp{
-  0%{ box-shadow:0 0 0 3px rgba(220,38,38,.4); }
+  0%{ box-shadow:0 0 0 4px rgba(220,38,38,.5); }
   100%{}
 }
 @keyframes flashDown{
-  0%{ box-shadow:0 0 0 3px rgba(22,163,74,.4); }
+  0%{ box-shadow:0 0 0 4px rgba(22,163,74,.5); }
   100%{}
 }
 
@@ -149,29 +159,44 @@ body{
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(11,28,45,.6);
+  background:rgba(11,28,45,.75);
   display:none;
   align-items:center;
   justify-content:center;
 }
+
 .modalContent{
   background:white;
-  border-radius:14px;
+  border-radius:18px;
   padding:20px;
-  width:90%;
-  max-width:360px;
+  width:92%;
+  max-width:380px;
+  color:var(--navy);
 }
+
+.modalContent h3{
+  margin-top:0;
+}
+
 .close{
-  margin-top:10px;
+  margin-top:12px;
   color:var(--navy-soft);
-  font-weight:800;
+  font-weight:900;
   cursor:pointer;
 }
 
-.info{
-  margin-top:8px;
-  font-size:11px;
-  color:var(--muted);
+/* RESPONSIVE BREAKPOINTS */
+@media(min-width:600px){
+  .calendar{ grid-template-columns:repeat(4,1fr); }
+}
+
+@media(min-width:900px){
+  .header{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .calendar{ grid-template-columns:repeat(7,1fr); }
 }
 </style>
 </head>
@@ -181,7 +206,7 @@ body{
 <div class="header">
   <div>
     <h3>✈️ Flight Price Intelligence</h3>
-    <div class="small">AI calendar • live FX • price movement</div>
+    <div class="small">Mobile-first • AI calendar • live price movement</div>
   </div>
   <input type="month" id="monthPicker" class="monthPicker"/>
 </div>
@@ -284,7 +309,7 @@ function render(){
           <p>🔁 ${r.stop}</p>
           <p>🛂 Türkiye – Vize Yok</p>
           <hr>
-          <p>$${usd.toFixed(0)} / ₺${tryP.toFixed(0)}</p>
+          <p><b>$${usd.toFixed(0)}</b> / <b>₺${tryP.toFixed(0)}</b></p>
           <div class="close" onclick="closeModal()">Kapat</div>
         `;
         modal.style.display="flex";

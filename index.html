@@ -2,592 +2,178 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Mobil Kameralı Çevirmen - Fotoğraf Çeviri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ahmet Salim ÇINARBAŞ | Yazar</title>
+    <meta name="description" content="Ahmet Salim ÇINARBAŞ - Geçmişten Günümüze Mardin Müzisyenleri, Mardin'den Altın Sözler, Mazide Kalanlar kitaplarının yazarı.">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
-            padding: 16px;
-        }
-
-        /* Ana konteyner */
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Başlık */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 24px;
-            color: #1a2a3a;
-            font-weight: 600;
-        }
-        .header p {
-            font-size: 13px;
-            color: #6c7a8a;
-            margin-top: 4px;
-        }
-
-        /* Dil seçici kartı */
-        .lang-card {
-            background: white;
-            border-radius: 24px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .lang-selector {
-            flex: 1;
-            min-width: 120px;
-        }
-        .lang-label {
-            font-size: 11px;
-            color: #8a9aaa;
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        select {
-            width: 100%;
-            padding: 12px 8px;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 14px;
-            background: white;
-            font-weight: 500;
-            color: #1a2a3a;
-        }
-        .swap-btn {
-            background: #eef2ff;
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 48px;
-            font-size: 20px;
-            cursor: pointer;
-            color: #4f46e5;
-            transition: 0.2s;
-        }
-        .swap-btn:active {
-            transform: scale(0.95);
-            background: #e0e7ff;
-        }
-
-        /* Kamera / Galeri butonları */
-        .capture-area {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .capture-btn {
-            flex: 1;
-            background: #4f46e5;
-            border: none;
-            padding: 16px;
-            border-radius: 28px;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-        .capture-btn:active {
-            transform: scale(0.97);
-            background: #4338ca;
-        }
-        .gallery-btn {
-            background: #10b981;
-        }
-        .gallery-btn:active {
-            background: #059669;
-        }
-        .capture-btn.secondary {
-            background: #f59e0b;
-        }
-
-        /* Fotoğraf önizleme alanı */
-        .preview-card {
-            background: white;
-            border-radius: 24px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: none;
-        }
-        .preview-title {
-            font-size: 13px;
-            color: #6c7a8a;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-        .image-container {
-            position: relative;
-            background: #f1f5f9;
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        .preview-img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            display: block;
-        }
-        .ocr-text-area {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 12px;
-            margin-top: 12px;
-        }
-        .ocr-text-label {
-            font-size: 12px;
-            color: #6c7a8a;
-            margin-bottom: 6px;
-        }
-        .ocr-text {
-            font-size: 13px;
-            color: #1a2a3a;
-            line-height: 1.5;
-            word-break: break-word;
-            background: white;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        /* Çeviri sonuç kartı */
-        .result-card {
-            background: white;
-            border-radius: 24px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .result-title {
-            font-weight: 600;
-            color: #1a2a3a;
-            font-size: 15px;
-        }
-        .copy-btn {
-            background: #eef2ff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 13px;
-            color: #4f46e5;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .copy-btn:active {
-            background: #e0e7ff;
-        }
-        .translated-text {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #1a2a3a;
-            min-height: 120px;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* İlerleme çubuğu */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: #4f46e5;
-            width: 0%;
-            transition: width 0.3s;
-            border-radius: 4px;
-        }
-
-        /* Durum mesajı */
-        .status {
-            font-size: 12px;
-            color: #6c7a8a;
-            text-align: center;
-            padding: 8px;
-            background: #f1f5f9;
-            border-radius: 20px;
-            margin-top: 12px;
-        }
-
-        /* Temizle butonu */
-        .clear-btn {
-            background: none;
-            border: 1px solid #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 14px;
-            color: #ef4444;
-            font-weight: 500;
-            width: 100%;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-        .clear-btn:active {
-            background: #fef2f2;
-        }
-
-        /* Gizli file input */
-        #cameraInput, #galleryInput {
-            display: none;
-        }
-
-        /* Animasyon */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .preview-card, .result-card {
-            animation: fadeIn 0.3s ease;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #FFFFFF; color: #0A1E3D; scroll-behavior: smooth; }
+        :root { --lacivert: #0A1E3D; --lacivert-light: #1E3A5F; --lacivert-soft: #2C4A6E; --white: #FFFFFF; --off-white: #F8F9FC; --altin: #C9A03D; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+        header { position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); z-index: 100; border-bottom: 2px solid var(--lacivert); padding: 20px 0; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo a { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; text-decoration: none; color: var(--lacivert); }
+        .logo span { color: var(--lacivert-light); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; }
+        .nav-links a { text-decoration: none; font-weight: 500; color: var(--lacivert); transition: opacity 0.2s; }
+        .hero { min-height: 90vh; display: flex; align-items: center; padding: 60px 0; background: var(--white); }
+        .hero-grid { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 3rem; }
+        .hero-content { flex: 1.2; }
+        .hero-badge { display: inline-block; background: var(--lacivert); color: var(--white); font-size: 0.7rem; padding: 4px 12px; border-radius: 40px; margin-bottom: 1.5rem; }
+        .hero-content h1 { font-size: 4rem; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--lacivert); }
+        .hero-content h1 .altin { color: var(--lacivert-light); border-bottom: 3px solid var(--lacivert); }
+        .hero-tagline { font-size: 1.2rem; color: var(--lacivert-soft); margin: 1.5rem 0 1rem; font-style: italic; }
+        .hero-desc { font-size: 1rem; max-width: 500px; color: var(--lacivert-soft); margin-bottom: 2rem; }
+        .x-link { display: inline-flex; align-items: center; gap: 10px; background: var(--lacivert); color: white; padding: 10px 22px; border-radius: 40px; text-decoration: none; }
+        .hero-visual { flex: 0.8; text-align: center; }
+        .author-photo { width: 280px; height: 280px; border-radius: 50%; object-fit: cover; border: 4px solid var(--lacivert); max-width: 100%; }
+        .mardin-motif { background: var(--off-white); border-radius: 60% 40% 50% 50% / 40% 50% 60% 50%; padding: 1.5rem; border: 1px solid var(--lacivert); }
+        section { padding: 90px 0; border-bottom: 1px solid #E2E6EE; }
+        .section-title { font-size: 2.8rem; font-weight: 600; font-family: 'Playfair Display', serif; margin-bottom: 2rem; position: relative; display: inline-block; color: var(--lacivert); }
+        .section-title:after { content: ''; position: absolute; bottom: -12px; left: 0; width: 80px; height: 3px; background: var(--lacivert); }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin-top: 2rem; }
+        .book-card { background: var(--white); border-radius: 28px; padding: 2.2rem; box-shadow: 0 8px 24px rgba(10,30,61,0.08); border: 1px solid #DCE3EC; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .book-card:hover { transform: translateY(-8px); border-color: var(--lacivert); }
+        .book-cover-icon i { font-size: 3rem; color: var(--lacivert); margin-bottom: 1.2rem; }
+        .book-card h3 { font-size: 1.4rem; font-family: 'Playfair Display', serif; color: var(--lacivert); }
+        .click-hint { margin-top: 1rem; font-size: 0.7rem; color: var(--lacivert-soft); opacity: 0.6; }
+        .audio-player { background: linear-gradient(135deg, #0A1E3D 0%, #1E3A5F 100%); border-radius: 48px; padding: 2rem; margin-top: 3rem; border: 1px solid var(--altin); }
+        .player-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .player-header i { font-size: 2rem; color: var(--altin); }
+        .player-header h3 { font-family: 'Playfair Display', serif; color: var(--altin); font-size: 1.5rem; }
+        .player-controls { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .player-controls button { background: var(--altin); color: #0A1E3D; border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 1.3rem; transition: 0.2s; }
+        .player-controls button:hover { transform: scale(1.05); background: #D4AF37; }
+        .progress-container { width: 100%; height: 6px; background: #2C4A6E; border-radius: 10px; cursor: pointer; margin-bottom: 0.8rem; }
+        .progress-bar { width: 0%; height: 100%; background: var(--altin); border-radius: 10px; }
+        .time-info { display: flex; justify-content: space-between; font-size: 0.8rem; color: #B0C4DE; }
+        .status-text { text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--altin); font-style: italic; }
+        .mardin-spirit { background: var(--off-white); border-radius: 48px; padding: 3rem; margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }
+        .spirit-item { text-align: center; flex: 1; min-width: 150px; }
+        .spirit-item i { font-size: 2.2rem; color: var(--lacivert); }
+        .contact-area { text-align: center; background: var(--lacivert); color: var(--white); border-radius: 48px; padding: 3rem; }
+        .x-follow a { background: var(--white); color: var(--lacivert); padding: 12px 28px; border-radius: 60px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+        footer { background: var(--lacivert); color: #B0C4DE; text-align: center; padding: 32px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,30,61,0.9); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--white); max-width: 500px; width: 90%; border-radius: 32px; padding: 2rem; position: relative; border: 1px solid var(--lacivert); }
+        .modal-close { position: absolute; top: 20px; right: 24px; font-size: 1.8rem; cursor: pointer; }
+        @media (max-width: 800px) {
+            .hero-content h1 { font-size: 2.6rem; }
+            .container { padding: 0 20px; }
+            .section-title { font-size: 2rem; }
+            .author-photo { width: 200px; height: 200px; }
+            .player-controls button { width: 45px; height: 45px; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>📸 Mobil Çevirmen</h1>
-        <p>Fotoğraf çek veya galeriden seç, yazıları hemen çevir</p>
+<header>
+    <div class="container header-flex">
+        <div class="logo"><a href="#">Ahmet Salim <span>ÇINARBAŞ</span></a></div>
+        <ul class="nav-links">
+            <li><a href="#home">Ana Sayfa</a></li>
+            <li><a href="#kitaplar">Kitaplar</a></li>
+            <li><a href="#seslikitap">M.Ö 1000 Mardin</a></li>
+            <li><a href="#mardin">Mardin Ruhu</a></li>
+            <li><a href="#iletisim">İletişim</a></li>
+        </ul>
     </div>
-
-    <!-- Dil seçici -->
-    <div class="lang-card">
-        <div class="lang-selector">
-            <div class="lang-label">KAYNAK DİL</div>
-            <select id="sourceLang">
-                <option value="tr">🇹🇷 Türkçe</option>
-                <option value="en">🇬🇧 İngilizce</option>
-                <option value="pt">🇵🇹 Portekizce</option>
-                <option value="es">🇪🇸 İspanyolca</option>
-                <option value="fr">🇫🇷 Fransızca</option>
-                <option value="de">🇩🇪 Almanca</option>
-                <option value="it">🇮🇹 İtalyanca</option>
-                <option value="ru">🇷🇺 Rusça</option>
-                <option value="ar">🇸🇦 Arapça</option>
-                <option value="zh-CN">🇨🇳 Çince</option>
-                <option value="ja">🇯🇵 Japonca</option>
-                <option value="ko">🇰🇷 Korece</option>
-            </select>
+</header>
+<main>
+    <section id="home" class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">Yazar</div>
+                <h1>Ahmet Salim <span class="altin">ÇINARBAŞ</span></h1>
+                <div class="hero-tagline">“Mardin’in sesini, sözünü ve geçmişini bugüne taşıyan kalem”</div>
+                <p class="hero-desc">Şehrin dar sokaklarından, taş konaklarından, kadim müzik meclislerinden süzülen hikayeleri kitaplaştıran bir yazar. Mardin'in kültür hafızasını yaşatıyor.</p>
+                <a href="https://twitter.com/ascinarbas" target="_blank" class="x-link"><i class="fab fa-x-twitter"></i> @ascinarbas</a>
+            </div>
+            <div class="hero-visual">
+                <div class="mardin-motif">
+                    <img src="https://pbs.twimg.com/media/FKxqDquXoAI7WTV?format=jpg&name=small" alt="Ahmet Salim ÇINARBAŞ" class="author-photo">
+                    <p style="margin-top: 1rem; font-size: 0.8rem;">Taşın ve nefesin şehri Mardin</p>
+                </div>
+            </div>
         </div>
-        <button class="swap-btn" id="swapBtn">🔄</button>
-        <div class="lang-selector">
-            <div class="lang-label">HEDEF DİL</div>
-            <select id="targetLang">
-                <option value="tr">🇹🇷 Türkçe</option>
-                <option value="en" selected>🇬🇧 İngilizce</option>
-                <option value="pt">🇵🇹 Portekizce</option>
-                <option value="es">🇪🇸 İspanyolca</option>
-                <option value="fr">🇫🇷 Fransızca</option>
-                <option value="de">🇩🇪 Almanca</option>
-                <option value="it">🇮🇹 İtalyanca</option>
-                <option value="ru">🇷🇺 Rusça</option>
-                <option value="ar">🇸🇦 Arapça</option>
-                <option value="zh-CN">🇨🇳 Çince</option>
-                <option value="ja">🇯🇵 Japonca</option>
-                <option value="ko">🇰🇷 Korece</option>
-            </select>
+    </section>
+    <section id="kitaplar">
+        <div class="container">
+            <h2 class="section-title">Kitaplarım</h2>
+            <div class="books-grid">
+                <div class="book-card" data-book="muzisyenler"><div class="book-cover-icon"><i class="fas fa-music"></i></div><h3>Geçmişten Günümüze<br>Mardin Müzisyenleri</h3><div class="click-hint"><i class="fas fa-hand-pointer"></i> Detay için tıkla</div></div>
+                <div class="book-card" data-book="altinsozler"><div class="book-cover-icon"><i class="fas fa-gem"></i></div><h3>Mardin'den Altın Sözler</h3><div class="click-hint"><i class="fas fa-hand-pointer"></i> Detay için tıkla</div></div>
+                <div class="book-card" data-book="mazide"><div class="book-cover-icon"><i class="fas fa-hourglass-half"></i></div><h3>Mazide Kalanlar</h3><div class="click-hint"><i class="fas fa-hand-pointer"></i> Detay için tıkla</div></div>
+            </div>
         </div>
-    </div>
-
-    <!-- Kamera ve Galeri butonları -->
-    <div class="capture-area">
-        <button class="capture-btn" id="cameraBtn">📷 Kamera ile Çek</button>
-        <button class="capture-btn gallery-btn" id="galleryBtn">🖼️ Galeriden Seç</button>
-    </div>
-
-    <!-- Gizli file inputlar -->
-    <input type="file" id="cameraInput" accept="image/*" capture="environment">
-    <input type="file" id="galleryInput" accept="image/*">
-
-    <!-- Fotoğraf önizleme ve OCR sonucu -->
-    <div class="preview-card" id="previewCard">
-        <div class="preview-title">📸 Çekilen Fotoğraf</div>
-        <div class="image-container">
-            <img id="previewImage" class="preview-img" alt="Önizleme">
+    </section>
+    <section id="seslikitap">
+        <div class="container">
+            <h2 class="section-title">M.Ö 1000 Mardin</h2>
+            <div class="audio-player">
+                <div class="player-header"><i class="fas fa-scroll"></i><h3>M.Ö 1000 Mardin | Radyo Tiyatrosu</h3></div>
+                <div class="player-controls"><button id="rewindBtn"><i class="fas fa-backward-step"></i></button><button id="playPauseBtn"><i class="fas fa-play"></i></button><button id="stopBtn"><i class="fas fa-stop"></i></button></div>
+                <div class="progress-container" id="progressContainer"><div class="progress-bar" id="progressBar"></div></div>
+                <div class="time-info"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+                <div class="status-text" id="statusText">🎙️ M.Ö 1000 Mardin - Radyo Tiyatrosu</div>
+            </div>
         </div>
-        <div class="ocr-text-area">
-            <div class="ocr-text-label">🔍 Fotoğraftan Okunan Metin</div>
-            <div class="ocr-text" id="ocrText">-</div>
-        </div>
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-        </div>
-        <div class="status" id="statusMsg">✅ Hazır - Fotoğraf çekin veya galeriden seçin</div>
-        <button class="clear-btn" id="clearBtn">🗑️ Temizle</button>
-    </div>
-
-    <!-- Çeviri sonucu -->
-    <div class="result-card" id="resultCard" style="display: none;">
-        <div class="result-header">
-            <span class="result-title">🌍 Çeviri Sonucu</span>
-            <button class="copy-btn" id="copyBtn">📋 Kopyala</button>
-        </div>
-        <div class="translated-text" id="translatedText">Çeviri burada görünecek</div>
-    </div>
-</div>
-
+    </section>
+    <section id="mardin"><div class="container"><h2 class="section-title">Mardin Ruhu</h2><div class="mardin-spirit"><div class="spirit-item"><i class="fas fa-church"></i><p>Kadim İnançlar</p></div><div class="spirit-item"><i class="fas fa-drum"></i><p>Çok Seslilik</p></div><div class="spirit-item"><i class="fas fa-archway"></i><p>Taş İşçiliği</p></div><div class="spirit-item"><i class="fas fa-hand-sparkles"></i><p>El Sanatları</p></div></div><p style="margin-top: 2rem; text-align: center; font-style: italic;">“Bu toprakların hafızasını kitaplarımla yeniden diriltiyorum.”</p></div></section>
+    <section id="iletisim"><div class="container"><div class="contact-area"><i class="fab fa-x-twitter" style="font-size: 2.5rem;"></i><h3>Takip Edin</h3><p>Yeni yazılar, Mardin notları ve kitap duyuruları için X hesabını takip edebilirsiniz.</p><div class="x-follow"><a href="https://twitter.com/ascinarbas" target="_blank"><i class="fab fa-x-twitter"></i> @ascinarbas</a></div></div></div></section>
+</main>
+<footer><div class="container"><p>© 2025 Ahmet Salim ÇINARBAŞ — Mardin'in sözü, sesi ve hafızası yaşasın.</p><p>Geçmişten Günümüze Mardin Müzisyenleri | Mardin'den Altın Sözler | Mazide Kalanlar</p></div></footer>
+<div id="bookModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><div class="modal-icon"><i id="modalIcon" class="fas fa-book"></i></div><h3 id="modalTitle"></h3><div class="modal-detail" id="modalDetail"></div><div class="modal-quote" id="modalQuote"></div></div></div>
 <script>
-    // DOM Elemanları
-    const cameraBtn = document.getElementById('cameraBtn');
-    const galleryBtn = document.getElementById('galleryBtn');
-    const cameraInput = document.getElementById('cameraInput');
-    const galleryInput = document.getElementById('galleryInput');
-    const previewCard = document.getElementById('previewCard');
-    const resultCard = document.getElementById('resultCard');
-    const previewImage = document.getElementById('previewImage');
-    const ocrTextDiv = document.getElementById('ocrText');
-    const translatedTextDiv = document.getElementById('translatedText');
-    const sourceLangSelect = document.getElementById('sourceLang');
-    const targetLangSelect = document.getElementById('targetLang');
-    const swapBtn = document.getElementById('swapBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const statusMsg = document.getElementById('statusMsg');
-    const progressFill = document.getElementById('progressFill');
-
-    let currentImageFile = null;
-
-    // Dil isimleri
-    const langNames = {
-        tr: 'Türkçe', en: 'İngilizce', pt: 'Portekizce', es: 'İspanyolca',
-        fr: 'Fransızca', de: 'Almanca', it: 'İtalyanca', ru: 'Rusça',
-        ar: 'Arapça', 'zh-CN': 'Çince', ja: 'Japonca', ko: 'Korece'
+    const booksData = {
+        muzisyenler: { title: "Geçmişten Günümüze Mardin Müzisyenleri", icon: "fas fa-music", year: "2023", pages: "312 sayfa", publisher: "Mardin Kültür Yayınları", description: "Mardin'in kadim müzik geleneğini belgeleyen kapsamlı bir çalışma.", quote: "“Mardin'de müzik, taşların fısıltısıdır.”" },
+        altinsozler: { title: "Mardin'den Altın Sözler", icon: "fas fa-gem", year: "2021", pages: "248 sayfa", publisher: "Şark Yayınları", description: "Yüzyılların bilgeliğini taşıyan deyişler.", quote: "“Taş sabreder, Mardin anlatır.”" },
+        mazide: { title: "Mazide Kalanlar", icon: "fas fa-hourglass-half", year: "2024", pages: "296 sayfa", publisher: "Nostalji Kitap", description: "Kaybolan meslekler, göç hikayeleri, unutulan mahalleler.", quote: "“Bir şehri unutmamak için onu yazmak gerek.”" }
     };
+    const modal = document.getElementById('bookModal');
+    document.querySelectorAll('.book-card').forEach(card => { card.addEventListener('click', () => { const book = booksData[card.getAttribute('data-book')]; if(book){ document.getElementById('modalIcon').className = `fas ${book.icon.split(' ')[1]}`; document.getElementById('modalTitle').innerText = book.title; document.getElementById('modalDetail').innerHTML = `<p><strong>Yayın Yılı:</strong> ${book.year}</p><p><strong>Sayfa Sayısı:</strong> ${book.pages}</p><p><strong>Yayınevi:</strong> ${book.publisher}</p><p><strong>Özet:</strong> ${book.description}</p>`; document.getElementById('modalQuote').innerText = `“${book.quote}”`; modal.classList.add('active'); } }); });
+    document.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
+    
+    // TAM VE EKSİKSİZ METİN - KIRPMA YOK, HİÇBİR ŞEY EKSİK DEĞİL
+    const metin = `Küçük Adis, kolundaki pis paçavraları sıktı. Gürültülü bir şekilde sokağın tozunda kavga eden güvercinlere bakmaya devam etti. Adis, yaşamının bir güvercininki kadar hoş ve bir o kadar da basit olması gerektiğini düşündü. Çünkü Adis’e göre onlar yemeği kolay ve bolca bulabiliyorlardı. Bu düşüncelerle elinde biriktirdiği çakıl taşlarını kavga eden güvercinlere doğru fırlattı. Güvercinler, taşın ve oluşan tozun dehşetiyle gürültülü bir şekilde tozu toprağa katarak gökyüzüne doğru yol aldı. Adis, bu başarısız girişiminden sinirinden ağlamaklı olup daha sonra yüksek sesle gülmeye başlamıştı; yaptığına bir anlam verememişti. Daha sonra düşünceli bir şekilde şehrin alt çarşısına doğru, üzerindeki eskimiş, sarkık, sarmal dolaş olan elbisesini toplayıp Lazar’ın büyük bir ustalık ile dilencilik yaptığı caddeden aşağı doğru süzülmeye devam etti. Lazar, armut burunlu, elmacık kemikleri dışarı doğru fırlamış, gözleri oldukça iri, sağ gözü yıllar önce aldığı bir yaradan dolayı kör olmuş, saçlarının tepesi dökülmüş yetmişlerinde bir dilenciydi. Yıllarca dilencilik yaptığı Meşkin Kapısı’nda hatırı sayılır, yedi sülalesine yetecek kadar bir servet elde etmişti. Fakat kazandığı para ile zıt bir yaşam sürüyordu. Elde ettiği devasa servete rağmen bir türlü dilenmeyi bırakamıyordu, daha doğrusu bırakmak istemiyordu. Adis, Mardin sokaklarını aç ve üşümüş bir halde dolaşırken açlık sorununu halletmesi gerektiğini düşüne düşüne, nereden öğrendiğini bilmediği bir melodiyi mırıldanarak bazen de ıslık çalarak, sokakları karış karış yürümeye devam ediyordu. Adis kısa boylu, zeytin gözlü, şahin bakışlıydı; sivri bir çenesi ve kulakları vardı. Uzak mesafede pişen yemeğin kokusunu alabilen, aşağı doğru bakan sivri bir buruna sahipti. Lazar, servetine servet katmak için var olan klasik dualarına ilaveten şöyle diyordu: “Merhamet edin, Mardin’in nazik beyleri; merhamet edin Mardin’in güzel ve kibar hanımefendileri.” Hiç beklenmedik bir anda, Adis Lazar’ın küf ve pas tutmuş tasından bir ekmek alacak parayı rüzgâr hızı ile alıp kaçmaya başlamasıyla acı bir feryat duyuldu. Var gücü ile bağırıp sesini daha fazla insana ulaştırma gayreti içinde olan Lazar, “Yardım edin! Haramiler! Haramiler!” diye bağırmaya devam ediyordu. “Benim paramı, zar zor kazandığım paramı çaldılar!” Lazar’ın feryatlarına en ufak bir tepki gösteren kimse yoktu. Lazar sinirli bir şekilde sağa sola bağırıyor, bu da para etmeyince kendini Meşkin Kapısı’nın tozlu topraklarına atıyor fakat kimse oralı olmuyordu. Adis attığı muzipçe kahkaha ile Lazar’ı daha da deli ediyordu. Adis’e yetişemeyen Lazar sağa sola saldırmaya devam ediyor, paslı ve küflenmiş tasından parasını çalan Adis’e tüm gayretlerine rağmen bir türlü yetişemiyordu. Adis, Lazar’dan aşırdığı para ile zaman kaybetmeden ekmek fırınına doğru ıslık çala çala gidiyor, sırıtarak ekmekten alacağı ilk ısırığın hayalini şimdiden kurmaya başlamıştı. Yılların dilencisi Lazar, garip bir gülümsemeyle biraz da öfkeli bir ses ile şunları mırıldanıyordu: “Ah! Çok iyi, ustam.” Dedikten sonra alaycı bir şekilde bağırdı: “Ve kim paramı çalacak kadar gaddar olabilir!” Diyerek kendi kendini teselli etmeye devam ederken, bir yabancı şehre güney kapısından giriş yapıyordu. Onu perişan eden açlık, yorgunluğa daha fazla dayanamamıştı. Şehrin girişinde kurulan pazara yakın, atının üstünden düşmüş, ayağa kalkmak için hamle yapsa da başarılı olamamıştı. Olanları merakla izleyen kalabalık, ne olduğuna bir anlam veremiyordu. Açlık ve yorgunluktan perişan bir halde şehrin güney kapısının önünde ölü gibi yatan adama sadece Eliza yardım etmek istemiş, onu kocası Robert ile birlikte yaşadığı, babasından kalma şehrin dışındaki harabe evine götürmeye çalışıyordu. Olayı merakla izleyen Robert, Eliza’ya yardımcı olmak için yabancı adamın kollarına gireceği sırada, “Bırak gideyim!” diye bağırdı yabancı. “Lütfen gitmeme izin veriniz. Size bela ve kötülükten başka bir şey getirmedim. Lütfen gitmeme izin veriniz, hatta imkânınız varsa siz de ayrılın şehirden.” Dedikten hemen sonra tekrar baygınlık geçirmiş ve bir daha hiç kalkamamıştı. Eliza ve Robert, hiç görmedikleri bu yabancı adama yardım etmek isterken duyduklarına bir anlam veremiyorlardı. Bu yabancının söyledikleri ne anlama geliyordu? Yerde yatan yabancı adamın dudakları, elleri ve yüzü çatlaklar içinde kalmıştı. Yabancı adamın “Size bela ve kötülükten başka bir şey getirmedim” sözlerinden sonra Robert ona dokunmaya cesaret edemiyordu. Kalabalık artmış, yerde yatan yabancının cesedini ağız ve burunlarını kapatarak merakla izliyorlardı. Kalabalığın artması ile şehrin savunma birlikleri, atlarını kalabalığa doğru dörtnala koşturuyor, alışveriş yapmak için pazara gelen insanlara ve pazar yerlerine çarpa çarpa, pazar mallarını devirerek yabancının olduğu alana varmışlardı. Kısa boylu, kel kafalı, kısa boyunlu, aşırı kilolu, patlak gözlü bakışıyla yüreğe korku salan şehrin güney savunma kolu komutanı Gabriel, gür sesiyle askerlerine kalabalığı dağıtmaları için emirler yağdırıyordu. Emri alan askerler kalkanları ile kalabalığı uzaklaştırmaya çalışıyordu. Gabriel atından indikten sonra ağzını eli ile kapatarak bir iki adım mesafeden yabancının cesedini incelemeye çalışıyordu. Gördüğü kadarı ile yabancının vücudunda herhangi bir ok, mızrak ya da kılıç yarası izi yoktu. Askerlerinden birine cesedi bir arabayla kışlaya getirmesi emrini verdikten sonra, diğer askerler ile birlikte kışlaya dönmüştü. Güney savunma birliklerinin tedavisini yapan şifacı ile birlikte, şehrin girişinde yabancıya yardım etmek isteyen Eliza ve kocası Robert’i de çağırmıştı. Yabancının cesedi, eşeğin çektiği bir yük arabasının içinde kışla kapısından giriş yaptığı sırada, olayı öğrenen diğer askerler meraklı gözlerle cesede bakmaya çalışıyorlardı. Oysaki görünürde arabadaki cesedin diğer cesetlerden bir farkı yoktu. Peki, bu kadar ilgi çekmesinin nedeni neydi? Güney kolu savunma komutanı Gabriel, şifacı, Eliza ve kocası Robert, mumların aydınlattığı odada durumu anlamaya çalışıyorlardı. Cesedin üzerinde bulunan tüm giysileri çıkarılmış, muayene için şifacı bekleniyordu. Şifacı ceset üzerinde gerekli incelemeleri yaptıktan sonra, bir çeşit ölümcül hastalığa yakalandığını anladığı anda Güney kolu savunma komutanı Gabriel’e cesedin derhal imha edilmesi, ceset ile temas eden herkesin karantina altına alınması gerektiğini söylüyordu. Bu gelişmeden sonra yabancının şehre girerken bindiği atı, cesedini askeri kışlaya kadar taşıyan eşek ve arabayı imha etmek için büyük bir ateş hazırlanmış ve ilk etapta bunlar ceset ile birlikte imha edilmişti. Güney kolu savunma komutanı Gabriel, bu yabancı ile ilk temasa geçen Eliza’ya “Ceset ile temas ettin mi?” diye sordu. Eliza “Hayır efendim, sadece gömleğinin alt kısmına dokundum. Fiziki bir temas olmadı. Kocam Robert ise çok daha sonra yardıma geldi, ancak cesede dokunmadı” söyledi. Gabriel bu sefer Eliza’ya “Peki, sizin ile konuşurken tanıklık edenler var. Ne söyledi size?” diye sordu. Eliza “Yabancının ‘Size bela ve kötülükten başka bir şey getirmedim’ dediğini duydum. Başka da bir şey duymadım” dedi. Şifacı, Eliza ve Robert’in de karantinaya alınması gerektiğini söylese de güney kolu savunma komutanı Gabriel buna gerek olmadığını, şehir surlarının dışında terk edilmiş bir yerde yaşadıklarını söyledi. Diğer taraftan Adis, karnını kuru ekmek ve Daniel’in kendisine verdiği kurum üzümler ile doyurmuştu. Daniel, şehrin doğu giriş kapısının üzerinde bulunan yolda kuru meyve satan, zayıf, göz çukurları içe doğru çökük, burnu bir kavga sırasında kırıldığı için eğrilen, çocuklar ve bazı insanlar tarafından “Eğri Burun” diye isim verilmiş bir adamdı. Fakat tüm fiziksel özelliklerinden ziyade kimseye zararı olmayan, yardımlaşmayı seven mükemmel bir insandı. Adis, Meşkin Kapısı’nda dilenmeye devam eden Lazar’ı izlemeye devam ediyordu. Adis tüm cesaretini toplayıp “Lazar, bugün şehirde ne oldu biliyor musun?” dedikten sonra Lazar bir taraftan “Aman Allah’ım, sen şeytan gel buraya, çabuk bana paramı geri ver! Gel buraya kahrolası küçük şeytan!” derken öbür taraftan eli ile topraktan birkaç taş almak için elini Meşkin Kapısı’nın tozlu topraklarında gezindiriyordu. Günlük kazancı bir önceki güne göre az olan Lazar, olanları merak etmişti. Şehirde ne olduğunu anlamaya çalışmak için “Anlat bakalım küçük şeytan” deyip sustu. Adis “Şehrin güney kapısından bir yabancı atı ile birlikte şehre girmek üzereyken atından düşüp bayılmış ve dediklerine göre bir daha kalkamamış” dedi. Lazar’ın merakı daha da artmış, ses tonunu biraz daha kalınlaştırarak ciddi bir şekilde “Başka ne söylediler? Kimmiş, nereden gelip nereye gidiyormuş? Öğrenebildin mi?” diye sormuş. Adis “Kim olduğunu, nereden gelip nereye gideceğini kimse öğrenememiş. Dediğim gibi düştüğü gibi can vermiş diyorlar” dedikten sonra Lazar “Yalnız ne küçük şeytan? Ne gizliyorsun benden?” diye üsteleyince Adis “Senden bir şey gizlediğim yok. Sadece Eliza yardım etmeye çalışırken ona, ‘Size bela ve kötülükten başka bir şey getirmedim, lütfen gitmeme izin veriniz, hatta imkânınız varsa siz de ayrılın şehirden’ demiş diyorlar, fakat ben duymadım” dedi. Lazar Adis’in söylediklerinden sonra “İyi bakalım küçük şeytan, sakın bir daha yanıma gelme, bacaklarını kırarım senin anladın mı?” dedikten sonra bu yabancı ile alakalı daha fazla bilgi almak için pazarın iç taraflarına doğru ilerledi. Pazar kalabalık olmasına rağmen alışverişten ziyade, şehrin girişinde atının üstünden düşen yabancı hakkında kulaktan kulağa bilgiler aktarılıyordu. Kimisi yakın zamanda şehirlerine saldırmak için binlerce askerin dört günlük yolda olduklarını, bir diğeri ise ancak iki günlük mesafede olduklarını iddia etmeye başlamıştı bile. Oysaki gerçekte bu yabancı bir askerden ziyade bir çiftçiye benziyordu. Yabancının cesedi, binek atı ve cesedini kışlaya getiren araba ve eşeğin içinde yakıldığı ateş o kadar büyüktü ki, gece aydınlanmış, yakılan ateş şehrin diğer ucundan rahatça izlenebiliyordu. Şehrin güney savunma kolu komutanı Gabriel, gündüz olup bitenleri pek önemsememiş, gecenin ilerleyen saatlerinde “Halk pazarda farklı şeyler söylüyor. Pek mantıklı gelmemesine rağmen… Aman Allah’ım, yoksa…” diye yumruğunu ceviz ağacından yapılmış masaya indirmişti. Odanın içinde gidip geliyor fakat Eliza’nın kendisine yalan, yanlış bilgi vermesinin imkânsız olduğunu da biliyordu. Tekrar cevizden yapılmış uzunca masaya oturduğunda “Hayır, Eliza bana yalan söylemez” diyerek gece boyunca uzunca düşünmüş, ancak yorgun düştükten sonra uyuyabilmişti. Eliza ve Robert erken uyanmış, Dar Boğaz Ormanı’ndan topladıkları odunlar ile birlikte güney kapısından giriş yapmış, pazara gelen insanlar ile ayaküstü sohbet ve selamlaşmalardan sonra pazar yerinde ki yerlerini almışlardı. Lazar her zaman ki yerini almış, yıllardır su yüzü görmeyen, yıkanmamış ellerini ovuşturarak “Bugün daha fazlası, daha fazlası” diyordu. Eliza ve Robert’in etrafı dün yaşanan olaydan sonra kalabalıklaşmış, insanlar tarafından adeta sorguya çekilir bir şekilde sorulara muhatap oluyorlardı. Şehrin güney savunma kolu komutanı Gabriel, askerlerine “Şehirde sokak sokak, ev ev, en ücra yerleri bile kontrol edin. Olumsuz bir durum tespit ettiğinizde derhal bana ulaştırın” emrini verdikten sonra askerler ayakları ile atların karınlarına doğru vurarak şehrin dört bir tarafına dağıldılar. Gabriel şehirdeki söylentiler yüzünden gece boyunca düşünmüş ancak yorgun düştükten sonra uyuyabilmişti. Tekrar aynı düşünceler ile yüz yüze kalmak üzereyken, özel birliklerin gelmesini emrini verip, cevizden yapılmış uzunca masanın başköşesine oturdu. Titrek bir şekilde yanmakta olan muma odaklanmış bir şekilde derin düşüncelere öylesine dalmıştı ki, özel birliklerin komutanı Petrus’un geldiğini görmemişti bile. “A Petrus, gel. Dün yaşanan olaydan sonra halk arasında ki söylentiler için ne diyorsun?” diye sordu. Petrus “Efendim, her olaydan sonra halk konuşur. Önemli olan konuşulanlar değil, gerçeklerdir” dedi. Gabriel oturduğu yerden kalkarak “Açık konuş Petrus. Halk şu anda dışarıda ve biz bu şehrin ve onların güvenliğinden sorumluyuz. Bu yüzden daha açık konuş” dedikten sonra Petrus “Efendim, ben de gerçeği bilmiyorum. Eliza ve kocası Robert bu yabancı ile konuşan tek insanlar. Fakat yabancının söylediklerine kendileri de bir anlam verememişler. Halkın konuştuklarına gelince, müsaade ederseniz şehrin dışına keşif birliklerini göndereyim” dedi. Gabriel “Evet, bu çok iyi olur. Daha fazla zaman kaybetmeden keşif birlikleri yola çıksınlar” dedikten sonra Petrus hemen keşif birliklerinin hazırlanması emrini vermişti. Keşif birliklerinin savurduğu kamçıların sesi, atların koşmasına karışan nal ve kişneme sesleri birbirine karışıp yabancının şehre giriş yaptığı güney kapısından şehrin dışına doğru çıkmışlardı. Gabriel’in askerleri şehirde olağandışı bir hareketlenmenin olup olmadığını anlamak için şehir içindeki turlarına devam ediyorlardı. Görünürde herhangi olumsuz bir şey yoktu. Eliza ve Robert getirmiş oldukları odunları satmakla meşgul iken, Adis uykulu gözler ile Pazar’daki yerini alan Lazar’ı izlemeye başlamıştı bile. Şehirdeki diğer çocuklar tahtalardan yapmış oldukları kılıç ve kalkanlar ile savaş sanatını öğrenmeye çalışıyorlardı. Bu çocuklara komutanlık yapan Davud adında eski bir savaşçıydı. Hatta Davud’a sorulduğunda orduların en ön saflarında savaştığını, muhasaralara katıldığını günlerce anlatırdı. Oysaki Davud hayatı boyunca hiçbir savaşa katılmamıştı. Sıradan bir çiftçi olduğu zamanlarda şehir kuşatılmış, okçuların şehre yağdırdıkları oklardan biri Davud’un bacağını sıyırmış, Davud olduğu yere yığılmıştı. Saatler sonra kendine geldiğinde ailesinin tümünün ölmüş olduğunu görünce aklını yitirmiş, bilinçsiz bir şekilde günlerce şehirde dolaşmıştı. Davud bir eşek üzerinde şehirde gezmekte, önüne geleni bir komutan edası ile selamlamaktadır. Kısa süre sonra şehir halkı da Davud’u aynı şekilde selamlamışlardır. Şehirdeki insanlar Davud’u çok severdi. Bu neden ile çocuklarının yaşlı bunak ile oynamalarına izin veriyorlardı. Şehirde bunlar yaşanırken şehrin doğusunda bulunan Shran Dağı’nda hareketlilik olmaya başlamıştı. Yıllar önce sevdiği erkeğin kendisine ihanet edip en yakın arkadaşı olan Eliza ile evlenmesine kızıp şehri terk eden Lola bu dağda yaşamaya başlamıştı. Ona göre ihanetin kimden geldiği belli değildi. Kardeş gibi sevdiği Eliza’dan mı, yoksa canından çok sevdiği Robert’ten mi? Yıllarca bu sorunun cevabını bulmaya çalışsa da bundan sonra dünyasında yıkımlara neden olan soruların cevabını alması Lola için yaşadıklarından sonra pek bir şeyi değiştirmeyecekti. Lola dağda yaşamaya başlamadan önce dedesi İshak ile birlikte bu dağa defalarca gelmiş ve buradaki ot ve bitkilerin ne işe yaradığını ondan öğrenmişti. Lola henüz iki yaşında küçük bir çocuk iken, yaşadığı şehir muhasaraya alınmış, düşmanın devasa mancınıklar ile fırlatmış olduğu büyük taşlar şehrin duvarlarını yıkmakla birlikte onlarca insanın ezilerek ölmesine neden olmuştu. İşte Lola’nın anne babası da bu büyük taşların yıkımına sebep olduğu evlerinde feci şekilde can vermişlerdi. Lola dedesi İshak tarafından büyütülmüştü. İshak şehirde şifacılar piri olarak nam salmış, otlardan hazırladığı ilaçlar ile şehir ve civardaki insanlara şifa dağıtıyordu. İshak doksan altı yaşında iken vefat etmişti. Lola dedesinin ölümü ve yaşadığı büyük ihanetten sonra, daha önce sıkça ziyaret ettiği Shran Dağı’nda yaşamaya başlamıştı. Lola Shran Dağı’nda günlerini şehri izlemek ile geçirirdi. Yine öyle bir günde Lola şehrin doğu girişindeki kalabalığa odaklanmış iken, omzuna bir el uzanmıştı. Lola omzuna uzanan elin vermiş olduğu korku ile herhangi bir tepki vermemişti. Bir müddet sonra “Lola kızım, anlatacaklarımı iyi dinle. Şehir yakında yok olacak, halkı uyar” dedikten sonra elini Lola’nın omuzundan çekerek, geldiği gibi çoktan gitmişti. Kimdi bu yabancı? Neden Lola’yı seçmişti? Kendisi neden şehir halkını uyarmıyordu? Lola aniden irkilerek oturduğu yerden kalkıp kendisine seslenen, elini omuzuna koyan adama bakmak için tüm cesaretini toplamış arkasına döndüğünde kendisinden başka kimsenin olmadığını görünce var olan korkusu daha da katmerleşmiş bir şekilde, esen şiddetli rüzgârdan korunmak için büyükçe bir kayanın arkasına sığınmıştı. Tek başına yaşamaya alışkın, her türlü olumsuzluğa karşı hazırlıklı Lola bu olayın etkisinden bir türlü kurtulamıyordu. Lola her gün yaptığı gibi şehri izlemekteydi. Garip olan ise şehirden Shran Dağı’na doğru gelen ne bir insan ne de bir hayvan vardı. Sadece Shran Dağı’nı kendilerine yuva edinen atmacalar gökyüzünde süzülüyorlardı. Duyduklarına bir anlam veremiyordu. Kim bilir, belki de kendi kendine evham yapmıştı. Şehir dışına gönderilen keşif birliklerinden bir haber alınamaması endişe ve halk arasında var olan paniğin artmasına neden oluyordu. Güney savunma kolu komutanı Gabriel, şehrin surlarında buz gibi esen rüzgâra rağmen ufka doğru derin düşünceler ile bakmaya devam ediyordu. Özel birlik komutanı Petrus yaşanan bu durum karşısında endişeli fakat birkaç gün daha beklemenin yararlı olacağı inancı içindeydi. Tüm bu olaylar yaşanırken şehrin ileri gelenleri halkın arasına karıştıklarında, yaşanan bu olaylar karşısında şaşkın olduklarını, kendilerini bekleyen tehlikenin ne olduğunu anlamaya çalışıyor izlenimini veriyorlardı. Fakat gerçek başkaydı. Akşam karanlığı şehrin üzerine bir perde gibi indiğinde, hayvan ticareti yapan Peter’in evinde buluşuyor, şehirde yaşanan ve yaşanması muhtemel olaylar ile alakalı hararetli tartışmalar gecenin ilerleyen saatlerine kadar devam ediyordu. Peter “Şehir halkı şu anda tam bir karmaşa, korku ve endişe içinde. Benim önerim, bu karmaşa devam ettiği müddetçe halkın elindeki değerli eşyalarını, evlerini, tarlalarını, bağ ve bahçelerini ölü bir fiyata almak” dedikten sonra Markus başını kaldırıp sinsice tebessüm ettikten sonra “Teklifiniz çok makul. Yalnız acele etmenin bir anlamı yok. Bir hafta sonra bize bağlı adamlar tekrar ufak çaplı bir kargaşa yaratacak, o zaman şehir sakinleri daha fazla korku ve endişeye kapılacaklardır. Fakat şu anda beklemek en iyisi” diyerek toplantıyı bitirmiş ve toplantıdakiler farklı yollardan evlerine dağılmıştı. Günün ilk ışıkları ile birlikte işyerini açan ilk kişi Fred olmuştu. Lazar şaşırmış bir şekilde Fred’in dükkânına bakıyordu. Haksız da değildi. Fred yaklaşık üç yıl önce kimseye haber vermeden şehirden ayrılmıştı. Fred Lazar’ı görünce “Günaydın ihtiyar” diyerek pas ve küf tutmuş tasına attığı demir paranın sesi ile mest olan Lazar, Fred’e soracağı soruları unutmuştu. Lazar dilencilik yaptığı yerdeki yerini aldıktan sonra, yıllar önce kaybettiği oğlu aklına gelmişti. Yüzünü derin bir iç çekerek duvara çevirdi ve göz kapaklarını kapattı, ama dudakları zaman zaman sessizce hareket etmeye devam etti. Oturduğu yerde sakin bir şekilde ağlamaya başlamış, gözyaşlarına hâkim olamıyordu. Onu izleyen Adis, Lazar’ı tanıdığı günden bu yana ilk defa ağladığına şahit oluyordu. Adis, ağlayan Lazar’a korkarak yaklaşmış, beline bağladığı bez parçasını Lazar’a uzatmıştı. Adis’in elinden aldığı bez ile yüzünü sildikten sonra “Teşekkür ederim küçük şeytan” dedi ve sustu. Adis bu olaya bir anlam verememekle beraber yaşlı, sinirli bunağa sormaya çekiniyordu. Çünkü Adis şehrin doğu yakasında yaşıyordu. Doğu yakasında yaşayanlar halk arasında ikinci sınıf insanlar olarak görülüyorlardı. Doğu yakası, büyük kilise yıkıntılarından bin adımdan daha uzak bir mesafede bulunan ve ana yolun yakınında uzanan, dar sokaklar ve yolların birbirine karıştığı, en dar sokakların arkasına saklanmış alçak kemerli geçitler ve karanlık girdapların sonunda yapılmıştı. Burada komşular karşılıklı pencerelerden el sıkışabilecekleri kadar dar inşa edilmişti evler. Evlerin birçoğu tek katlı, duvarların içi ve dışı pis ve bakımsız, pencereleri ise kalın, kasvetli, ışığı bile geçirmeyecek bir şekilde yapılmıştı. Öğleden sonra Fred’in gelmesi ile birlikte hanı eğlence düşkünü insanlar tarafından doldurulmuştu. Fred uzun zaman sonra gördüğü bu manzara karşısında gözleri deniz feneri gibi ışıldamakta iken ellerini ovuşturup “İşte bu” diyordu. Kavga eden çocuklar, sarhoş erkek ve kadınlar aşağıdaki avluda dolaşıp durdular. Bu yoğun ve anlamsız kalabalığı ancak çakan bir şimşekten çıkan gök gürültüsü ve ardından yağan yağmur bastırabilmişti. Bardaktan boşanırcasına yağan yağmurun altında Lazar günün hasılatı ile birlikte eve doğru gidiyordu ki duyduğu ses ile kendini gizleyip olup bitenleri izlemeye başlamıştı. O esnada Adis, şehre alışveriş için gelen yabancıdan bir miktar para çalmış, koşarken düşmenin vermiş olduğu ağrı ile yaralı yaratıklara rehberlik eden bu tür içgüdünün öncülüğünde, Adis sürünerek zorla yıkık bir lağım ağzı içinde kendisini dostça olmayan gözlerden sakladı. Adamlar yıkık lağım çukurunun başında “Bu velet konuştuklarımızı duydu mu?” diye sordu. Arkadaşı “Olabilir, çünkü bizden para çalacak kadar bir zaman peşimizden gelmiş olabilir” dedikten sonra iki yabancı Fred’in hanının önüne bağladıkları atlarına binerek şehirden uzaklaşmışlardı. Çukurda ıstırap çeken Adis uzun saatler boyunca uzanmıştı. Güneşin ilk ışıkları ile birlikte Lazar her zaman ki yerinde oturmuş dilenmeye başlamıştı. Öğlene doğru kendisini izleyen, devamlı rahatsız eden küçük şeytan Adis geldi aklına. Güneş şehri terk etmiş, Lazar evine doğru yol almıştı fakat Adis’i de merak etmiyor değildi. Dün gece Adis’in canını kurtarmak için saklandığı lağım çukuruna bakmak için oraya doğru ilerledi. Robert ve Eliza da satamadıkları odunları arabaya yüklemiş, şehrin dışındaki evlerine gitmek için hazırlıklarını yapıyorlardı. Lazar lağım çukurunun başına geldiğinde birkaç kez “Küçük şeytan” dedikten sonra herhangi bir tepki almamış ve hiçbir ses duymamıştı. Çukurun yanından bir iki adım uzaklaştıktan sonra cılız bir inilti duydu. Bu Adis’in iniltisi olabilir mi? Lazar bu sefer gözlerini kapatmış, sadece sesi duymaya odaklanmaya çalışıyordu. İnilti tekrar duyulduğunda Lazar omuzundaki çuvalını yere atıp çukurun başına gelip “Küçük şeytan, beni duyabiliyor musun?” diye seslendi. Adis, evet anlamında iniltilerine devam ediyordu. Lazar havanın kararması ile birlikte iyice göremiyordu. Adis’i o çukurdan çıkarmanın telaşı içinde sağa sola bakınıyordu. O esnada aklına hancı Fred’ten yardım istemek gelmişti. Adımlarını hızlandırmış Fred’e doğru giderken yolda Robert ve Eliza ile karşılaşmış fakat içinde bulunduğu durumdan dolayı onları fark etmemişti. Robert ve Eliza “Bu adamın nesi var?” diye birbirlerine bakmışlardı. Eliza “Lazar hayrola, nereye gidiyorsun?” diye sorduğunda Lazar şaşırmış bir şekilde “Şey, şey Fred’e gidiyorum. Kimsesiz Adis lağım çukuruna düştü. Dünden beri orada” dedikten sonra Robert “Aman Tanrım, çabuk bizi o çukura götür. Zavallı çocuk kim bilir belki çoktan ölmüştür” dedi. Lazar, Robert ve Eliza’nın varlığından güç alarak adımlarını daha seri ve sert bir şekilde atarak çukura varmıştı. Çukur çok büyük ve derin değildi, fakat ihtiyar yaşlı dilenci için pek zor bir işti. Robert çukura inmiş, Adis’in iniltileri Eliza’nın yüreğini yaksa da zavallının ölmediğine çok seviniyordu. Robert yarı cansız Adis’i çukurun ağzına doğru getirmiş, Eliza ve Lazar onu yukarı doğru çıkarmışlardı. Lazar, Adis’in içinde bulunduğu durumu görünce üzüntüsünden olduğu yere çökmüştü. Eliza Adis’in yüzünü siliyor, Robert su testisinden Adis’e su içirmeye çalışsa da başarılı olamamıştı. Eliza ve Robert durumun iyi olmadığının farkında olup pazarda satamadıkları odunları arabadan atmış, Adis’in yarı cansız bedenini odun arabasına çok yavaş ve dikkatli bir şekilde yerleştirmişti. Lazar uzun yıllardır su yüzü görmeyen uzun kahverengi abasını Adis’in üzerine örtmüştü. Lazar, bir hayatı kurtarmış olmanın mutluluğu ile Robert ve Eliza’ya defalarca teşekkür etmişti. Robert ve Eliza odun arabasını yavaş yavaş şehrin çıkış kapısına doğru götürdüklerinde Lazar olduğu yerde bu küçük şeytanın yaşaması için dua etmeye devam ediyordu. Robert ve Eliza, Adis’i kaldıkları eve getirmişti. Robert küçük çocuğun üstündeki giysileri çıkarmış, sıcak su ve bez ile vücudunu temizlemeye çalışıyor, öbür taraftan Eliza Adis’e göre evde elbise bulmaya çalışsa da evde Robert’in giysilerinden başka bir şey yoktu. O gece Robert’in giysilerini giydirmişlerdi. Eliza çocuğun kıyafetlerini ile Lazar’ın uzun yıllar boyu su görmeyen kahverengi abasını da yıkamıştı. Robert ve Eliza, Adis’in başında uyuya kalmışlardı. Sabah olduğunda Adis sayıklıyor, önceki günün kötü olayları, yarı unutulmuş bir rüyanın puslu parçaları gibi, gözlerinin önünde geçiyordu. Eliza sayıklayan Adis’in sesi ile uyanmıştı. Adis’in ellerini elleri arasına alan Eliza yaşaması için dua ediyordu. Robert odun arabasını hazırlamış şehre gideceği sırada, Eliza “Yaşlı dilencinin abasını yıkadım, ona teslim et. Odunlar satılırsa biraz et ve Adis’e göre birkaç parça elbise almasını” tembih ettikten sonra sönmüş sobayı tekrar yakıp Adis’in başucunda beklemeye devam etmişti. Adis yarı cansız bir şekilde rüyalarında bile nefret etmeye ve sayıklamaya devam ediyordu. Adis’in sayıklamaları o kadar artmıştı ki Eliza endişe etmeye başlamıştı. Adis’in terleyen vücudunu ıslak bez ile silen Eliza, sobanın üzerinde kaynayan çorbadan birkaç kaşık alıp küçük çocuğa içirmeye çalışıyordu. Zorlu birkaç denemeden sonra Adis’e birkaç kaşık çorba içirebilmişti. Gün çok uzun sürmüş, Robert büyük şehir pazarındaki yerini almıştı. Burada Robert’i çevreleyen insanlar kalabalığa karışıyor, gördüğü ve duyduğu şey yüzünden şaşırmış ve üzülmüştü. Anlamsız ve manasız insan uğultusu Robert’i derin düşüncelere sevk etmek üzereyken, Lazar’ın sesi ile irkilmişti. Lazar “Robert, küçük şeytan nasıl oldu?” sorusuna Robert “Dün akşam nasıl gördüysen hâlâ aynı” diyerek kısa bir cevap vermişti. Eliza’nın yıkadığı abasını Lazar’a teslim etmiş, Lazar çok mutlu bir şekilde abasını giydikten sonra “Robert, al şu parayı küçük şeytan için birkaç parça elbise ve yiyecek alırsın” dedikten sonra her zaman olduğu gibi dilenmeye devam etmek için Meşkin Kapısı’nın yolunu tutmuştu. Öte yandan özel birlikler komutanı Petrus, Norvan ustadan bugüne kadar eşi benzeri olmayan, taktığı zaman olduğundan daha fazla heybetli ve güçlü gösterecek bir yüzük yapmasını istemişti. Norvan, yüzüğün benzersiz olması için ne yapılabileceğini düşünüyordu. Bakır ve gümüş karışımlı bir yüzük yapımı için çalıştığı esnada, Petrus’un söyledikleri de aklından çıkmıyordu. Fakat nasıl ve ne şekilde Petrus’un istediklerini bu yüzüğe yansıtabilecekti? Norvan usta, atölyesinin arka odasında tek başına kalmıştı. Önünde duran bakır ve gümüş külçelerine uzun uzun baktı. Petrus’un istediği yüzük sıradan bir takıdan çok daha fazlası olmalıydı. Fakat nasıl? Eliyle masanın üzerinde duran kömür kalemiyle birkaç çizik attı kâğıda. Sonra duraksadı. Gözleri birden parladı. “Şehrin kapıları,” diye mırıldandı kendi kendine. “Güney kapısı, doğu kapısı, kuzey kapısı ve batı kapısı. Dört kapı, dört yön. Bir şehrin gücü kapılarında saklıdır.” Kömür kalemiyle dört nokta çizdi. Sonra bu noktaları birleştiren çizgiler ekledi. Ortada bir daire belirdi. Yüzüğün kaşının ortasına işlenecek bu şekil, şehrin surlarını simgeleyecekti. Norvan, gece yarısına kadar çalıştı. Bakırı eritti, gümüşü katkıladı. Demiri dövdü, şekil verdi. Sabaha karşı, yüzüğün ham hali ortaya çıktığında, Norvan’ın elleri nasır tutmuş, gözleri kanlanmıştı. Fakat yüzükte bir eksiklik vardı. Petrus’un istediği “heybet ve güç” henüz tam olarak yansımamıştı bu metale. Sabahın ilk ışıklarıyla birlikte, Robert şehrin pazarındaki yerini aldı. Arabada kalan son odun demetlerini dizdi önüne. Gözleri dalgındı. Aklı evde kalan Adis’teydi. Lazar, her zamanki köşesine oturmuş, ellerini ovuşturarak dilenmeye başlamıştı bile. Fakat dudaklarındaki dua, her zamanki gibi yüksek sesle değil, fısıltı halindeydi. “Merhamet edin, Mardin’in nazik beyleri; merhamet edin Mardin’in güzel ve kibar hanımefendileri…” Bir ara sözünü kesti, gözleri pazarın kalabalığında birini arıyor gibiydi. Sonra omuzlarını silkti ve duasına devam etti. Derken kalabalığın arasından Davud geçti. Eşeğinin üzerinde dimdik oturuyor, sağa sola komutan edasıyla selamlar veriyordu. Arkasında tahta kılıçlı çocuklardan oluşan küçük bir kafile vardı. “Durun!” diye bağırdı Davud, eşeğini durdurarak. “Düşman geliyor! Hazır olun!” Çocuklar bir anda ciddileşti, tahta kalkanlarını öne çıkardılar. Pazarda alışveriş yapan kadınlar gülümsedi. Bazıları başlarını sallayıp “Bunak herif, yine başladı” diye fısıldaştı. Lazar, Davud’u izlerken yüzünde garip bir ifade belirdi. Yıllar önce kaybettiği oğlunun da böyle oyunlar oynadığını hatırladı. Oğlu da tahta kılıçlarla savaşçılık oynardı. Şimdi o oğlan büyümüş, şehri terk etmiş, bir daha da dönmemişti. Lazar’ın gözleri buğulandı. Başını önüne eğdi, avuçlarını açtı. Birkaç kişi tasına para attı, fakat Lazar onları fark etmedi bile. Eliza, evde Adis’in başında nöbet tutuyordu. Çocuk hâlâ sayıklıyor, zaman zaman irkilerek uyanıyor, sonra tekrar kendinden geçiyordu. Eliza sobanın üzerinde kaynayan çorbayı karıştırdı. Dışarıda rüzgârın uğultusu duyuluyordu. Şehrin dışında, harabe bir evde, yabancı bir çocuğa çorba kaynatmak… Eliza bu düşünceyle içini garip bir huzur kapladı. Derken Adis aniden doğruldu. Gözleri kocaman açılmış, nefes nefeseydi. “Konuştular!” diye fısıldadı. “İki adam… Fred’in hanının önünde… Konuştular.” Eliza hemen yanına gitti. “Adis, ne konuştular? Kimdi onlar?” Adis’in gözleri kaydı, boşluğa baktı. “Bir hafta… Bir hafta sonra… Kargaşa çıkaracaklar. Halk korksun diye.” “Söyle bana Adis, kimdi onlar?” Eliza çocuğun omzundan tuttu. Ama Adis’in başı yastığa düştü, gözleri kapandı. Tekrar kendinden geçmişti. Eliza çocuğun alnına dokundu. Ateşi hâlâ yüksekti. Fakat söyledikleri, kulağında uğuldadı durdu. Bir hafta sonra… Kargaşa çıkaracaklar… Eliza elindeki bez parçasını sıktı. Robert gelince konuşmalıydı. Bir şeyler oluyordu, fakat ne olduğunu kimse tam olarak bilmiyordu. Güney kapısında ölen yabancı, şehrin dışına gönderilen keşif birliklerinden haber alınamaması, halk arasında yayılan söylentiler… Ve şimdi Adis’in sayıklamaları. Eliza, sönmekte olan sobaya birkaç odun daha attı. Alevler yeniden canlandı, odanın duvarlarında titrek gölgeler oluşturdu. Güney savunma kolu komutanı Gabriel, sabahın erken saatlerinde surlara çıktı. Rüzgâr sert esiyor, şehrin bayraklarını dalgalandırıyordu. Ufukta göz alabildiğine uzanan bozkır, bomboş görünüyordu. Petrus, merdivenlerden hızla çıkıp Gabriel’in yanında durdu. “Keşif birliklerinden hâlâ haber yok, komutanım,” dedi Petrus, sesini rüzgâra karşı yükselterek. Gabriel cevap vermedi. Gözlerini ufka dikmişti. “İkinci bir birlik göndermemi emreder misiniz?” diye sordu Petrus. Gabriel başını iki yana salladı. “Bekle. Bir gün daha bekleyelim.” “Peki ya bir gün sonra da haber gelmezse?” Gabriel döndü, Petrus’un gözlerine baktı. “Gelir. Haber mutlaka gelir.” Sesinde bir kesinlik vardı, fakat Petrus bu kesinliğin inançtan mı, yoksa inatçılıktan mı kaynaklandığını kestiremedi. Aşağıda, şehrin içinde, çarşıda telaşlı bir hareketlilik vardı. Kadınlar çocuklarını yanlarından ayırmıyor, erkekler gruplar halinde fısıldaşıyordu. Şehrin ileri gelenlerinden birkaçı, endişeli bakışlarla surlara doğru bakıyordu. Gabriel, bunları izlerken içinden geçenleri düşündü. Eliza’nın söyledikleri aklından çıkmıyordu: “Size bela ve kötülükten başka bir şey getirmedim.” Bu sözler bir uyarı mıydı? Yoksa ölüm döşeğindeki bir adamın çılgınca mırıltıları mı? Peter’in evinde, gece toplantısına katılanlar yeniden bir araya gelmişti. Bu kez sayıları daha fazlaydı. Aralarında Markus, birkaç tüccar ve şehrin ileri gelenlerinden bazıları vardı. “Keşif birliklerinden hâlâ haber yok,” dedi Markus, elindeki şarap kadehiyle oynayarak. “Halk panik içinde. Bu tam da istediğimiz ortam.” Peter başını salladı. “Ama Gabriel beklememizi söyledi. Daha erken.” “Gabriel,” diye homurdandı içlerinden biri, “eski bir savaşçı. Onun korkaklığı yüzünden fırsatı kaçırmayalım.” Markus elini kaldırdı. “Hayır. Bekleyeceğiz. Sabırlı olmak gerek. Halkın korkusu henüz zirveye ulaşmadı. Birkaç gün daha… Birkaç gün sonra kendi istekleriyle mallarını bize getirecekler. Fiyat sormadan, pazarlık etmeden.” Gülümsedi. O gülümsemeyi görenler, içlerinde ürperti hissettiler. “Peki ya bu yabancı ölümü? Ya salgın?” diye sordu biri. Markus omuzlarını silkti. “Şifacı ne dedi? Ölümcül bir hastalık. Ama ceset yakıldı, temas edenler karantinaya alındı. Salgın çıkarsa… Çıkarsa daha da iyi olur. O zaman halk, mallarını bize bedavaya verecek.” Odada kısa bir sessizlik oldu. Sonra Peter kadehini kaldırdı. “Şehir düşerken bile kazanmanın yolları vardır,” dedi. Kadehler havada buluştu. Shran Dağı’nda, Lola günlerdir yerinden kıpırdamıyordu. Omzuna dokunan el, duyduğu sözler… Bunların bir hayal olduğunu düşünmek istedi, fakat içine sinmiyordu. Dedesinin ona öğrettiği otları toplamak için dağın eteklerine indi. Kurumuş lavanta, kekik, papatya… Bunları toplarken aklı hep şehirdeydi. Aşağıda, surların ardında, insanlar telaş içinde koşturuyordu. Küçücük figürler, karınca sürüsü gibiydiler. Lola, bir kayanın üzerine oturdu. Rüzgâr saçlarını dağıttı. Gözlerini kapattı. “Şehir yakında yok olacak, halkı uyar.” Kimdi bu ses? Neden ona seslenmişti? Belki de dedesiydi. Belki de dedesi, öbür taraftan ona sesleniyordu. Ama neden şehir yok olacaktı? Salgın yüzünden mi? Savaş yüzünden mi? Lola, küçük bir kese içinde topladığı otları sıkıca bağladı. Sonra ayağa kalktı. Uzun zamandır gitmediği şehre, aşağıya bakıyordu. “Gitmeli miyim?” diye fısıldadı rüzgâra. Rüzgâr cevap vermedi. Sadece dağın yamaçlarında ıslık çalarak dolaştı. Lola, keseyi beline bağladı. Dağdaki mağarasına dönüp birkaç günlük erzak hazırladı. Kararını vermişti. Şehre inecekti. Belki de dedesinin ruhu onu uyarmıştı. Belki de Eliza’yı görmenin zamanı gelmişti. Yıllardır uzak durduğu, kalbinde derin bir yara açan Eliza’yı. Akşam olurken Robert, pazardaki tezgâhını topladı. Odunların tamamını satamamıştı, fakat Lazar’ın verdiği parayla birkaç parça elbise ve biraz et almıştı. Lazar’ın yanına uğradı. Yaşlı dilenci hâlâ aynı yerde oturuyor, tasının önüne bakıyordu. “Lazar,” dedi Robert. “Adis için dua etmeye devam et. Ateşi hâlâ düşmedi ama yaşıyor.” Lazar başını kaldırdı. Gözleri kıpkırmızıydı. “Yaşıyor mu?” diye sordu, sesi titrek. “Yaşıyor. Eliza başında bekliyor.” Lazar derin bir nefes aldı. “İyi. Çok iyi. Küçük şeytan… Çok yaşamalı.” Robert başıyla onayladı. Sonra çekinerek sordu: “Lazar, sen oğlunu nerede kaybettin?” Lazar’ın yüzü buruştu. Uzun süre cevap vermedi. Sonra fısıltıyla konuştu: “Savaşta. Şehir kuşatıldığında. O daha küçücük bir çocuktu. Onu kaybettim. Onu kaybettikten sonra her şeyi kaybettim.” Robert bir şey söylemek istedi, fakat sözler boğazında düğümlendi. Lazar devam etti: “Sonra dilenmeye başladım. Para biriktirdim. Çok para biriktirdim. Ama oğlum geri gelmedi. Hiçbir şey geri gelmedi.” Sustu. Gözleri yine dolmuştu. Robert, Lazar’ın omzuna elini koydu. “Adis, oğlunuz değil ama… Ona sahip çıkın Lazar.” Lazar başını salladı. “Sahip çıkacağım. Sahip çıkacağım küçük şeytana.” Robert, elindeki paketleri sıkıca tutarak şehrin güney kapısına doğru yürüdü. Arkasında Lazar, karanlıkta tek başına oturuyor, dua ediyordu. Eliza, Robert’in eve dönmesini beklerken Adis’in ateşini düşürmeye çalışıyordu. Çocuğun alnına koyduğu ıslak bezleri sık sık değiştiriyor, her iniltisinde başucuna eğiliyordu. Derken Adis’in dudakları kıpırdamaya başladı. Eliza hemen yanına yaklaştı. “İki adam… Fred’in hanında…” diye mırıldandı Adis. “Bir hafta sonra… Kargaşa…” Eliza bu kez sözünü tamamlamasını bekledi. “Sonra Adis? Ne yapacaklar?” “Toplanacaklar… Halk korkacak… Mallarını… Mallarını ucuza alacaklar…” Eliza’nın yüreği sıkıştı. “Kim bunlar Adis? İsimlerini duydun mu?” Adis’in gözleri aralandı. Boşluğa baktı. “Markus… Peter… Ötekini görmedim…” Sonra başı yastığa düştü. Gözleri kapandı. Ama nefes alışverişi daha düzenliydi. Eliza, çocuğun alnına dokundu. Ateşi biraz düşmüş gibiydi. Markus. Peter. Eliza bu isimleri biliyordu. Şehrin ileri gelenlerindendi. Zengin tüccarlardı. Halk arasında adları pek hayırla anılmazdı ama kimse onlara dokunamazdı. Şehirde nüfuzları büyüktü. Eliza, dışarıdaki kapı gıcırtısıyla başını çevirdi. Robert elindeki paketlerle içeri girdi. Yüzü soğuktan kızarmış, gözleri yorgundu. “Robert,” dedi Eliza hemen. “Adis sayıkladı. Konuştuklarını duymuş. Peter ve Markus bir hafta sonra şehirde kargaşa çıkaracaklarmış. Halk korksun, mallarını ucuza alsınlar diye.” Robert paketleri masaya bıraktı. “Ne diyorsun sen? Peter ve Markus mu?” “Evet. Adis onların konuştuğunu duymuş. Lağım çukurunda saklanırken.” Robert uzun süre sustu. Sonra pencereye gitti, dışarıdaki karanlığa baktı. “Bunu Gabriel’e söylemeli,” dedi. “Peki ya Gabriel onlardan yanaysa?” Robert döndü. “Gabriel eski bir savaşçı. Şehri korumakla görevli. Eğer Peter ve Markus halkı soymayı planlıyorsa, Gabriel bunu duymak ister.” “Peki ya inanmazsa? Bir sokak çocuğunun sayıklamalarına mı inanacak?” Robert düşündü. “O zaman biz kendimiz uyaracağız halkı.” Eliza endişeyle kocasına baktı. “Bu tehlikeli olabilir Robert. Peter ve Markus’un adamları var.” “Eliza,” dedi Robert yumuşak bir sesle. “O yabancı ne demişti? ‘Size bela ve kötülükten başka bir şey getirmedim.’ Belki de o yabancı bizi uyarmak için gelmişti. Ve şimdi bu çocuk… Belki de o yabancının yerine geçti.” Eliza, uyuyan Adis’e baktı. Yüzü Lazar’ın kahverengi abasının altında küçücük görünüyordu. “Sabah olunca konuşuruz,” dedi. “Şimdi dinlen.” Robert başını salladı. Sobaya birkaç odun daha attı. Ateş çıtırdadı, odanın duvarlarında dans eden gölgeler belirdi. Dışarıda rüzgâr uğulduyor, şehrin surlarını yalıyordu. Uzakta, Shran Dağı’nın zirvesinde bir ışık yanıp sönüyor gibiydi. Belki de Lola, dağdaki mağarasında ateş yakmıştı. Belki de o da uyumuyor, şehre bakıyordu. Gece yarısını çoktan geçmişti. Rüzgâr şehrin surlarında uğuldarken, sanki uzaklardan gelen bir çığlık sesi taşıyordu. Eliza uykuyla uyanıklık arasında gidip gelirken, kapıya vurulan sert bir yumrukla sıçradı. Robert de aynı anda uyanmıştı. İkisi de nefeslerini tuttular. Vuruş tekrarladı. Daha sert, daha ısrarlı. “Kim var orada?” diye sordu Robert, sesini olabildiğince sakin tutmaya çalışarak. Cevap gelmedi. Sadece nefes alışverişi duyuluyordu kapının arkasında. Hırıltılı, derin, hasta bir hayvanın nefesini andıran bir ses. Eliza, yatağın kenarında duran bıçağı fark etti. Robert’e baktı. Robert başını iki yana salladı. Henüz değil. Kapı bir kez daha vuruldu. Bu kez daha güçlüydü. Tahta çerçeve gıcırdadı. “Robert…” diye fısıldadı Eliza. Robert parmağını dudaklarına götürdü. Yavaşça pencereye doğru ilerledi. Perdenin aralığından dışarıyı gözetledi. Ay ışığında, kapının önünde bir gölge duruyordu. Tek başına. Hareket etmiyordu. Sadece bekliyordu. “Kimsin?” diye seslendi Robert bu kez daha yüksek. Kapının arkasından gelen ses, Robert’in tüylerini diken diken etti. İnsana benzeyen ama tam olarak insana ait olmayan bir sesle konuşuyordu: “Açın… Açın kapıyı… Ölüm geldi… Peşimde…” Eliza’nın eli ağzına gitti. Adis yatakta doğruldu, gözleri karanlıkta parlıyordu. Sayıklamıyordu artık. Tamamen uyanıktı. “Açmayın,” dedi Adis, sesi titreyerek. “O kapıyı açmayın. O adam… O adam ölü. Güney kapısında ölen yabancı. Onu gördüm. Rüyamda gördüm. Geri geldi.” Robert’in ensesindeki tüyler diken diken oldu. Pencereye tekrar yanaştı. Dışarıdaki gölge hâlâ oradaydı. Ama şimdi başını kaldırmış, doğrudan pencereye bakıyordu. Yüzü görünmüyordu. Kapüşonun altında karanlıktan başka bir şey yoktu. “Size bela ve kötülükten başka bir şey getirmedim,” dedi dışarıdaki ses. Bu kez daha net, daha yakın. Sanki ağzını pencerenin camına dayamıştı. “Ama şimdi… Şimdi onlar geliyor. Benimle birlikte geldiler. Kapıları kapatın. Pencereleri mühürleyin. Çok geç olmadan…” Ses kesildi. Robert perdeyi çekti. Dışarıda kimse yoktu. Gölge kaybolmuştu. Ama ay ışığında, kapının önündeki toprakta, bir çift ayak izi vardı. Ve o ayak izleri… Kapıya doğru gelmişti. Ama kapıdan uzaklaşan hiçbir iz yoktu. Sabah olurken şehre korku çökmüştü. Gabriel, surlardan aşağıya baktığında, pazar yerinin neredeyse boş olduğunu gördü. Açık olan birkaç tezgâhın önünde bile kimse yoktu. İnsanlar evlerine kapanmış, kapılarını sürgülemiş, pencerelerini tahtalarla kapatmışlardı. Petrus, merdivenlerden hızla çıkıp Gabriel’in yanına geldi. Yüzü bembeyazdı. “Komutanım,” dedi, sesi boğuk. “Keşif birliklerinden… Haber var.” Gabriel döndü. “Neredeler?” Petrus sustu. Gözlerini kaçırdı. “Konuş Petrus.” “Bulundular, komutanım. Şehrin üç saat doğusunda. Ama…” “Ne ama?” Petrus derin bir nefes aldı. “Onları bulduk. Fakat… Fakat kendileri değillerdi. Gözleri… Gözleri bembeyaz olmuş. Konuşmuyorlar. Hiçbirine konuşturabildik mi sanıyorsunuz? Ağızlarını açtıklarında… İçlerinden bir duman çıkıyor. Soğuk bir duman. Dondurucu.” Gabriel’in eli kılıcının kabzasına gitti. “Neredeler şimdi?” “Kışlaya getirdik. Ama komutanım… Şifacı onlara yaklaşmamızı yasakladı. Yaklaşanın… Eli yüzü donuyormuş. Bir asker dokundu. Parmağı… Parmağı buz kesti.” Gabriel hiçbir şey söylemedi. Surlardan aşağıya, boşalan pazara baktı. Sonra gözlerini ufka dikti. Doğuda, Shran Dağı’nın ardında, kara bulutlar yükseliyordu. Ama bu bulutlar gökyüzünde değil, yeryüzünde hareket ediyordu. “Petrus,” dedi Gabriel, sesi demir gibi sert. “Şehrin tüm kapılarını kapat. Kimse içeri girmesin, kimse dışarı çıkmasın.” “Ya içeridekiler, komutanım?” Gabriel ona baktı. “İçeridekiler… İçeridekiler için artık çok geç olabilir.” Fred’in hanı, sabahın erken saatlerinde aniden boşalmıştı. Oysa her zamanki gibi eğlence düşkünleri, sarhoşlar, kumarbazlar doldururdu burayı. Ama bu sabah, masalar bomboştu. Sadece Fred, tezgâhın arkasında duruyor, elindeki bardağı silip duruyordu. Kapı gıcırdadı. Fred başını kaldırdı. İki adam içeri girdi. Uzun paltolar giymişlerdi. Yüzleri kapüşonların altında gizliydi. “Kapalıyız,” dedi Fred. Adamlar durmadı. Tezgâha yaklaştılar. İçlerinden biri kapüşonunu geriye itti. Markus’tu. Yüzünde o sinsice tebessüm vardı. “Fred,” dedi Markus. “Uzun zamandır görüşemedik.” Fred’in elindeki bardak yere düştü, paramparça oldu. “Ne istiyorsunuz?” diye sordu Fred, sesi titreyerek. Markus, tezgâhın üzerine bir kese altın bıraktı. “Sadece küçük bir iyilik. Bu gece, hanını açık tut. Kapılarını kimseye kapatma. Gelenleri ağırla. İçki ver, yemek ver. Ne isterlerse ver.” “Kim gelecek?” Markus’un tebessümü genişledi. “Ölüler, Fred. Ölüler gelecek.” Fred’in yüzü bembeyaz kesildi. “Ne… Ne diyorsun sen?” Markus arkasını döndü. Kapıya doğru yürürken arkasından seslendi: “Gece yarısı. Kapıları açık tut. Yoksa… Sen de onlardan biri olursun.” Kapı kapandı. Fred olduğu yere çöküp kaldı. Kesenin içindeki altınlar, masanın üzerinde ışıldıyordu. Ama Fred onlara bakmaya bile cesaret edemiyordu. Shran Dağı’nda Lola, gece boyunca uyumamıştı. Aşağıda şehirden gelen sesler, çığlıklar, bağrışmalar… Bunların hepsini duymuştu. Ama asıl korkutan, duyduklarının ardından gelen sessizlikti. Saatlerdir şehirden tek bir ses gelmiyordu. Elindeki meşaleyi tutuşturdu. Dağın yamacından aşağı inmeye başladı. Yolu iyi biliyordu. Dedesinin ona gösterdiği gizli patikalar, mağaralar, geçitler… Bunların hepsi aklındaydı. Yürürken bir an duraksadı. Önünde, bir ağacın gövdesine yaslanmış, bir adam duruyordu. Yüzü solgun, dudakları morarmıştı. Gözleri açıktı ama bakmıyordu. Bakışları boşluğa dalmıştı. Lola’nın eli ağzına gitti. Adamı tanıdı. Keşif birliklerinden biriydi. Şehrin dışına gönderilen askerlerden. “Hey,” dedi Lola, sesini titretmemeye çalışarak. “Hey, sen iyi misin?” Adamın dudakları kıpırdadı. Ağzından bir duman çıktı. Soğuk bir duman. Lola’nın nefesi buğulandı. “Kaç,” dedi adam. Sesinde hayat yoktu. “Kaç Lola. Şehre gitme. Çok geç. Çok geç.” “Ne oldu size? Ne gördünüz?” Adamın gözleri birden canlandı. Korkunç bir canlanmaydı bu. Gözbebekleri kaybolmuş, yerini bembeyaz bir boşluk almıştı. “Onları gördük,” dedi adam. “Dağların ardında. Binlercesini. Ama canlı değiller. Hiçbiri canlı değil. Yürüyorlar ama ölüler. Hepsi ölü. Ve buraya geliyorlar. O yabancıyla birlikte geldiler. O onların habercisiydi.” Adamın başı öne düştü. Bir daha kıpırdamadı. Lola geri geri çekildi. Elindeki meşale titriyordu. Arkasını döndü ve dağın yamacında koşmaya başladı. Rüzgâr arkadan ıslık çalıyor, sanki onu kovalıyordu. Şehre inmeliydi. İnsanları uyarmalıydı. Ama neyi uyaracaktı? Ölüler mi geliyordu? Yoksa daha kötü bir şey mi? Dedesinin sesi kulaklarında çınladı: “Şehir yakında yok olacak, halkı uyar.” Şimdi anlamıştı. Dedesinin onu uyardığı şey buydu. Ama çok mu geçti? Robert ve Eliza, sabahın ilk ışıklarıyla birlikte şehre vardıklarında, gördükleri manzara karşısında donakaldılar. Pazar yeri bomboştu. Tezgâhlar devrilmiş, mallar yerlere saçılmıştı. Kimse toplamaya bile tenezzül etmemişti. Sokaklarda dolaşan birkaç kişi vardı, ama onlar da başları önünde, hızlı adımlarla evlerine gitmeye çalışıyorlardı. “Ne oldu burada?” diye fısıldadı Eliza. Robert cevap vermedi. Gözleri sokakların sonunda, Meşkin Kapısı’na doğru bakıyordu. Orada, her zamanki yerinde, Lazar oturuyordu. Ama yanında birileri vardı. Üç kişi. Uzun paltolar giymişlerdi. Robert, Eliza’nın kolunu çekti. “Gel. Lazar’a gidelim.” Yaklaştıklarında, Lazar’ın yüzünün mosmor olduğunu gördüler. Adamlardan biri Lazar’ın omzuna yapışmış, diğeri ise tasını karıştırıyordu. “Bırakın onu!” diye bağırdı Robert. Adamlar döndü. Yüzlerinde tebessüm vardı. Ama o tebessüm insana ait değildi. Sanki bir maskeydi. “Sen kimsin?” diye sordu içlerinden biri. “Ona dokunmayın. Ne istiyorsunuz ondan?” Adamlar birbirine baktı. Sonra tebessümleri silindi. Yüzleri ifadesizleşti. Gözleri… Gözleri bembeyazdı. Lazar titreyen bir sesle konuştu: “Robert… Kaç. Onlar… Onlar ölü. Dün gece geldiler. Kimse nereden geldiklerini bilmiyor. Ama gözleri… Gözlerine bak.” Robert kılıcına davrandı. Ama adamlar kımıldamadı. Sadece durdular. Öylece durdular. Sanki zaman onlar için durmuştu. Sonra içlerinden biri konuştu. Ama sesi insan sesi değildi. Derinlerden, kuyulardan, boşluklardan gelen bir ses: “O yabancı… O yabancı bizi çağırdı. Artık buradayız. Kapılar açılsın. Kapılar açılsın ki girelim.” Robert, Eliza’nın elini tuttu. “Kaç,” dedi fısıltıyla. “Hemen kaç.” Ama arkalarını döndüklerinde, sokakların ağzında daha fazlasının beklediğini gördüler. Onlarca. Yüzlerce. Hepsi aynı solgun yüz, aynı bembeyaz gözler, aynı soğuk nefes. Şehrin sokakları, ölülerle doluyordu. Gabriel, surların üzerinden şehri izliyordu. Aşağıda, sokaklarda hareket eden gölgeleri görüyordu. Ama onları durduracak gücü yoktu. Askerlerinin yarısı keşif birlikleriyle birlikte yok olmuştu. Kalanlar ise korkudan titriyor, silahlarını tutamıyorlardı. Petrus yanına geldi. Yüzü çökmüş, gözleri kan çanağına dönmüştü. “Komutanım,” dedi. “Şehrin dört bir yanındalar. Evlerin içine giriyorlar. İnsanları… İnsanları buluyorlar. Ve onlar da…” “Ne yapıyorlar Petrus?” Petrus’un sesi titredi. “Onlar da onlardan oluyor. Birkaç saat içinde… Birkaç saat içinde şehirde yaşayan kalmayacak.” Gabriel yumruğunu surların taşlarına vurdu. “Nasıl? Nasıl oldu bu?” “O yabancı,” dedi Petrus. “O yabancı bir uyarıydı. Ama biz anlamadık. O ‘bela ve kötülük’ derken… Ardında bunları getireceğini söylüyordu. Biz dinlemedik. Şimdi hepsi burada.” Gabriel’in gözleri birden parladı. “O yabancı… Onun söyledikleri… ‘İmkânınız varsa siz de ayrılın şehirden’ demiş.” “Evet komutanım.” “O zaman hâlâ bir umut var. Şehri terk edeceğiz. Halkı topla. Güney kapısından çıkacağız.” Petrus başını salladı. “Ama komutanım… Onlar da güney kapısında. Hepsi orada. Sanki… Sanki bizi bekliyorlar.” Gabriel, güneye doğru baktı. Kapının önünde, yüzlerce solgun figür duruyordu. Hareket etmiyorlardı. Sadece bekliyorlardı. Kapının açılmasını bekliyorlardı. “O halde,” dedi Gabriel, kılıcını çekerek. “Kapıyı açacağız. Ve savaşacağız. Yaşayanlar için. Ölülere karşı.” Lola, dağın eteklerinden şehri izliyordu. Aşağıda, surların ardında, korkunç bir sessizlik vardı. Ama o sessizliğin içinde hareket eden gölgeleri görüyordu. Elindeki keseyi sıktı. Dedesinin otları… Bu otlar belki bir işe yarardı. Belki de işe yaramazdı. Ama denemek zorundaydı. Dağın gizli patikalarından aşağı inmeye başladı. Yol boyunca, birkaç kez durup etrafı dinledi. Her şey sessizdi. Fazla sessizdi. Şehrin arka kapısına vardığında, kapının ardından bir ses duydu. İnleme. İnsana benzeyen ama insan olmayan bir inleme. Kapıyı araladı. İçeride, yere yığılmış bir asker vardı. Gözleri bembeyaz olmuş, dudakları morarmıştı. Ama hâlâ yaşıyordu. Ya da yaşadığı sanılıyordu. Lola, keseden bir avuç ot çıkardı. Dedesinin ona öğrettiği gibi, otları havanda dövdü, suyla karıştırdı. Sonra askerin dudaklarına damlattı. Bir an hiçbir şey olmadı. Sonra askerin gözleri birden canlandı. Bembeyaz bakışları kayboldu, yerine insana ait bir ifade geldi. “Lola?” diye fısıldadı asker. “Sen… Sen misin?” “Evet. Sakin ol. Dedesinin otları işe yaradı galiba.” Askerin yüzü buruştu. “Çok geç,” dedi. “Çok geç Lola. Onlar artık içeride. Her yerdeler.” Lola ayağa kalktı. Keseyi beline sıkıca bağladı. Kapıdan içeri girdi. Belki de dedesinin ona bıraktığı en büyük miras, bu otlardı. Belki de şehri kurtarmanın tek yolu buydu. Ama önce, hayatta kalanları bulmalıydı. Ve onları bu karanlıktan çıkarmalıydı. Elinde kesesi, yüreğinde korkusuyla, Lola karanlık sokaklara daldı. Arkadan rüzgâr uğulduyor, ölülerin nefesi şehri sarıyordu. Ama Lola durmadı. Dedesinin sesi kulaklarında çınlıyordu: “Şehir yakında yok olacak, halkı uyar.” Belki de hâlâ zaman vardı. Belki de… Lola, karanlık sokaklarda ilerlerken her adımda daha derin bir sessizliğe gömülüyordu. Şehrin dar geçitleri, ay ışığını bile içine almıyor, evlerin kapıları sürgülü, pencereleri tahtalarla kapatılmıştı. Kimi evlerin önünde devrilmiş kandiller, yere saçılmış eşyalar vardı. Sanki insanlar kaçarken her şeyi ardında bırakmışlardı. Elindeki keseyi beline daha sıkı bağladı. Dedesinin otlarından yapılmış ilaç, askerin gözlerini bir anlığına canlandırmıştı. Ama ne kadar sürecekti bu etki? Bilmiyordu. Dedesinin ona anlattığı her şey, şimdi birer birer hatırına geliyordu. “Ölümün nefesi soğuktur Lola,” derdi dedesi. “Ama hayatın sıcaklığı, en koyu karanlığı bile geri püskürtür. Otların gücü topraktan gelir, toprak ananın rahminden. Unutma, ölüye hayat veremezsin, ama ölümün pençesindeki canlıyı geri çekebilirsin.” Lola, Şifacılar Çarşısı’na vardığında duraksadı. Burası, dedesinin yıllarca ilaçlarını hazırladığı, hastaları kabul ettiği yerdi. Dükkânın kepenkleri kapalıydı. Ama kapının önünde bir gölge duruyordu. Lola, nefesini tutarak yaklaştı. Gölge kımıldamıyordu. Uzun bir palto giymiş, başını önüne eğmişti. Ayakları çıplaktı. Toprağa basan ayakların altından, incecik bir buz tabakası yayılıyordu. Lola'nın eli kesesine gitti. Bir avuç ot çıkardı. Kurutulmuş adaçayı, biberiye ve dedesinin "ateş otu" dediği, yalnızca Shran Dağı'nın zirvesinde yetişen o nadide bitkiden hazırlamıştı. “Hey,” dedi Lola, sesini olabildiğince sakin tutarak. “Beni duyuyor musun?” Gölge başını kaldırdı. Yüzünde hiçbir ifade yoktu. Gözlerinin içi bembeyazdı. Dudakları morarmış, yanakları çökmüştü. Ama göğsü hâlâ inip kalkıyordu. Nefes alıyordu. Yaşıyordu. Henüz. “Adın ne?” diye sordu Lola. “Adını söyle. Adını hatırla. Adın seni hayata bağlar.” Gölgenin dudakları kıpırdadı. Ses, boğazından zorla çıkıyor gibiydi. “Ni… Ni… kol…” “Nikol mu? Nikol, seni duyuyorum. Ben Lola. Dedesinin otlarıyla sana geleceğim. Bana dokunmana izin ver.” Lola, yavaşça yaklaştı. Nikol'ün elleri yanlarında sarkıyordu. Parmaklarının uçları mosmordu. Lola, otları avucunda ezdi, üzerine tükürdüğü suyu damlattı. Karışım, koyu yeşil bir macun haline geldi. Bunu Nikol'ün alnına, şakaklarına ve dudaklarına sürdü. Bir an hiçbir şey olmadı. Sonra Nikol'ün bedeni sarsıldı. Ağzından keskin, soğuk bir duman çıktı. Lola geri çekildi ama düşmedi. Duman havada dağılırken, Nikol'ün gözlerindeki beyazlık yavaşça kaybolmaya başladı. Önce bir gözbebeği belirdi, sonra diğeri. Gözleri kan çanağına dönmüştü, ama bakıyordu. “Lo… la…” dedi Nikol, sesi hırıltılı. “Kaç… kaç buradan.” “Kaçmayacağım. Söyle bana, ne oldu size? Keşif birliklerine ne oldu?” Nikol'ün yüzü buruştu. Sanki hatırlamak, ona fiziksel bir acı veriyordu. “Dağların ardından geldiler,” dedi. “Önce bir sis vardı. Beyaz, soğuk bir sis. İçinden yürüyorlardı. Yüzlercesi. Binlercesi. Gözleri… Gözleri yoktu. Boşluk vardı. Ama bizi görüyorlardı. Her birimizi görüyorlardı.” “Nasıl? Nasıl görüyorlardı?” “Nefesimiz,” dedi Nikol. “Sıcak nefesimiz. Onlar soğuk. Sıcaklığı arıyorlar. Sıcak kanı. Canlıyı. Bizi buldular. Önce atlarımız düştü. Sonra arkadaşlarım. Birer birer. Gözleri beyazladı. Konuşmayı kestiler. Sonra ayağa kalktılar ve… ve bize doğru yürüdüler.” Nikol'ün sesi kesildi. Gözleri yeniden bulanıklaşmaya başladı. Lola hemen yeni bir macun hazırladı. Bu kez daha fazla ot kullandı. Karışımı Nikol'ün yüzüne sürerken, adamın elleri birden Lola'nın kolunu kavradı. Kavrayışı güçlüydü, ama soğuktu. “O yabancı,” dedi Nikol. “Güney kapısında ölen yabancı. O bir uyarıydı. Onun ardından geldiler. O onların habercisiydi. Ama o… o hâlâ konuşuyor. Onu gömdüler, yaktılar, ama o hâlâ konuşuyor. Onun sesi rüzgârda. Onun nefesi sokaklarda. Onun…” Nikol'ün başı öne düştü. Elleri gevşedi. Lola, adamın nabzını yokladı. Zayıftı, ama vardı. Yaşıyordu. Lola, Nikol'ü dükkânın kapısının yanına yasladı. Üzerine kendi pelerinini örttü. “Seni sonra alacağım,” dedi fısıltıyla. “Önce diğerlerini bulmalıyım.” Lazar, Meşkin Kapısı’nın orada, devrilmiş tezgâhların arasında tek başına oturuyordu. O üç solgun adam gitmişti ama onların soğuk nefesi hâlâ havadaydı. Lazar, ellerini ovuşturdu. Parmakları uyuşmuştu. Yıllardır dilencilik yaptığı bu köşe, şimdi ona bir mezar kadar soğuk geliyordu. Adis'in sayıklamalarını, Robert ve Eliza'nın telaşını düşündü. Sonra kendi oğlunu. Küçücük bir çocuktu. Savaşta kaybolmuştu. Bulamamıştı cesedini bile. Yıllarca beklemişti dönmesini. Kapıya her vuran olduğunda, oğlum mu diye koşmuştu. Ama gelen olmamıştı. Şimdi ise kapıya vuranlar vardı. Ama onlar ölüydü. Lazar, ayağa kalkmak için çabaladı. Dizleri tutmuyordu. Tam o sırada, sokakların ucunda bir gölge belirdi. Hızlı adımlarla yaklaşıyordu. Lazar'ın yüreği ağzına geldi. Ama gölge yaklaştıkça, onun bir kadın olduğunu gördü. Başında bağlı bir yazma, belinde bir kese, elinde bir meşale vardı. “Lazar?” dedi kadın. “Meşkin Kapısı’nın dilencisi Lazar mı sen?” “Kim soruyor?” diye cevap verdi Lazar, sesini titretmemeye çalışarak. “Lola. İshak'ın torunu.” Lazar'ın gözleri fal taşı gibi açıldı. “Lola mı? Dağa çekilen Lola mı?” “Evet. Vakit yok Lazar. Şehirde kaç kişi kaldı? Kaç kişi yaşıyor?” Lazar başını iki yana salladı. “Bilmiyorum. Sabahleyin daha çok kişi vardı. Sonra onlar geldi. Gözleri bembeyaz olanlar. Her yere yayıldılar. Kimi evlere girdi, kimi sokaklarda dolaşıyor. İnsanlar kaçıştı. Kimi güney kapısına, kimi kuzeye. Ama…” “Ama ne?” “Ama kapılar kapalı. Gabriel, kimse girip çıkmasın diye emir verdi. Şimdi herkes surların içinde. Ölülerle birlikte.” Lola'nın yüzü gerildi. “Gabriel ne yapıyor?” “Surlarda. Askerleriyle birlikte. Savaşacaklarını söylüyor. Ama… Lola, onlar ölü. Ölüyle nasıl savaşılır?” Lola cevap vermedi. Kesesini açtı, içinden bir avuç kuru ot çıkardı. “Lazar, seni tanıdığıma memnun oldum. Ama şimdi bana yardım etmen gerek. Robert ve Eliza’nın evini biliyor musun? Şehrin dışında, harabe bir ev.” “Bilirim. Adis orada. Küçük şeytan.” “Adis orada mı? İyi. Sen şimdi bana oranın yolunu göster. Ama önce, şehirde hâlâ ayakta duran, gözleri bembeyaz olmayan kim varsa, onları bulmam lazım. Bu otlar, onları kurtarabilir. En azından bir süreliğine.” Lazar, Lola'ya baktı. Kadının gözlerinde, yıllardır görmediği bir şey vardı. Umut. Belki de çaresizlik. Ama olsun. Ayaktaydı. Savaşıyordu. “Ben sana yardım ederim,” dedi Lazar. “Ama önce sen bana bir şey söyle. O yabancı… Güney kapısında ölen yabancı. O neydi? Bir uyarı mı? Bir lanet mi?” Lola, Lazar'ın gözlerine baktı. “O, bir ayna,” dedi. “İçimizdeki karanlığı gösteren bir ayna. Şehir onu kovdu, ona yardım etmedi, ölüme terk etti. Ve şimdi, şehrin yaptığı her kötülük, onun ardından geri geldi. Ama Lazar, bu sadece bir başlangıç. Asıl felaket, eğer durdurmazsak, yarın olacak.” Gabriel, surların üzerinde, kılıcının kabzasını sıkıca tutuyordu. Aşağıda, şehrin sokaklarında hareket eden gölgeleri saymaya çalıştı. Yüzlerce. Belki binlerce. Hepsi aynı solgun yüz, aynı boş bakış, aynı soğuk nefes. Petrus yanına geldi. Yüzü mosmordu. “Komutanım, doğu kapısında da onlardan var. Kuzeyde de. Batıda da. Sanki şehri kuşatmışlar.” “Kapıları kapatın,” dedi Gabriel. “Hiçbirini açmayın.” “Ama komutanım, içeridekiler… İçeridekiler kaçmak istiyor. Kadınlar, çocuklar. Onları duyuyor musunuz? Bağrışıyorlar. Kapılara vuruyorlar.” Gabriel sustu. Sesleri duyuyordu. Çığlıkları, ağıtları, duaları. Ama ne yapabilirdi? Kapıları açarsa, ölüler de girecekti. Ya da daha kötüsü, içeridekiler dışarı çıkacak, onlar da o soğuk nefese maruz kalacak, onlar da… dönüşecekti. “Petrus,” dedi Gabriel, sesi boğuk. “Şifacıya haber gönder. Karantina altındakiler ne durumda?” Petrus başını eğdi. “Şifacı… Şifacı da onlardan oldu komutanım. Gece yarısı. Karantinadaki askerleri kontrol ederken, içlerinden biri aniden ayağa kalktı. Şifacının yüzüne doğru nefes verdi. O an… O an şifacının gözleri beyazladı. Şimdi o da aşağıda, ötekilerle birlikte.” Gabriel'in eli titredi. Yumruğunu sıktı. “Peki ya o yabancı? Cesedi yakıldı mı?” “Yakıldı komutanım. Ama ateş… Ateş sönmüyor. Hâlâ yanıyor. Üç gündür yanıyor. Ve dumanı… Dumanı siyah değil, beyaz. Soğuk bir duman. Rüzgâr onu şehrin her yanına taşıyor. Belki de bu yüzden… Belki de herkes onlardan oluyor.” Gabriel, gözlerini kapadı. Derin bir nefes aldı. Sonra açtı. “Petrus, tüm askerleri topla. Surların üzerinde topla. Ellerine ne varsa alsınlar. Kılıç, mızrak, balta, sopa. Ama bir şartla.” “Ne komutanım?” “Kimse aşağı inmeyecek. Kimse onlarla temas etmeyecek. Surlardan atacaklarız. Taş atacağız, ok atacağız, ne varsa. Ama kimse onlara yaklaşmayacak.” “Peki ya içeridekiler komutanım? Ya halk?” Gabriel, Petrus'un gözlerine baktı. “Onlar için… Onlar için bir umut var mı bilmiyorum. Ama biz, bu surlarda, yaşayan son insanlar olarak, onların ruhlarını korumak zorundayız. Eğer onlar da ölülere katılırsa, bu şehir tamamen yok olur. O zaman geri dönüş yok.” Petrus başını salladı. Arkasını döndü, emirleri iletmek için merdivenlerden inmeye başladı. Gabriel yalnız kaldı. Gökyüzüne baktı. Ay, bulutların ardında gizlenmişti. Yıldızlar görünmüyordu. Sanki gökyüzü de ölmüştü. “Eliza,” diye mırıldandı Gabriel. “Sen ne demiştin? ‘Size bela ve kötülükten başka bir şey getirmedim.’ Keşke anlasaydık. Keşke dinleseydik.” Eliza, Robert'le birlikte, dar sokaklarda koşuyordu. Arkalarında, o soğuk nefes hâlâ peşlerindeydi. Robert, elinden tuttuğu Eliza'yı bir köşeye çekti. Nefes nefeseydiler. “Şimdi ne yapacağız?” diye sordu Eliza. Robert etrafına bakındı. “Lazar'ı bıraktık. Onu da almalıydık.” “Lazar gitmek istemedi. ‘Ben bu köşede doğdum, bu köşede öleceğim’ dedi. Onu zorla götüremezdik.” Robert başını salladı. “Doğru. Ama şimdi… Şimdi eve nasıl gideceğiz? Sokaklar onlarla dolu.” “Güney kapısına gitmeliyiz. Gabriel belki kapıyı açar. Belki dışarı çıkmamıza izin verir.” “Kapılar kapalı Eliza. Adis'in sayıklamalarını duymadın mı? Gabriel kimseyi içeri almıyor, kimseyi dışarı çıkarmıyormuş.” “O zaman ne yapacağız? Burada mı bekleyeceğiz? Onlar gelip bizi bulana kadar?” Robert sustu. Tam o sırada, sokağın başında bir gölge belirdi. İkisi de nefeslerini tuttu. Ama gölge yaklaştıkça, onun bir kadın olduğunu gördüler. Arkasında, yaşlı bir adam yürüyordu. Lazar. “Robert! Eliza!” diye seslendi Lazar. “Bakın kim geldi!” Kadın, elindeki meşaleyi kaldırdı. Yüzü aydınlandı. Eliza'nın elleri titredi. Yılların öfkesi, yılların acısı, yılların hasreti bir anda boğazına düğümlendi. “Lola?” diye fısıldadı Eliza. “Evet, Lola,” dedi kadın, sesi soğuk. “Dağa çekilen, ihanete uğrayan, terk edilen Lola.” Eliza'nın gözleri doldu. “Lola, ben…” “Konuşma şimdi,” dedi Lola, elini kaldırarak. “Zamanı değil. Önce bu şehri kurtarmalıyız. Sonra, eğer hâlâ yaşıyorsak, o zaman konuşuruz. O zaman hesabımızı görürüz.” Robert, Lola'ya bakıyor, bir türlü inanamıyordu. Yıllar önce şehri terk eden, dağlara çekilen Lola. Şimdi karşısındaydı. Yüzü çizgilerle dolmuş, saçlarına aklar düşmüştü, ama gözleri hâlâ aynıydı. Aynı ateş, aynı inat, aynı yaralı bakış. “Lola,” dedi Robert, sesi titrek. “Seni gördüğüme sevindim.” Lola ona baktı. Uzun uzun baktı. “Yalan söyleme Robert,” dedi sonra. “Sevinmedin. Beni gördüğüne pişman olacaksın. Çünkü ben buraya, sizi kurtarmaya geldim. Ama kurtardıktan sonra, belki de sizi terk etmeyeceğim. Belki de kalacağım. Ve o zaman, senin için asıl dert başlayacak.” Robert'ın yüzü kızardı. Eliza başını önüne eğdi. Lazar, bu gerilimi bozmak için araya girdi. “Lola, şimdi ne yapacağız? Bu otlar gerçekten işe yarayacak mı?” Lola, kesesini çıkardı. “Dedem İshak, yıllarını bu otları incelemeye verdi. Ölümün nefesine karşı, hayatın nefesini koydu. Bu otlar, Shran Dağı'nın zirvesinde yetişir. Güneşi ilk gören, rüzgârı son duyan bitkilerdir. Onlar, ölümün soğuğuna karşı, hayatın sıcaklığını taşır.” “Nasıl kullanacağız?” diye sordu Eliza. “Önce, hâlâ yaşayanları bulmalıyız. Onları bu otlarla korumalıyız. Sonra, o yabancının yakıldığı ateşi söndürmeliyiz. Çünkü o ateş, ölülerin nefesini şehrin her yanına taşıyor. O ateş sönmeden, bu lanet bitmez.” “Ateş nerede?” diye sordu Robert. “Kışlanın avlusunda. Şifacıların karantina kurduğu yerde. Ama orası şimdi… Orası ölülerle dolu.” Robert, Lola'ya baktı. “Bizi oraya götür.” Lola kaşlarını kaldırdı. “Orada yüzlerce ölü var Robert. Silahlarınla ne yapacaksın?” “Savaşacağım,” dedi Robert, kılıcının kabzasını sıkarak. Lola güldü. Acı, hırçın bir gülüş. “Ölüyle savaş olmaz Robert. Onları kılıçla kesemezsin. Okla vuramazsın. Onlar zaten ölü. Onları durdurmanın tek yolu, onlara hayat vermek. Ya da onları toprağa gömmek.” “Nasıl yani?” Lola, kesesinden bir avuç ot çıkardı. “Bu otları ateşe atacağız. Ateş, soğuk duman yerine, sıcak bir duman çıkaracak. O duman, ölülerin nefesini püskürtecek. Onları geçici olarak durduracak. O sırada, ateşi söndüreceğiz. Ama bunu yapabilmek için, ateşe yaklaşmamız lazım. Ve ateşin etrafı, onlarla dolu.” Lazar söze karıştı. “Ben gelirim. Ben yaşlıyım. Zaten ömrümün sonundayım. Benim kaybedecek bir şeyim yok.” Lola, Lazar'a baktı. “Senin kaybedecek çok şeyin var Lazar. O küçük çocuk. Adis. Onun senden başka kimsesi yok.” Lazar'ın gözleri doldu. Adis… O küçük şeytan… Onu koruyacak mısınız?” “Söz veriyorum,” dedi Lola. “Ama sen de bana söz ver. Bu gece, saklan. Kimseye görünme. Sabah olana kadar bekle. Sabah olduğunda, eğer hâlâ yaşıyorsak, Adis’i sana getireceğim.” Lazar başını salladı. “Söz veriyorum.” Lola, Robert ve Eliza’yı alarak karanlık sokaklarda ilerlemeye başladı. Her köşe başında duruyor, etrafı dinliyor, rüzgârın yönünü kontrol ediyordu. Kesesindeki otlardan bir tutam alıp ağzına koyuyor, sonra Robert ve Eliza’ya da veriyordu. “Bunu çiğneyin,” dedi. “Nefesiniz sıcak kalsın. Soğuk nefes, onları çağırır. Sıcak nefes, onları uzak tutar.” Robert otları çiğnedi. Ağzı acı doldu, ama nefesi gerçekten ısınmıştı. Eliza da aynısını yaptı. Üçü, Meşkin Kapısı’ndan geçip, Kışla ’ya doğru ilerlediler. Yolda, birkaç solgun figür gördüler. Lola, onlara yaklaşmadan, uzaktan geçti. Figürler başlarını çevirdiler, ama sanki onları görmüyor gibiydiler. Sanki Lola’nın nefesi, onları görünmez kılıyordu. “Bu otlar nefesimizi örtüyor,” diye fısıldadı Lola. “Onlar, sadece soğuğu algılayabiliyor. Sıcaklığı değil. Ama bu uzun sürmez. Çabuk olmalıyız.” Kışla ’ya vardıklarında, gördükleri manzara karşısında donakaldılar. Avlunun ortasında, devasa bir ateş yanıyordu. Alevler bembeyazdı. Etrafında, yüzlerce solgun figür duruyordu. Hepsi ateşe bakıyor, ağızlarından çıkan soğuk duman, ateşin alevleriyle birleşiyor, gökyüzüne yükseliyordu. “İşte orada,” dedi Lola. “O ateş. Onu söndürmeliyiz.” “Nasıl?” diye sordu Robert. “Suyla mı?” “Su işe yaramaz. Bu ateş, soğuktan besleniyor. Su ona güç verir. Onu söndürmenin tek yolu, sıcaklık. Hayatın sıcaklığı.” Lola, kesesini çıkardı. İçindeki tüm otları avucuna döktü. “Bu otlar, Shran Dağı’nın zirvesinde yetişti. Güneşin ilk ışığını onlar gördü. Rüzgârın son nefesini onlar duydu. Onlar, hayatın ta kendisi. Bunları ateşe atacağım. Ateş, bir anlığına sıcak alevler çıkaracak. O sırada, ateşin etrafındaki ölüler dağılacak. Siz, o anda ateşe koşun. Üzerine toprak atın. Kum atın. Ne varsa atın. Ama sakın su atmayın.” “Peki ya sen?” diye sordu Eliza. Lola, Eliza’nın gözlerine baktı. “Ben, otları ateşe atacağım. Sonra… Sonra ne olursa.” “Lola, seninle geliyorum,” dedi Robert. “Hayır,” dedi Lola keskin bir sesle. “Sen Elizayla kal. Bu işi ben yapacağım. Dedemin ruhu benimle. O beni koruyacak.” Lola, elindeki otları sıktı. Derin bir nefes aldı. Sonra avluya doğru yürümeye başladı. Lola, adımlarını sessizce atıyordu. Ayaklarının altındaki toprak, donmuş gibiydi. Her adımda, incecik bir buz tabakası kırılıyor, çıtırtı sesi çıkarıyordu. Ama ölüler, bu sese aldırış etmiyordu. Onlar sadece ateşe bakıyor, ağızlarından çıkan soğuk dumanla onu besliyorlardı. Lola, ateşe on adım kala durdu. Elleri titriyordu. Ama içindeki ses, dedesinin sesi, ona güç veriyordu. “Korkma Lola. Toprak ananın gücü sende. Bu otlar, onun rahminden çıktı. Ateş, onun nefesidir. Sen, onun elisin.” Lola, otları iki eliyle tuttu. Gözlerini kapadı. Bir dua okudu. Dedesinin ona öğrettiği, Shran Dağı’nın zirvesinde, rüzgâra karşı okuduğu o kadim dua. “Toprak ana, bana güç ver. Ateş baba, bana yol göster. Rüzgâr kardeş, bana nefes ver. Su kız kardeş, bana hayat ver.” Gözlerini açtı. Otları, var gücüyle ateşe fırlattı. Otlar, ateşle buluştuğunda, bir an hiçbir şey olmadı. Sonra, ateşin bembeyaz alevleri, birden kızardı. Kızıldan tura, turuncudan sarıya döndü. Sıcak bir duman yükselmeye başladı. O kadar sıcaktı ki, Lola’nın yüzünü yaladı. Ölüler, bu sıcaklıkla irkildi. Başlarını çevirdiler. Gözlerindeki beyazlık, bir an için kayboldu. Yerine, korku geldi. Evet, ölüler korkuyordu. Sıcaktan, hayattan, ışıktan. “Şimdi!” diye bağırdı Lola. Robert ve Eliza, avluya koştu. Ellerine ne geçtiyse, ateşe atmaya başladılar. Toprak, kum, taş, kırık tuğlalar. Her bir parça, ateşin alevlerini biraz daha söndürüyordu. Ölüler, geri gelmeye başladı. Sıcaklığın şoku geçmişti. Şimdi, ateşlerini söndürmeye çalışan bu canlılara doğru yürüyorlardı. Yüzlerce. Binlerce. Robert, bir an için etrafına baktı. Her yerdelerdi. Arkalarında, önlerinde, yanlarında. Kapıları kapatmışlardı. Çıkış yoktu. “Lola!” diye bağırdı Robert. “Yol yok! Hepsi etrafımızı sardı!” Lola, ateşe baktı. Alevler hâlâ yanıyordu. Sönmek üzereydi ama tam olarak sönmemişti. Biraz daha. Sadece biraz daha. “Devam edin!” diye bağırdı. “Ateş sönmek üzere!” Eliza, bir kova dolusu kumu ateşe boşalttı. Alevler son bir kez çatırdadı, sonra… söndü. Avlu, aniden karanlığa gömüldü. Sadece gökyüzünde, bulutların arasından sızan ay ışığı vardı. Ve o ışıkta, ölüler… Ölüler durmuştu. Hareket etmiyorlardı. Sanki ateşle birlikte onlar da sönmüştü. Lola, yere çöküp kaldı. Nefes nefeseydi. Elleri yanmış, yüzü is içinde kalmıştı. Ama yaşıyordu. Robert ve Eliza da yaşıyordu. “Başardık,” dedi Lola, sesi hırıltılı. “Ateş söndü.” Robert, avludaki ölülere baktı. Hâlâ oradaydılar. Ama hareket etmiyorlardı. Sanki birer heykel gibiydiler. “Ne yapacağız şimdi?” diye sordu Robert. Lola, ayağa kalktı. “Şimdi… Şimdi onları toprağa vermeliyiz. Her birini. Tek tek. Toprak anaya. O, onları kabul edecek. Ama bu, günler sürer.” “Günlerimiz var mı?” diye sordu Eliza. Lola, gökyüzüne baktı. Doğuda, Shran Dağı’nın ardından, güneşin ilk ışıkları süzülüyordu. Kızıl bir ışık. Sıcak bir ışık. “Var,” dedi Lola. “Güneş doğuyor. Ve o, ölülerin nefesini püskürtür. Gündüzleri onlar uyur. Geceleri uyanır. Yeter ki bu ateş bir daha yanmasın.” Sabah olduğunda, şehir sessizliğe bürünmüştü. Ama bu sessizlik, önceki gecenin korku dolu sessizliği değildi. Bu, bir uykunun, bir dinlenmenin sessizliğiydi. Gabriel, surlardan aşağıya baktığında, sokaklarda hareket eden gölgelerin olmadığını gördü. Ölüler, güneşin ışığıyla birlikte oldukları yerde donup kalmış, sanki toprağa kök salmışlardı. Petrus yanına geldi. Yüzü yorgundu ama gözlerinde bir umut ışığı vardı. “Komutanım, ateş söndü. Kışlanın avlusunda. Kim yaptı bilmiyorum, ama ateş artık yanmıyor.” Gabriel başını salladı. “Biliyorum. Gördüm. Şimdi ne yapacağız Petrus?” “Halkı toplamalıyız. Hayatta kalanları. Onları güvenli bir yere almalıyız. Ve sonra… Sonra bu ölüleri toprağa vermeliyiz.” “Kaç kişi kaldı Petrus?” Petrus sustu. “Bilmiyorum komutanım. Ama az. Çok az.” Gabriel, gözlerini kapadı. Derin bir nefes aldı. Sonra açtı. “Petrus, emir ver. Kapıları açın. Kim dışarı çıkmak istiyorsa çıksın. Ama kimse şehirden ayrılmasın. Burada kalmalıyız. Bu topraklarda. Bu şehirde. Ölülerimizi gömmeliyiz. Yaralarımızı sarmalıyız. Ve yeniden başlamalıyız.” “Ya o yabancı komutanım? Ya onun getirdiği bela?” Gabriel, güneye doğru baktı. Kapının önünde, tek bir solgun figür duruyordu. Diğerlerinden farklıydı. Başını kaldırmış, doğrudan Gabriel’e bakıyordu. Gözlerinde beyazlık yoktu. Sadece karanlık vardı. Derin, sonsuz bir karanlık. “O,” dedi Gabriel, “bir uyarıydı. Onu dinlemedik. Şimdi, onun mesajını anladık. Belki de bu yüzden hâlâ buradayız. Belki de bu yüzden hâlâ yaşıyoruz.” Lola, Robert ve Eliza’yla birlikte, şehrin dışındaki harabe eve doğru yürüyordu. Güneş yükseldikçe, hava ısınıyor, topraktaki buzlar eriyordu. Kuşlar, ağaçlara konmaya başlamış, uzaktan bir horoz sesi duyuluyordu. Eliza, Lola’nın yanında yürüyor, ona bakmaya cesaret edemiyordu. Yılların acısı, yılların suçluluğu, yılların özlemi, hepsi bir anda içine oturmuştu. “Lola,” dedi Eliza, sesi titrek. “Ben… Ben özür dilemek istiyorum.” Lola, yürümeye devam etti. Cevap vermedi. “Seni kırdım. Sana ihanet ettim. Robert’le… Robert’le evlendiğimde, seni düşünmedim. Kendi mutluluğumu düşündüm. Ama senin acını, senin yalnızlığını hiç düşünmedim.” Lola durdu. Eliza’ya döndü. Gözlerinde yaş vardı. Ama o yaşlar, acıdan mı, yoksa öfkeden miydi, bilinmiyordu. “Yıllarca dağda tek başıma yaşadım Eliza,” dedi Lola. “Her gece, şehre baktım. Her gece, senin evinin ışığını gördüm. Ve her gece, kendime sordum. Neden? Neden ben? Neden o?” “Lola, ben…” “Sustur,” dedi Lola, elini kaldırarak. “Zamanı değil. Belki de hiçbir zaman zamanı olmayacak. Ama şunu bil Eliza. Dün gece, ateşe otları atarken, ölebileceğimi düşündüm. Ve ölmeden önce aklıma gelen tek şey, senin yüzündü. Senin çocukluğumuzdaki yüzün. Beraber dereye gittiğimiz, beraber çiçek topladığımız, beraber güldüğümüz o kızın yüzü.” Eliza’nın gözleri doldu. “O kız hâlâ var Lola. O kız hiç ölmedi.” Lola, Eliza’ya uzun uzun baktı. Sonra, elini uzattı. Eliza, o eli tuttu. İkisinin de elleri soğuktu, yorgundu, yaralıydı. Ama tutuşları sıcaktı. “Belki de,” dedi Lola, “bu felaket, bize bir şeyleri hatırlatmak için geldi. Belki de kaybettiklerimizi bulmak için.” Robert, arkada duruyor, bu anı izliyordu. Gözleri de doluydu. Yıllar önce yaptığı seçimin ağırlığını, ilk kez bu kadar derinden hissetti. “Lola,” dedi Robert. “Ben de özür dilemek istiyorum. Ben…” “Sen sus,” dedi Lola, ona dönerek. “Senin özrünü şimdi değil, belki yıllar sonra duyarım. Ama şunu bil, Robert. Seni seçtiği için Eliza’yı suçlamıyorum. Seni seçtiği için, belki de haklıydı. Ama beni terk ettiği için… Bunu asla affetmeyeceğim.” Robert başını eğdi. Lola, arkasını döndü ve yürümeye devam etti. Harabe eve vardıklarında, Adis’i yatakta buldular. Çocuk uyanıktı. Gözleri korkuyla doluydu. Ama ateşi düşmüştü. Yanakları pembeleşmiş, nefesi düzenliydi. “Adis,” dedi Eliza, hemen yanına giderek. “Nasılsın?” “Korktum,” dedi Adis, sesi hâlâ zayıf. “Dün gece sesler duydum. Çığlıklar. Sonra her şey sustu. Çok sustu.” “Korkma,” dedi Eliza. “Artık her şey bitti. Güneş doğdu. Her şey yolunda.” Adis, Lola’yı gördü. “Sen kimsin?” diye sordu. Lola, yatağın kenarına oturdu. Adis’in alnına dokundu. “Ben Lola. Şifacı. Seni iyileştirmeye geldim.” “Şifacı mı? Lazar’ın anlattığı şifacılar gibi mi?” Lola gülümsedi. “Evet. Deden gibi.” “Deden mi var senin?” “Vardı. Ama o çoktan toprak oldu. Ama onun bilgisi bende. Onun otları bende. Onun ruhu bende.” Adis, Lola’ya merakla baktı. “Bana da öğretir misin? Otları, ilaçları, şifayı?” Lola, çocuğun gözlerine baktı. O gözlerde, kendi çocukluğundaki o ateşi gördü. Dedesinin ona baktığı gibi baktı. “Öğretirim,” dedi Lola. “Ama önce iyileşmen lazım. Sonra, şehrimizi yeniden inşa etmemiz lazım. Sonra, ölülerimizi gömmemiz lazım. Ve sonra… Sonra, sana her şeyi öğreteceğim. Shran Dağı’nın zirvesindeki otları, rüzgârın dilini, toprağın sesini. Her şeyi.” Adis’in gözleri parladı. “Gerçekten mi?” “Gerçekten. Ama bir şartla.” “Ne?” “Baban gibi olmayacaksın. Lazar gibi olmayacaksın. Peter gibi, Markus gibi olmayacaksın. Sen, iyi bir insan olacaksın. Yardım eden, koruyan, seven bir insan.” Adis, başını salladı. “Söz veriyorum. İyi bir insan olacağım. Lazar gibi değil. O kötü biri. Paramı çaldı diye bacaklarımı kırmak istedi.” Lola güldü. “Lazar, aslında iyi biri. Ama korkuyor. Çok korkuyor. Oğlunu kaybetti, seni de kaybetmekten korkuyor. Onu affet.” “Affeder miyim?” diye sordu Adis, düşünceli bir yüzle. “Affedersin. Çünkü affetmek, iyi insan olmanın ilk kuralıdır.” Günler geçti. Haftalar oldu. Şehir, yavaş yavaş ayağa kalkmaya başladı. Gabriel, askerleriyle birlikte ölüleri toprağa verdi. Her birini, birer birer. Onların isimlerini sordu, bilenlerden öğrendi. Bilmeyenlere, yeni isimler verdi. “Şehri koruyan”, “Toprağa düşen”, “Rüzgâra karışan” gibi isimler. Petrus, şehrin güvenliğini sağladı. Kapıları yeniden inşa etti. Surları onardı. Ve her akşam, surların üzerine çıkıp, ufku izledi. Dağların ardında, bir daha o soğuk sis görünür mü diye. Peter ve Markus, planlarını gerçekleştiremediler. Onlar da ölülerle birlikte, toprağa verildi. Kimse onların ardından ağlamadı. Kimse onların ismini anmadı. Fred, hanını kapattı. Şehirden ayrıldı. Nereye gittiğini kimse bilmiyor. Ama bazıları, onu kuzeye, dağların ardına doğru giderken gördüklerini söylüyor. Davud, eşeğinin üzerinde, hâlâ şehirde dolaşıyor. Ama artık tahta kılıçlı çocuklar yok. Çünkü o çocukların çoğu, ölülerle birlikte toprağa verildi. Davud, şimdi tek başına dolaşıyor, önüne gelene selam veriyor. Ama selam verdiği kimse yok. Lazar, Meşkin Kapısı’na geri döndü. Yine dilencilik yapıyor. Ama artık duası değişmiş. Artık “Merhamet edin, Mardin’in nazik beyleri” demiyor. Şöyle diyor: “Merhamet edin, yaşayanlar. Merhamet edin, birbirinize. Çünkü yarın, belki de siz ölülerin arasında olacaksınız. Ve o zaman, merhamet dileyecek, ama kimse sizi duymayacak.” Adis, Lazar’ın yanına oturuyor, ona yardım ediyor. Bazen Lazar’ın tasına para atan oluyor, bazen olmuyor. Ama Adis, artık Lazar’ın parasını çalmıyor. Çünkü Lazar, ona abasını vermişti. O kahverengi, yıllarca yıkanmamış, ama şimdi tertemiz olan abasını. Lola, şehirde kaldı. Dedesinin dükkanını açtı. İnsanlara şifa dağıttı. Otlarından ilaçlar yaptı. Geceleri, Shran Dağı’na çıkıp, ot topladı. Gündüzleri, şehirde hastaları iyileştirdi. Adis, ona yardım etti. Otları öğrendi, ilaçları öğrendi, duaları öğrendi. Eliza ve Robert, harabe evlerinde kalmaya devam etti. Ama artık sadece ikisi değildi. Lola, sık sık onları ziyaret ediyordu. Bazen birlikte yemek yiyorlar, bazen beraber çalışıyorlar, bazen de hiç konuşmadan oturup, güneşin batışını izliyorlardı. Bir akşam, güneş batarken, Lola, Eliza’nın elini tuttu. “Belki de,” dedi Lola, “ihanet diye bir şey yoktur. Belki de herkes, kendi yolunu çizer. Ve o yollar, bazen kesişir, bazen ayrılır. Ama hiçbir zaman tamamen kopmaz. Eliza, Lola’nın elini sıktı. “Affettin mi beni?” diye sordu. Lola, güneşin battığı ufka baktı. Kızıl ışıklar, gökyüzünü boyuyor, bulutların arasından süzülüyordu. “Belki de” dedi Lola, “affetmek, unutmak değildir. Affetmek, yeniden başlamaktır. Ve ben, bugün, yeniden başlamak istiyorum.” Eliza’nın gözleri doldu. Robert, arkada duruyor, bu anı izliyordu. O da ağlıyordu. Ama artık suçluluktan değil, umuttan.`;
 
-    // Çeviri fonksiyonu (paragraf bazlı, 500 karakter limitine dikkat)
-    async function translateText(text, sourceLang, targetLang) {
-        if (!text || text.trim() === "") return "";
-        if (sourceLang === targetLang) return text;
-        
-        try {
-            // Metni 450 karakterlik parçalara böl
-            const chunks = [];
-            for (let i = 0; i < text.length; i += 450) {
-                chunks.push(text.substring(i, i + 450));
-            }
-            
-            let translatedChunks = [];
-            for (let i = 0; i < chunks.length; i++) {
-                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunks[i])}&langpair=${sourceLang}|${targetLang}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data && data.responseData && data.responseData.translatedText) {
-                    let translated = data.responseData.translatedText;
-                    translated = translated.replace(/&#39;/g, "'").replace(/&quot;/g, '"');
-                    translatedChunks.push(translated);
-                } else {
-                    translatedChunks.push(chunks[i]);
-                }
-                
-                // İlerleme göster
-                const percent = ((i + 1) / chunks.length) * 100;
-                progressFill.style.width = `${percent}%`;
-            }
-            
-            return translatedChunks.join(" ");
-        } catch (error) {
-            console.error("Çeviri hatası:", error);
-            return "❌ Çeviri hatası: " + error.message;
-        }
+    // SpeechSynthesis
+    let utterance = null, isPlaying = false, currentPosition = 0, startTime = 0, progressInterval = null;
+    const playPauseBtn = document.getElementById('playPauseBtn'), stopBtn = document.getElementById('stopBtn'), rewindBtn = document.getElementById('rewindBtn'), progressBar = document.getElementById('progressBar'), progressContainer = document.getElementById('progressContainer'), currentTimeSpan = document.getElementById('currentTime'), durationSpan = document.getElementById('duration'), statusText = document.getElementById('statusText');
+    let totalDuration = metin.length * 0.055 * 1000;
+    function formatTime(seconds) { const mins = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60); return `${mins}:${secs < 10 ? '0' : ''}${secs}`; }
+    durationSpan.innerText = formatTime(totalDuration / 1000);
+    function startSpeaking() {
+        if (utterance) window.speechSynthesis.cancel();
+        utterance = new SpeechSynthesisUtterance(metin);
+        utterance.lang = 'tr-TR';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.0;
+        utterance.volume = 1;
+        const voices = window.speechSynthesis.getVoices();
+        const turkishVoice = voices.find(v => v.lang === 'tr-TR' && (v.name.includes('Seda') || v.name.includes('Zeynep') || v.name.includes('Türkçe') || v.name.includes('Melisa')));
+        if (turkishVoice) utterance.voice = turkishVoice;
+        utterance.onstart = () => { isPlaying = true; playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; statusText.innerHTML = '🎙️ M.Ö 1000 Mardin - Radyo Tiyatrosu dinleniyor... (Vurgulu, dramatik anlatım)'; startTime = Date.now(); startProgressTracking(); };
+        utterance.onend = () => { stopSpeaking(); statusText.innerHTML = '✅ M.Ö 1000 Mardin bölümü sona erdi.'; progressBar.style.width = '100%'; currentTimeSpan.innerText = formatTime(totalDuration / 1000); };
+        utterance.onerror = () => { stopSpeaking(); statusText.innerHTML = '⚠️ Seslendirme hatası.'; };
+        window.speechSynthesis.speak(utterance);
     }
-
-    // OCR ile fotoğraftan metin çıkarma
-    async function processImageOCR(imageFile) {
-        statusMsg.innerHTML = "📸 Fotoğraf işleniyor...";
-        progressFill.style.width = '10%';
-        
-        try {
-            // Fotoğrafı göster
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                previewCard.style.display = 'block';
-            };
-            reader.readAsDataURL(imageFile);
-            
-            progressFill.style.width = '30%';
-            statusMsg.innerHTML = "🔍 Yazılar okunuyor (OCR)...";
-            
-            // OCR için dil seçimi
-            let sourceLang = sourceLangSelect.value;
-            let tesseractLang = "tur+eng+por+spa+fra+deu+ita";
-            
-            if (sourceLang === "tr") tesseractLang = "tur";
-            else if (sourceLang === "en") tesseractLang = "eng";
-            else if (sourceLang === "pt") tesseractLang = "por";
-            else if (sourceLang === "es") tesseractLang = "spa";
-            else if (sourceLang === "fr") tesseractLang = "fra";
-            else if (sourceLang === "de") tesseractLang = "deu";
-            else if (sourceLang === "it") tesseractLang = "ita";
-            else if (sourceLang === "ru") tesseractLang = "rus";
-            else tesseractLang = "tur+eng+por+spa";
-            
-            const worker = await Tesseract.createWorker(tesseractLang);
-            progressFill.style.width = '60%';
-            
-            const { data: { text } } = await worker.recognize(imageFile);
-            await worker.terminate();
-            
-            progressFill.style.width = '80%';
-            
-            if (text && text.trim()) {
-                ocrTextDiv.innerHTML = text.trim();
-                statusMsg.innerHTML = "✅ OCR tamamlandı! Şimdi çevriliyor...";
-                
-                // Çeviri yap
-                const targetLang = targetLangSelect.value;
-                const sourceLangCode = sourceLangSelect.value;
-                const translated = await translateText(text.trim(), sourceLangCode, targetLang);
-                
-                translatedTextDiv.innerHTML = translated;
-                resultCard.style.display = 'block';
-                
-                progressFill.style.width = '100%';
-                statusMsg.innerHTML = "✅ Çeviri tamamlandı!";
-                setTimeout(() => { progressFill.style.width = '0%'; }, 1000);
-            } else {
-                ocrTextDiv.innerHTML = "⚠️ Fotoğrafta okunabilir metin bulunamadı.";
-                statusMsg.innerHTML = "⚠️ Metin bulunamadı, farklı bir fotoğraf deneyin.";
-                progressFill.style.width = '0%';
-            }
-            
-        } catch (err) {
-            statusMsg.innerHTML = "❌ Hata: " + err.message;
-            progressFill.style.width = '0%';
-            console.error(err);
-        }
-    }
-
-    // Kamera ile çek
-    cameraBtn.addEventListener('click', () => {
-        cameraInput.click();
-    });
-    
-    cameraInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        if (file.size > 50 * 1024 * 1024) {
-            statusMsg.innerHTML = "❌ Dosya çok büyük (max 50MB)";
-            return;
-        }
-        
-        currentImageFile = file;
-        await processImageOCR(file);
-        cameraInput.value = '';
-    });
-    
-    // Galeriden seç
-    galleryBtn.addEventListener('click', () => {
-        galleryInput.click();
-    });
-    
-    galleryInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        if (file.size > 50 * 1024 * 1024) {
-            statusMsg.innerHTML = "❌ Dosya çok büyük (max 50MB)";
-            return;
-        }
-        
-        currentImageFile = file;
-        await processImageOCR(file);
-        galleryInput.value = '';
-    });
-    
-    // Dilleri değiştir
-    swapBtn.addEventListener('click', async () => {
-        const tempSource = sourceLangSelect.value;
-        const tempTarget = targetLangSelect.value;
-        sourceLangSelect.value = tempTarget;
-        targetLangSelect.value = tempSource;
-        
-        // Eğer zaten bir metin çevrildiyse tekrar çevir
-        const currentText = ocrTextDiv.innerHTML;
-        if (currentText && currentText !== "-" && !currentText.includes("bulunamadı")) {
-            statusMsg.innerHTML = "🔄 Diller değiştirildi, yeniden çevriliyor...";
-            const translated = await translateText(currentText, sourceLangSelect.value, targetLangSelect.value);
-            translatedTextDiv.innerHTML = translated;
-            statusMsg.innerHTML = "✅ Çeviri güncellendi!";
-        }
-    });
-    
-    // Temizle
-    clearBtn.addEventListener('click', () => {
-        previewCard.style.display = 'none';
-        resultCard.style.display = 'none';
-        ocrTextDiv.innerHTML = '-';
-        translatedTextDiv.innerHTML = 'Çeviri burada görünecek';
-        previewImage.src = '';
-        statusMsg.innerHTML = "✅ Temizlendi - Yeni fotoğraf çekin veya seçin";
-        progressFill.style.width = '0%';
-        currentImageFile = null;
-    });
-    
-    // Kopyala
-    copyBtn.addEventListener('click', async () => {
-        const textToCopy = translatedTextDiv.innerText;
-        if (textToCopy && textToCopy !== 'Çeviri burada görünecek') {
-            try {
-                await navigator.clipboard.writeText(textToCopy);
-                statusMsg.innerHTML = "✅ Çeviri panoya kopyalandı!";
-                setTimeout(() => {
-                    if (currentImageFile) statusMsg.innerHTML = "✅ Hazır";
-                    else statusMsg.innerHTML = "✅ Hazır - Fotoğraf çekin veya galeriden seçin";
-                }, 2000);
-            } catch (err) {
-                statusMsg.innerHTML = "❌ Kopyalama başarısız";
-            }
-        }
-    });
-    
-    // Sayfa yüklendiğinde
-    window.addEventListener('load', () => {
-        statusMsg.innerHTML = "✅ Hazır - Fotoğraf çekin veya galeriden seçin";
-    });
+    function pauseSpeaking() { if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) { window.speechSynthesis.pause(); isPlaying = false; playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; statusText.innerHTML = '⏸️ Durduruldu.'; if (progressInterval) clearInterval(progressInterval); } }
+    function resumeSpeaking() { if (window.speechSynthesis.paused) { window.speechSynthesis.resume(); isPlaying = true; playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; statusText.innerHTML = '🎙️ Devam ediyor...'; startTime = Date.now() - (currentPosition * 1000); startProgressTracking(); } else if (!window.speechSynthesis.speaking) startSpeaking(); }
+    function stopSpeaking() { window.speechSynthesis.cancel(); isPlaying = false; playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; progressBar.style.width = '0%'; currentTimeSpan.innerText = '0:00'; currentPosition = 0; if (progressInterval) clearInterval(progressInterval); statusText.innerHTML = '⏹️ Durduruldu. Baştan dinlemek için Oynat\'a basın.'; }
+    function rewindSpeaking() { window.speechSynthesis.cancel(); isPlaying = false; playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; progressBar.style.width = '0%'; currentTimeSpan.innerText = '0:00'; currentPosition = 0; if (progressInterval) clearInterval(progressInterval); statusText.innerHTML = '⏪ Başa sarıldı.'; startSpeaking(); }
+    function startProgressTracking() { if (progressInterval) clearInterval(progressInterval); progressInterval = setInterval(() => { if (isPlaying && window.speechSynthesis.speaking && !window.speechSynthesis.paused) { const elapsed = Date.now() - startTime; let percent = (elapsed / totalDuration) * 100; if (percent > 100) percent = 100; progressBar.style.width = `${percent}%`; currentTimeSpan.innerText = formatTime(elapsed / 1000); currentPosition = elapsed / 1000; } }, 100); }
+    playPauseBtn.addEventListener('click', () => { if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) pauseSpeaking(); else if (window.speechSynthesis.paused) resumeSpeaking(); else startSpeaking(); });
+    stopBtn.addEventListener('click', stopSpeaking);
+    rewindBtn.addEventListener('click', rewindSpeaking);
+    progressContainer.addEventListener('click', (e) => { statusText.innerHTML = '⏩ İleri sarma desteklenmiyor. Başa sar butonunu kullanın.'; });
+    window.speechSynthesis.onvoiceschanged = () => { const voices = window.speechSynthesis.getVoices(); const turkishVoice = voices.find(v => v.lang === 'tr-TR'); if (turkishVoice && utterance) utterance.voice = turkishVoice; };
+    window.addEventListener('beforeunload', () => { if (window.speechSynthesis) window.speechSynthesis.cancel(); });
+    document.querySelectorAll('.nav-links a').forEach(anchor => { anchor.addEventListener('click', function(e) { const targetId = this.getAttribute('href'); if(targetId && targetId !== '#') { const target = document.querySelector(targetId); if(target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); } } }); });
 </script>
 </body>
 </html>

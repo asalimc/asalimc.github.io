@@ -1,321 +1,593 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Flight Price Intelligence</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Mobil Kameralı Çevirmen - Fotoğraf Çeviri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<style>
-:root{
-  --bg:#050814;
-  --card:#0b1224;
-  --border:#1e293b;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 16px;
+        }
 
-  --text:#f8fafc;
-  --muted:#94a3b8;
+        /* Ana konteyner */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-  --accent:#38bdf8;
+        /* Başlık */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #1a2a3a;
+            font-weight: 600;
+        }
+        .header p {
+            font-size: 13px;
+            color: #6c7a8a;
+            margin-top: 4px;
+        }
 
-  --up:#22c55e;
-  --down:#ef4444;
+        /* Dil seçici kartı */
+        .lang-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .lang-selector {
+            flex: 1;
+            min-width: 120px;
+        }
+        .lang-label {
+            font-size: 11px;
+            color: #8a9aaa;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        select {
+            width: 100%;
+            padding: 12px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            background: white;
+            font-weight: 500;
+            color: #1a2a3a;
+        }
+        .swap-btn {
+            background: #eef2ff;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #4f46e5;
+            transition: 0.2s;
+        }
+        .swap-btn:active {
+            transform: scale(0.95);
+            background: #e0e7ff;
+        }
 
-  --low:#052e1c;
-  --mid:#0b1224;
-  --high:#3f0a0a;
-}
+        /* Kamera / Galeri butonları */
+        .capture-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .capture-btn {
+            flex: 1;
+            background: #4f46e5;
+            border: none;
+            padding: 16px;
+            border-radius: 28px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .capture-btn:active {
+            transform: scale(0.97);
+            background: #4338ca;
+        }
+        .gallery-btn {
+            background: #10b981;
+        }
+        .gallery-btn:active {
+            background: #059669;
+        }
+        .capture-btn.secondary {
+            background: #f59e0b;
+        }
 
-*{box-sizing:border-box}
+        /* Fotoğraf önizleme alanı */
+        .preview-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .preview-title {
+            font-size: 13px;
+            color: #6c7a8a;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .image-container {
+            position: relative;
+            background: #f1f5f9;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .preview-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            display: block;
+        }
+        .ocr-text-area {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .ocr-text-label {
+            font-size: 12px;
+            color: #6c7a8a;
+            margin-bottom: 6px;
+        }
+        .ocr-text {
+            font-size: 13px;
+            color: #1a2a3a;
+            line-height: 1.5;
+            word-break: break-word;
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
 
-body{
-  margin:0;
-  font-family:system-ui;
-  background:var(--bg);
-  color:var(--text);
-}
+        /* Çeviri sonuç kartı */
+        .result-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .result-title {
+            font-weight: 600;
+            color: #1a2a3a;
+            font-size: 15px;
+        }
+        .copy-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            color: #4f46e5;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .copy-btn:active {
+            background: #e0e7ff;
+        }
+        .translated-text {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #1a2a3a;
+            min-height: 120px;
+            border: 1px solid #e2e8f0;
+        }
 
-/* HEADER */
-.header{
-  padding:14px;
-  background:#020617;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+        /* İlerleme çubuğu */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 4px;
+        }
 
-.header h3{
-  margin:0;
-  font-size:18px;
-  font-weight:900;
-}
+        /* Durum mesajı */
+        .status {
+            font-size: 12px;
+            color: #6c7a8a;
+            text-align: center;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
 
-.small{font-size:12px;color:var(--muted)}
+        /* Temizle butonu */
+        .clear-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #ef4444;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .clear-btn:active {
+            background: #fef2f2;
+        }
 
-.monthPicker{
-  padding:10px;
-  border-radius:12px;
-  background:#020617;
-  color:white;
-  border:1px solid var(--border);
-  font-weight:700;
-}
+        /* Gizli file input */
+        #cameraInput, #galleryInput {
+            display: none;
+        }
 
-/* CONTENT */
-.container{padding:12px}
-
-/* CARD */
-.routeCard{
-  background:var(--card);
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:16px;
-  border:1px solid var(--border);
-}
-
-.title{font-weight:900}
-.info{font-size:12px;color:var(--muted)}
-
-/* CALENDAR */
-.calendar{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:12px;
-}
-
-.day{
-  background:#020617;
-  border-radius:14px;
-  padding:8px;
-  text-align:center;
-  cursor:pointer;
-  transition:.2s;
-  border:1px solid #020617;
-}
-
-.day:hover{border-color:var(--accent)}
-
-.hm-low{background:var(--low)}
-.hm-mid{background:var(--mid)}
-.hm-high{background:var(--high)}
-
-.price{font-weight:900}
-
-.tag{
-  font-size:10px;
-  font-weight:800;
-  margin-top:2px;
-  color:#e5e7eb;
-}
-
-.cheapest{outline:2px solid var(--accent)}
-
-.flash-up{animation:flashUp .6s}
-.flash-down{animation:flashDown .6s}
-
-@keyframes flashUp{
-  0%{box-shadow:0 0 0 4px rgba(34,197,94,.9)}
-}
-@keyframes flashDown{
-  0%{box-shadow:0 0 0 4px rgba(239,68,68,.9)}
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(2,6,23,.85);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:99;
-}
-
-.modalContent{
-  background:#020617;
-  width:95%;
-  max-width:520px;
-  border-radius:20px;
-  padding:16px;
-  border:1px solid var(--border);
-}
-
-.modalHeader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:900;
-}
-
-.closeBtn{cursor:pointer;font-size:20px}
-
-.detailGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:12px;
-  font-size:14px;
-}
-
-.box{
-  background:#0b1224;
-  border-radius:12px;
-  padding:10px;
-  border:1px solid var(--border);
-  text-align:center;
-  font-weight:800;
-}
-
-/* RESPONSIVE */
-@media(min-width:700px){
-  .calendar{grid-template-columns:repeat(7,1fr)}
-  .header{flex-direction:row;justify-content:space-between}
-}
-</style>
+        /* Animasyon */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .preview-card, .result-card {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
-
 <body>
-
-<div class="header">
-  <div>
-    <h3>✈️ Flight Price Intelligence</h3>
-    <div class="small">Live pricing • Heatmap • Flash arrows</div>
-  </div>
-  <input type="month" id="monthPicker" class="monthPicker"/>
-</div>
-
 <div class="container">
-  <div id="app"></div>
-</div>
+    <div class="header">
+        <h1>📸 Mobil Çevirmen</h1>
+        <p>Fotoğraf çek veya galeriden seç, yazıları hemen çevir</p>
+    </div>
 
-<div class="modal" id="modal">
-  <div class="modalContent" id="modalContent"></div>
+    <!-- Dil seçici -->
+    <div class="lang-card">
+        <div class="lang-selector">
+            <div class="lang-label">KAYNAK DİL</div>
+            <select id="sourceLang">
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="en">🇬🇧 İngilizce</option>
+                <option value="pt">🇵🇹 Portekizce</option>
+                <option value="es">🇪🇸 İspanyolca</option>
+                <option value="fr">🇫🇷 Fransızca</option>
+                <option value="de">🇩🇪 Almanca</option>
+                <option value="it">🇮🇹 İtalyanca</option>
+                <option value="ru">🇷🇺 Rusça</option>
+                <option value="ar">🇸🇦 Arapça</option>
+                <option value="zh-CN">🇨🇳 Çince</option>
+                <option value="ja">🇯🇵 Japonca</option>
+                <option value="ko">🇰🇷 Korece</option>
+            </select>
+        </div>
+        <button class="swap-btn" id="swapBtn">🔄</button>
+        <div class="lang-selector">
+            <div class="lang-label">HEDEF DİL</div>
+            <select id="targetLang">
+                <option value="tr">🇹🇷 Türkçe</option>
+                <option value="en" selected>🇬🇧 İngilizce</option>
+                <option value="pt">🇵🇹 Portekizce</option>
+                <option value="es">🇪🇸 İspanyolca</option>
+                <option value="fr">🇫🇷 Fransızca</option>
+                <option value="de">🇩🇪 Almanca</option>
+                <option value="it">🇮🇹 İtalyanca</option>
+                <option value="ru">🇷🇺 Rusça</option>
+                <option value="ar">🇸🇦 Arapça</option>
+                <option value="zh-CN">🇨🇳 Çince</option>
+                <option value="ja">🇯🇵 Japonca</option>
+                <option value="ko">🇰🇷 Korece</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Kamera ve Galeri butonları -->
+    <div class="capture-area">
+        <button class="capture-btn" id="cameraBtn">📷 Kamera ile Çek</button>
+        <button class="capture-btn gallery-btn" id="galleryBtn">🖼️ Galeriden Seç</button>
+    </div>
+
+    <!-- Gizli file inputlar -->
+    <input type="file" id="cameraInput" accept="image/*" capture="environment">
+    <input type="file" id="galleryInput" accept="image/*">
+
+    <!-- Fotoğraf önizleme ve OCR sonucu -->
+    <div class="preview-card" id="previewCard">
+        <div class="preview-title">📸 Çekilen Fotoğraf</div>
+        <div class="image-container">
+            <img id="previewImage" class="preview-img" alt="Önizleme">
+        </div>
+        <div class="ocr-text-area">
+            <div class="ocr-text-label">🔍 Fotoğraftan Okunan Metin</div>
+            <div class="ocr-text" id="ocrText">-</div>
+        </div>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div class="status" id="statusMsg">✅ Hazır - Fotoğraf çekin veya galeriden seçin</div>
+        <button class="clear-btn" id="clearBtn">🗑️ Temizle</button>
+    </div>
+
+    <!-- Çeviri sonucu -->
+    <div class="result-card" id="resultCard" style="display: none;">
+        <div class="result-header">
+            <span class="result-title">🌍 Çeviri Sonucu</span>
+            <button class="copy-btn" id="copyBtn">📋 Kopyala</button>
+        </div>
+        <div class="translated-text" id="translatedText">Çeviri burada görünecek</div>
+    </div>
 </div>
 
 <script>
-let usdTry=0;
-const memory={};
+    // DOM Elemanları
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+    const previewCard = document.getElementById('previewCard');
+    const resultCard = document.getElementById('resultCard');
+    const previewImage = document.getElementById('previewImage');
+    const ocrTextDiv = document.getElementById('ocrText');
+    const translatedTextDiv = document.getElementById('translatedText');
+    const sourceLangSelect = document.getElementById('sourceLang');
+    const targetLangSelect = document.getElementById('targetLang');
+    const swapBtn = document.getElementById('swapBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const progressFill = document.getElementById('progressFill');
 
-async function fx(){
-  const r=await fetch("https://open.er-api.com/v6/latest/USD");
-  const d=await r.json();
-  usdTry=d.rates.TRY;
-}
+    let currentImageFile = null;
 
-const routes=[
-{
-  name:"São Paulo (GRU) → Istanbul (IST)",
-  airline:"Turkish Airlines",
-  stop:"Direct / Doha",
-  transit:"Transit vize gerekmez",
-  base:720,
-  demand:1.1
-},
-{
-  name:"Brasília (BSB) → Istanbul (IST)",
-  airline:"LATAM + Turkish Airlines",
-  stop:"Paris (CDG)",
-  transit:"Transit vize gerekebilir",
-  base:690,
-  demand:.95
-}
-];
+    // Dil isimleri
+    const langNames = {
+        tr: 'Türkçe', en: 'İngilizce', pt: 'Portekizce', es: 'İspanyolca',
+        fr: 'Fransızca', de: 'Almanca', it: 'İtalyanca', ru: 'Rusça',
+        ar: 'Arapça', 'zh-CN': 'Çince', ja: 'Japonca', ko: 'Korece'
+    };
 
-let activeDate=new Date();
+    // Çeviri fonksiyonu (paragraf bazlı, 500 karakter limitine dikkat)
+    async function translateText(text, sourceLang, targetLang) {
+        if (!text || text.trim() === "") return "";
+        if (sourceLang === targetLang) return text;
+        
+        try {
+            // Metni 450 karakterlik parçalara böl
+            const chunks = [];
+            for (let i = 0; i < text.length; i += 450) {
+                chunks.push(text.substring(i, i + 450));
+            }
+            
+            let translatedChunks = [];
+            for (let i = 0; i < chunks.length; i++) {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunks[i])}&langpair=${sourceLang}|${targetLang}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.responseData && data.responseData.translatedText) {
+                    let translated = data.responseData.translatedText;
+                    translated = translated.replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+                    translatedChunks.push(translated);
+                } else {
+                    translatedChunks.push(chunks[i]);
+                }
+                
+                // İlerleme göster
+                const percent = ((i + 1) / chunks.length) * 100;
+                progressFill.style.width = `${percent}%`;
+            }
+            
+            return translatedChunks.join(" ");
+        } catch (error) {
+            console.error("Çeviri hatası:", error);
+            return "❌ Çeviri hatası: " + error.message;
+        }
+    }
 
-function price(b,d,dm){
-  return b+Math.sin(d/6)*25+(Math.random()-.5)*20+dm*Math.cos(d/10)*30;
-}
+    // OCR ile fotoğraftan metin çıkarma
+    async function processImageOCR(imageFile) {
+        statusMsg.innerHTML = "📸 Fotoğraf işleniyor...";
+        progressFill.style.width = '10%';
+        
+        try {
+            // Fotoğrafı göster
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewCard.style.display = 'block';
+            };
+            reader.readAsDataURL(imageFile);
+            
+            progressFill.style.width = '30%';
+            statusMsg.innerHTML = "🔍 Yazılar okunuyor (OCR)...";
+            
+            // OCR için dil seçimi
+            let sourceLang = sourceLangSelect.value;
+            let tesseractLang = "tur+eng+por+spa+fra+deu+ita";
+            
+            if (sourceLang === "tr") tesseractLang = "tur";
+            else if (sourceLang === "en") tesseractLang = "eng";
+            else if (sourceLang === "pt") tesseractLang = "por";
+            else if (sourceLang === "es") tesseractLang = "spa";
+            else if (sourceLang === "fr") tesseractLang = "fra";
+            else if (sourceLang === "de") tesseractLang = "deu";
+            else if (sourceLang === "it") tesseractLang = "ita";
+            else if (sourceLang === "ru") tesseractLang = "rus";
+            else tesseractLang = "tur+eng+por+spa";
+            
+            const worker = await Tesseract.createWorker(tesseractLang);
+            progressFill.style.width = '60%';
+            
+            const { data: { text } } = await worker.recognize(imageFile);
+            await worker.terminate();
+            
+            progressFill.style.width = '80%';
+            
+            if (text && text.trim()) {
+                ocrTextDiv.innerHTML = text.trim();
+                statusMsg.innerHTML = "✅ OCR tamamlandı! Şimdi çevriliyor...";
+                
+                // Çeviri yap
+                const targetLang = targetLangSelect.value;
+                const sourceLangCode = sourceLangSelect.value;
+                const translated = await translateText(text.trim(), sourceLangCode, targetLang);
+                
+                translatedTextDiv.innerHTML = translated;
+                resultCard.style.display = 'block';
+                
+                progressFill.style.width = '100%';
+                statusMsg.innerHTML = "✅ Çeviri tamamlandı!";
+                setTimeout(() => { progressFill.style.width = '0%'; }, 1000);
+            } else {
+                ocrTextDiv.innerHTML = "⚠️ Fotoğrafta okunabilir metin bulunamadı.";
+                statusMsg.innerHTML = "⚠️ Metin bulunamadı, farklı bir fotoğraf deneyin.";
+                progressFill.style.width = '0%';
+            }
+            
+        } catch (err) {
+            statusMsg.innerHTML = "❌ Hata: " + err.message;
+            progressFill.style.width = '0%';
+            console.error(err);
+        }
+    }
 
-function tag(date){
-  const t=new Date();
-  const diff=Math.floor((date-t)/(86400000));
-  if(diff===0) return "BUGÜN";
-  if(diff===1) return "YARIN";
-  if(date.getDay()==0||date.getDay()==6) return "HAFTA SONU";
-  return "";
-}
-
-function openModal(r,date,usd){
-  const m=document.getElementById("modal");
-  const c=document.getElementById("modalContent");
-  c.innerHTML=`
-    <div class="modalHeader">
-      <div>${r.name}</div>
-      <div class="closeBtn" onclick="modal.style.display='none'">✕</div>
-    </div>
-    <div class="detailGrid">
-      <div class="box">${date}</div>
-      <div class="box">$${usd.toFixed(0)} / ₺${(usd*usdTry).toFixed(0)}</div>
-      <div class="box">${r.airline}</div>
-      <div class="box">${r.stop}</div>
-      <div class="box" style="grid-column:span 2">${r.transit}</div>
-    </div>
-  `;
-  m.style.display="flex";
-}
-
-function render(){
-  const app=document.getElementById("app");
-  app.innerHTML="";
-  const y=activeDate.getFullYear(), m=activeDate.getMonth();
-  const days=new Date(y,m+1,0).getDate();
-
-  routes.forEach(r=>{
-    const prices=[];
-    for(let i=1;i<=days;i++) prices.push(price(r.base,i,r.demand));
-    const min=Math.min(...prices);
-
-    const card=document.createElement("div");
-    card.className="routeCard";
-    card.innerHTML=`<div class="title">${r.name}</div>
-    <div class="info">${r.airline} • ${r.stop}</div>
-    <div class="calendar"></div>`;
-    app.appendChild(card);
-
-    const cal=card.querySelector(".calendar");
-
-    prices.forEach((usd,i)=>{
-      const d=i+1;
-      const date=new Date(y,m,d);
-      const label=date.toLocaleDateString("tr-TR",{weekday:"short",day:"numeric"});
-      const key=r.name+y+m+d;
-      const prev=memory[key];
-      memory[key]=usd;
-
-      let arrow="";
-      let flash="";
-      if(prev){
-        if(usd>prev){arrow="▲ ";flash="flash-up"}
-        if(usd<prev){arrow="▼ ";flash="flash-down"}
-      }
-
-      const div=document.createElement("div");
-      div.className=`day ${usd==min?"hm-low":"hm-mid"} ${flash}`;
-      if(usd==min) div.classList.add("cheapest");
-
-      div.innerHTML=`
-        <div>${label}</div>
-        <div class="price">${arrow}$${usd.toFixed(0)}</div>
-        <div class="price">₺${(usd*usdTry).toFixed(0)}</div>
-        ${usd==min?'<div class="tag">⭐ EN UCUZ</div>':""}
-        ${tag(date)?`<div class="tag">${tag(date)}</div>`:""}
-      `;
-
-      div.onclick=()=>openModal(r,label,usd);
-      cal.appendChild(div);
+    // Kamera ile çek
+    cameraBtn.addEventListener('click', () => {
+        cameraInput.click();
     });
-  });
-}
-
-const mp=document.getElementById("monthPicker");
-mp.value=new Date().toISOString().slice(0,7);
-mp.onchange=()=>{activeDate=new Date(mp.value);render();};
-
-async function start(){await fx();render();}
-start();
-setInterval(start,30000);
+    
+    cameraInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 50 * 1024 * 1024) {
+            statusMsg.innerHTML = "❌ Dosya çok büyük (max 50MB)";
+            return;
+        }
+        
+        currentImageFile = file;
+        await processImageOCR(file);
+        cameraInput.value = '';
+    });
+    
+    // Galeriden seç
+    galleryBtn.addEventListener('click', () => {
+        galleryInput.click();
+    });
+    
+    galleryInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 50 * 1024 * 1024) {
+            statusMsg.innerHTML = "❌ Dosya çok büyük (max 50MB)";
+            return;
+        }
+        
+        currentImageFile = file;
+        await processImageOCR(file);
+        galleryInput.value = '';
+    });
+    
+    // Dilleri değiştir
+    swapBtn.addEventListener('click', async () => {
+        const tempSource = sourceLangSelect.value;
+        const tempTarget = targetLangSelect.value;
+        sourceLangSelect.value = tempTarget;
+        targetLangSelect.value = tempSource;
+        
+        // Eğer zaten bir metin çevrildiyse tekrar çevir
+        const currentText = ocrTextDiv.innerHTML;
+        if (currentText && currentText !== "-" && !currentText.includes("bulunamadı")) {
+            statusMsg.innerHTML = "🔄 Diller değiştirildi, yeniden çevriliyor...";
+            const translated = await translateText(currentText, sourceLangSelect.value, targetLangSelect.value);
+            translatedTextDiv.innerHTML = translated;
+            statusMsg.innerHTML = "✅ Çeviri güncellendi!";
+        }
+    });
+    
+    // Temizle
+    clearBtn.addEventListener('click', () => {
+        previewCard.style.display = 'none';
+        resultCard.style.display = 'none';
+        ocrTextDiv.innerHTML = '-';
+        translatedTextDiv.innerHTML = 'Çeviri burada görünecek';
+        previewImage.src = '';
+        statusMsg.innerHTML = "✅ Temizlendi - Yeni fotoğraf çekin veya seçin";
+        progressFill.style.width = '0%';
+        currentImageFile = null;
+    });
+    
+    // Kopyala
+    copyBtn.addEventListener('click', async () => {
+        const textToCopy = translatedTextDiv.innerText;
+        if (textToCopy && textToCopy !== 'Çeviri burada görünecek') {
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                statusMsg.innerHTML = "✅ Çeviri panoya kopyalandı!";
+                setTimeout(() => {
+                    if (currentImageFile) statusMsg.innerHTML = "✅ Hazır";
+                    else statusMsg.innerHTML = "✅ Hazır - Fotoğraf çekin veya galeriden seçin";
+                }, 2000);
+            } catch (err) {
+                statusMsg.innerHTML = "❌ Kopyalama başarısız";
+            }
+        }
+    });
+    
+    // Sayfa yüklendiğinde
+    window.addEventListener('load', () => {
+        statusMsg.innerHTML = "✅ Hazır - Fotoğraf çekin veya galeriden seçin";
+    });
 </script>
-
 </body>
 </html>

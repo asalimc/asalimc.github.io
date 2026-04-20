@@ -7,24 +7,24 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Sistema de Gestão Comercial - Simone Oliveira Bonifacio">
-    <meta name="author" content="Simone Oliveira Bonifacio">
     
-    <!-- Web Manifest - TAM DÜZELTİLMİŞ -->
     <link rel="manifest" href="data:application/manifest+json,{
-        %22name%22: %22SBO%20-%20Simone%20Oliveira%20Bonifacio%22,
-        %22short_name%22: %22SBO%22,
-        %22description%22: %22Sistema de Gestão Comercial - Vendas, Estoque, Faturas e Fornecedores%22,
-        %22start_url%22: %22.%22,
+        %22background_color%22: %22%23ffffff%22,
+        %22description%22: %22Sistema%20de%20Gest%C3%A3o%20Comercial%20-%20Simone%20Oliveira%20Bonifacio%22,
+        %22dir%22: %22ltr%22,
         %22display%22: %22standalone%22,
-        %22background_color%22: %22%230f766e%22,
-        %22theme_color%22: %22%230f766e%22,
+        %22name%22: %22SBO%20-%20Simone%20Store%22,
         %22orientation%22: %22portrait%22,
+        %22scope%22: %22/%22,
+        %22short_name%22: %22SBO%22,
+        %22start_url%22: %22/%22,
+        %22theme_color%22: %22%230f766e%22,
+        %22lang%22: %22pt%22,
         %22icons%22: [
             {
                 %22src%22: %22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230f766e'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3ESBO%3C/text%3E%3C/svg%3E%22,
                 %22sizes%22: %22any%22,
-                %22type%22: %22image/svg+xml%22,
-                %22purpose%22: %22any%22
+                %22type%22: %22image/svg+xml%22
             }
         ]
     }">
@@ -67,7 +67,6 @@
             padding-bottom: 20px;
         }
         
-        /* Hamburger Menu */
         .sidebar {
             position: fixed;
             top: 0;
@@ -136,7 +135,6 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="p-5 bg-teal-dark text-white">
             <div class="flex items-center gap-3">
@@ -168,8 +166,8 @@
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-teal rounded-xl flex items-center justify-center text-white font-black text-sm">SBO</div>
                 <div>
-                    <h1 id="brand-name" class="font-bold text-xs leading-tight">Simone Oliveira</h1>
-                    <span id="system-badge" class="text-[7px] text-teal-light uppercase font-black">Bonifacio Store</span>
+                    <h1 class="font-bold text-xs leading-tight">Simone Oliveira</h1>
+                    <span class="text-[7px] text-teal-light uppercase font-black">Bonifacio Store</span>
                 </div>
             </div>
         </div>
@@ -182,7 +180,6 @@
 
     <main class="main-view no-scrollbar" id="app-content">
         
-        <!-- DASHBOARD -->
         <div id="view-dashboard" class="space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <div class="stats-card border-l-4 border-teal"><p class="text-[9px] font-bold text-slate-400">VENDAS HOJE</p><h3 id="dash-today-sales" class="text-xl font-black text-teal-dark">R$ 0,00</h3></div>
@@ -193,7 +190,6 @@
             <div class="bg-teal-dark p-5 rounded-3xl text-white"><p class="text-xs font-bold text-teal-light uppercase">PRODUTOS CRÍTICOS</p><div id="dash-critical-list" class="mt-3 space-y-2 max-h-48 overflow-y-auto text-sm"></div></div>
         </div>
 
-        <!-- POS -->
         <div id="view-pos" class="h-full flex flex-col gap-3">
             <div class="bg-teal-dark rounded-3xl p-5 text-white shadow-xl flex flex-col shrink-0 min-h-[300px]">
                 <div class="flex justify-between items-center mb-3 border-b border-teal/50 pb-2">
@@ -216,14 +212,12 @@
             </div>
         </div>
 
-        <!-- STOCK -->
         <div id="view-stock" class="space-y-4">
             <div class="flex justify-between items-center flex-wrap gap-2"><h2 class="text-xl font-black">Estoque</h2><button onclick="openProductModal()" class="btn-teal px-3 py-2 rounded-xl text-xs"><i class="fas fa-plus"></i> Novo Produto</button></div>
             <input type="text" id="stock-search" oninput="renderStock()" placeholder="Pesquisar..." class="w-full p-3 rounded-xl border border-teal/20">
             <div id="stock-list" class="grid grid-cols-1 gap-2"></div>
         </div>
 
-        <!-- INVOICES -->
         <div id="view-invoices" class="space-y-4">
             <h2 class="text-xl font-black">Faturas</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
@@ -233,19 +227,16 @@
             <div id="invoice-list" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
         </div>
 
-        <!-- FORNECEDORES (Toptancılar Portekizce) -->
         <div id="view-fornecedores" class="space-y-4">
             <div class="flex justify-between items-center"><h2 class="text-xl font-black">Fornecedores</h2><button onclick="openFornecedorModal()" class="btn-teal px-3 py-2 rounded-xl text-xs"><i class="fas fa-plus"></i> + Fornecedor</button></div>
             <div id="fornecedor-list" class="grid grid-cols-1 gap-3"></div>
         </div>
 
-        <!-- CUSTOMERS -->
         <div id="view-customers" class="space-y-4">
             <div class="flex justify-between items-center"><h2 class="text-xl font-black">Clientes</h2><button onclick="openCustomerModal()" class="btn-teal px-3 py-2 rounded-xl text-xs"><i class="fas fa-plus"></i> Novo Cliente</button></div>
             <div id="customer-list" class="grid grid-cols-1 gap-3"></div>
         </div>
 
-        <!-- FINANCE -->
         <div id="view-finance" class="space-y-5">
             <h2 class="text-xl font-black">Financeiro</h2>
             <div class="grid grid-cols-2 gap-3"><div class="stats-card"><p class="text-[9px] font-bold text-slate-400">RECEITA TOTAL</p><h3 id="fin-income" class="text-lg font-black">R$ 0,00</h3></div><div class="stats-card"><p class="text-[9px] font-bold text-slate-400">VALOR ESTOQUE</p><h3 id="fin-stock" class="text-lg font-black">R$ 0,00</h3></div></div>
@@ -268,7 +259,6 @@
             <div id="expense-list" class="space-y-2 max-h-48 overflow-y-auto"></div></div>
         </div>
 
-        <!-- REPORTS -->
         <div id="view-reports" class="space-y-5">
             <h2 class="text-xl font-black">Relatórios</h2>
             <div class="grid grid-cols-2 gap-2 mb-3">
@@ -284,7 +274,6 @@
             <div id="report-container" class="space-y-3 max-h-[55vh] overflow-y-auto"></div>
         </div>
 
-        <!-- STORE INFO -->
         <div id="view-store" class="space-y-4">
             <h2 class="text-xl font-black">Informações da Loja</h2>
             <div class="bg-white p-5 rounded-3xl shadow-sm space-y-3">
@@ -298,7 +287,6 @@
             </div>
         </div>
 
-        <!-- SETTINGS -->
         <div id="view-settings" class="space-y-4">
             <h2 class="text-xl font-black">Configurações</h2>
             <div class="bg-white p-5 rounded-3xl shadow-sm space-y-4">
@@ -315,36 +303,36 @@
     <!-- MODAIS -->
     <div id="modal-payment" class="modal-bg"><div class="modal-content p-5"><h3 class="text-xl font-black mb-3 text-teal-dark">Pagamento</h3><div class="grid grid-cols-2 gap-2 mb-4"><button onclick="finishSale('Dinheiro')" class="p-3 rounded-xl border-2 border-teal/20"><i class="fas fa-money-bill-wave text-green-600"></i><p class="font-bold text-sm">DINHEIRO</p></button><button onclick="finishSale('Cartão')" class="p-3 rounded-xl border-2 border-teal/20"><i class="fas fa-credit-card text-blue-600"></i><p class="font-bold text-sm">CARTÃO</p></button><button onclick="finishSale('PIX')" class="p-3 rounded-xl border-2 border-teal/20"><i class="fas fa-qrcode text-purple-600"></i><p class="font-bold text-sm">PIX</p></button><button onclick="finishSale('Transferência')" class="p-3 rounded-xl border-2 border-teal/20"><i class="fas fa-exchange-alt text-orange-600"></i><p class="font-bold text-sm">TRANSFERÊNCIA</p></button></div><button onclick="closeModal('modal-payment')" class="w-full py-2 text-slate-400">CANCELAR</button></div></div>
 
-    <div id="modal-product" class="modal-bg"><div class="modal-content p-4"><h3 id="p-modal-title" class="text-lg font-black mb-3">Produto</h3><div class="space-y-2"><div class="relative w-full h-32 bg-slate-100 rounded-2xl overflow-hidden border-2 border-dashed border-teal"><i class="fas fa-camera absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-400"></i><input type="file" id="p-img" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer"><div id="p-preview" class="absolute inset-0 pointer-events-none"></div></div><input type="hidden" id="p-id"><input type="text" id="p-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="text" id="p-barcode" placeholder="Código" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><select id="p-category" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><option value="Bijuteria">Bijuteria</option><option value="Acessórios">Acessórios</option><option value="Relógios">Relógios</option><option value="Outros">Outros</option></select><div class="grid grid-cols-2 gap-2"><input type="number" id="p-cost" placeholder="Preço de Custo" class="p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="p-price" placeholder="Preço de Venda" class="p-2 bg-slate-50 rounded-xl text-sm"></div><input type="number" id="p-stock" placeholder="Estoque" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveProduct()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-product')" class="bg-slate-100 px-4 rounded-xl">FECHAR</button></div></div></div></div>
+    <div id="modal-product" class="modal-bg"><div class="modal-content p-4"><h3 id="p-modal-title" class="text-lg font-black mb-3">Produto</h3><div class="space-y-2"><div class="relative w-full h-32 bg-slate-100 rounded-2xl overflow-hidden border-2 border-dashed border-teal flex items-center justify-center"><i class="fas fa-camera text-2xl text-slate-400"></i><input type="file" id="p-img" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer"><div id="p-preview" class="absolute inset-0 pointer-events-none"></div></div><input type="hidden" id="p-id"><input type="text" id="p-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="text" id="p-barcode" placeholder="Código" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><select id="p-category" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><option value="Bijuteria">Bijuteria</option><option value="Acessórios">Acessórios</option><option value="Relógios">Relógios</option><option value="Outros">Outros</option></select><div class="grid grid-cols-2 gap-2"><input type="number" id="p-cost" placeholder="Preço de Custo" class="p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="p-price" placeholder="Preço de Venda" class="p-2 bg-slate-50 rounded-xl text-sm"></div><input type="number" id="p-stock" placeholder="Estoque" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveProduct()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-product')" class="bg-slate-100 px-4 rounded-xl">FECHAR</button></div></div></div></div>
 
-    <div id="modal-customer" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3">Cliente</h3><div class="space-y-2"><input type="hidden" id="cust-id"><input type="text" id="cust-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><input type="tel" id="cust-phone" placeholder="Telefone" class="flex-1 p-2 bg-slate-50 rounded-xl text-sm"><button onclick="importFromPhonebook('customer')" class="bg-teal-light px-3 rounded-xl text-teal-dark"><i class="fas fa-address-card"></i></button></div><input type="text" id="cust-address" placeholder="Endereço" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveCustomer()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-customer')" class="bg-slate-100 px-4 rounded-xl">CANCELAR</button></div></div></div></div>
+    <div id="modal-customer" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3">Cliente</h3><div class="space-y-2"><input type="hidden" id="cust-id"><input type="text" id="cust-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><input type="tel" id="cust-phone" placeholder="Telefone" class="flex-1 p-2 bg-slate-50 rounded-xl text-sm"><button onclick="importFromPhonebook('customer')" class="bg-teal-light px-3 rounded-xl text-teal-dark"><i class="fas fa-address-book"></i></button></div><input type="text" id="cust-address" placeholder="Endereço" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveCustomer()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-customer')" class="bg-slate-100 px-4 rounded-xl">CANCELAR</button></div></div></div></div>
 
-    <div id="modal-fornecedor" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3">Fornecedor</h3><div class="space-y-2"><input type="hidden" id="fornecedor-id"><input type="text" id="fornecedor-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><input type="tel" id="fornecedor-phone" placeholder="Telefone" class="flex-1 p-2 bg-slate-50 rounded-xl text-sm"><button onclick="importFromPhonebook('fornecedor')" class="bg-teal-light px-3 rounded-xl text-teal-dark"><i class="fas fa-address-card"></i></button></div><input type="text" id="fornecedor-address" placeholder="Endereço" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveFornecedor()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-fornecedor')" class="bg-slate-100 px-4 rounded-xl">CANCELAR</button></div></div></div></div>
+    <div id="modal-fornecedor" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3">Fornecedor</h3><div class="space-y-2"><input type="hidden" id="fornecedor-id"><input type="text" id="fornecedor-name" placeholder="Nome" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><input type="tel" id="fornecedor-phone" placeholder="Telefone" class="flex-1 p-2 bg-slate-50 rounded-xl text-sm"><button onclick="importFromPhonebook('fornecedor')" class="bg-teal-light px-3 rounded-xl text-teal-dark"><i class="fas fa-address-book"></i></button></div><input type="text" id="fornecedor-address" placeholder="Endereço" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><div class="flex gap-2"><button onclick="saveFornecedor()" class="btn-teal flex-1 py-2 rounded-xl text-sm">SALVAR</button><button onclick="closeModal('modal-fornecedor')" class="bg-slate-100 px-4 rounded-xl">CANCELAR</button></div></div></div></div>
 
     <div id="modal-customer-detail" class="modal-bg"><div class="modal-content p-4"><h3 id="cd-name" class="text-lg font-black text-teal-dark"></h3><p id="cd-phone" class="text-xs text-slate-400 mb-2"></p><div id="cd-history" class="space-y-2 max-h-80 overflow-y-auto"></div><button onclick="closeModal('modal-customer-detail')" class="w-full mt-3 py-2 bg-teal-dark text-white rounded-xl text-sm">FECHAR</button></div></div>
 
-    <div id="modal-purchase-invoice" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3 text-blue-600">Fatura de Compra</h3><div class="space-y-2"><select id="purchase-product-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"></select><input type="number" id="purchase-quantity" placeholder="Quantidade" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="purchase-price" placeholder="Preço Unitário" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><button onclick="processPurchaseInvoice()" class="bg-blue-600 text-white w-full py-2 rounded-xl text-sm">REGISTRAR</button><button onclick="closeModal('modal-purchase-invoice')" class="w-full py-2 text-slate-400 text-sm">Cancelar</button></div></div></div>
+    <div id="modal-purchase-invoice" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3 text-blue-600">Fatura de Compra</h3><div class="space-y-2"><select id="purchase-product-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"></select><select id="purchase-fornecedor-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><option value="">Selecione Fornecedor</option></select><input type="number" id="purchase-quantity" placeholder="Quantidade" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="purchase-price" placeholder="Preço Unitário" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><button onclick="processPurchaseInvoice()" class="bg-blue-600 text-white w-full py-2 rounded-xl text-sm">REGISTRAR</button><button onclick="closeModal('modal-purchase-invoice')" class="w-full py-2 text-slate-400 text-sm">Cancelar</button></div></div></div>
 
-    <div id="modal-sales-invoice" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3 text-emerald-600">Fatura de Venda</h3><div class="space-y-2"><select id="sales-product-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"></select><input type="number" id="sales-quantity" placeholder="Quantidade" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="sales-price" placeholder="Preço Unitário" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><select id="sales-customer-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><option value="">Selecione Cliente</option></select><button onclick="processSalesInvoice()" class="bg-emerald-600 text-white w-full py-2 rounded-xl text-sm">REGISTRAR</button><button onclick="closeModal('modal-sales-invoice')" class="w-full py-2 text-slate-400 text-sm">Cancelar</button></div></div></div>
+    <div id="modal-sales-invoice" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3 text-emerald-600">Fatura de Venda</h3><div class="space-y-2"><select id="sales-product-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"></select><select id="sales-customer-select" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><option value="">Selecione Cliente</option></select><input type="number" id="sales-quantity" placeholder="Quantidade" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="sales-price" placeholder="Preço Unitário" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><button onclick="processSalesInvoice()" class="bg-emerald-600 text-white w-full py-2 rounded-xl text-sm">REGISTRAR</button><button onclick="closeModal('modal-sales-invoice')" class="w-full py-2 text-slate-400 text-sm">Cancelar</button></div></div></div>
 
     <div id="modal-expense" class="modal-bg"><div class="modal-content p-4"><h3 class="text-lg font-black mb-3">Despesa</h3><div class="space-y-2"><input type="text" id="expense-desc" placeholder="Descrição" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="number" id="expense-amount" placeholder="Valor" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><input type="date" id="expense-date" class="w-full p-2 bg-slate-50 rounded-xl text-sm"><button onclick="addExpense()" class="btn-teal w-full py-2 rounded-xl text-sm">ADICIONAR</button><button onclick="closeModal('modal-expense')" class="w-full py-2 text-slate-400 text-sm">Cancelar</button></div></div></div>
 
     <div id="modal-receipt" class="modal-bg"><div class="modal-content p-3 max-w-sm"><div id="receipt-content" class="receipt"></div><div class="flex gap-2 mt-3"><button onclick="sendReceiptWhatsApp()" class="btn-teal flex-1 py-2 rounded-xl text-xs"><i class="fab fa-whatsapp"></i> Enviar</button><button onclick="closeModal('modal-receipt')" class="bg-slate-100 flex-1 py-2 rounded-xl text-xs">Fechar</button></div></div></div>
 
     <script>
-        const db = new Dexie("SBO_SYSTEM_V4");
+        const db = new Dexie("SBO_SYSTEM_V5");
         db.version(1).stores({ 
             products: "++id, name, barcode, category, price, cost, stock, img", 
             customers: "++id, name, phone, address", 
             fornecedores: "++id, name, phone, address",
             sales: "++id, date, customerId, total, profit, method, items, invoiceNo",
-            invoices: "++id, date, type, customerId, fornecedorId, items, total, invoiceNo",
+            invoices: "++id, date, type, customerId, fornecedorId, fornecedorName, items, total, invoiceNo",
             expenses: "++id, description, amount, date", 
             store: "id, val",
             config: "id, val" 
         });
 
-        let cart = [], config = { company: 'Simone Oliveira Bonifacio', currency: 'R$', lowStock: 5, darkMode: false, lang: 'pt' }, currentImg = "", posGridView = false, lastReceipt = null, currentReportData = [], currentReportType = '', currentReportPeriod = '';
+        let cart = [], config = { currency: 'R$', lowStock: 5, darkMode: false, lang: 'pt' }, currentImg = "", posGridView = false, lastReceipt = null, currentReportData = [], currentReportType = '', currentReportPeriod = '';
 
         async function init() { 
             await loadConfig(); 
@@ -362,10 +350,10 @@
             }; 
             await loadCustomerSelect(); 
             await loadProductSelects();
+            await loadFornecedorSelects();
             await renderExpenses(); 
             await renderInvoices(); 
             await renderFornecedores();
-            document.getElementById('brand-name').innerText = "Simone Oliveira";
             if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
         }
         
@@ -423,7 +411,6 @@
             document.getElementById('set-low-stock').value = config.lowStock; 
             if(config.darkMode) document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
-            if(config.lang === 'tr') document.documentElement.lang = 'tr';
             updateUIText(); 
         }
         
@@ -451,7 +438,13 @@
             const select = document.getElementById('cart-customer-select'); 
             select.innerHTML = '<option value="0">Cliente Rápido</option>' + custs.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); 
             const salesSelect = document.getElementById('sales-customer-select');
-            if(salesSelect) salesSelect.innerHTML = '<option value="">Selecione Cliente</option>' + custs.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            if(salesSelect) salesSelect.innerHTML = '<option value="0">Cliente Rápido</option>' + custs.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+        
+        async function loadFornecedorSelects() { 
+            const fornecs = await db.fornecedores.toArray(); 
+            const purchaseSelect = document.getElementById('purchase-fornecedor-select'); 
+            if(purchaseSelect) purchaseSelect.innerHTML = '<option value="">Selecione Fornecedor</option>' + fornecs.map(f => `<option value="${f.id}">${f.name}</option>`).join(''); 
         }
         
         async function loadProductSelects() { 
@@ -548,16 +541,16 @@
             const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0); 
             const profit = cart.reduce((s, x) => s + ((x.price - (x.cost || 0)) * x.cQty), 0); 
             const customerId = parseInt(document.getElementById('cart-customer-select').value); 
-            let customer = null; if(customerId) customer = await db.customers.get(customerId); 
+            let customer = null; if(customerId && customerId !== 0) customer = await db.customers.get(customerId); 
             for(let item of cart) { 
                 const prod = await db.products.get(item.id); 
                 const newStock = prod.stock - item.cQty; 
                 await db.products.update(item.id, { stock: newStock }); 
             } 
             const invoiceNo = 'SAT-' + Date.now(); 
-            const sale = { date: new Date().toISOString(), customerId, total, profit, method, items: cart.map(i => ({name: i.name, qty: i.cQty, price: i.price})), invoiceNo }; 
+            const sale = { date: new Date().toISOString(), customerId: customerId || 0, total, profit, method, items: cart.map(i => ({name: i.name, qty: i.cQty, price: i.price})), invoiceNo }; 
             await db.sales.add(sale); 
-            await db.invoices.add({ date: new Date().toISOString(), type: 'sales', customerId, items: cart.map(i => ({name: i.name, qty: i.cQty, price: i.price, total: i.price * i.cQty})), total, invoiceNo }); 
+            await db.invoices.add({ date: new Date().toISOString(), type: 'sales', customerId: customerId || 0, items: cart.map(i => ({name: i.name, qty: i.cQty, price: i.price, total: i.price * i.cQty})), total, invoiceNo }); 
             closeModal('modal-payment'); 
             showReceiptModal(sale, customer); 
             clearCart(); 
@@ -588,7 +581,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); 
         }
         
-        // STOCK
         async function renderStock() { 
             const query = document.getElementById('stock-search')?.value.toLowerCase() || ''; 
             let prods = await db.products.toArray(); 
@@ -636,36 +628,38 @@
             openModal('modal-product'); 
         }
         
-        // INVOICES
         async function renderInvoices() { 
             const invoices = await db.invoices.toArray(); 
             const reversed = invoices.reverse().slice(0,30); 
             document.getElementById('invoice-list').innerHTML = reversed.map(inv => `<div class="bg-white p-3 rounded-2xl border-l-4 ${inv.type === 'purchase' ? 'border-blue-500' : 'border-emerald-500'}"><div class="flex justify-between"><span class="text-xs font-bold">${inv.type === 'purchase' ? 'COMPRA' : 'VENDA'}</span><span class="text-[9px]">${new Date(inv.date).toLocaleDateString()}</span></div><p class="font-bold text-sm">${config.currency} ${inv.total.toFixed(2).replace('.',',')}</p><p class="text-[9px] text-slate-500">${inv.items.length} produto(s)</p></div>`).join(''); 
         }
         
-        async function openPurchaseInvoiceModal() { await loadProductSelects(); openModal('modal-purchase-invoice'); }
+        async function openPurchaseInvoiceModal() { await loadProductSelects(); await loadFornecedorSelects(); openModal('modal-purchase-invoice'); }
         async function processPurchaseInvoice() { 
             const productId = parseInt(document.getElementById('purchase-product-select').value); 
+            const fornecedorId = parseInt(document.getElementById('purchase-fornecedor-select').value); 
             const qty = parseInt(document.getElementById('purchase-quantity').value); 
             const price = parseFloat(document.getElementById('purchase-price').value); 
             if(!productId || !qty || !price) { showToast('Preencha todos os campos'); return; } 
             const prod = await db.products.get(productId); 
+            let fornecedorName = '';
+            if(fornecedorId) { const f = await db.fornecedores.get(fornecedorId); fornecedorName = f ? f.name : ''; }
             const newStock = prod.stock + qty; 
             const newCost = ((prod.cost * prod.stock) + (price * qty)) / newStock; 
             await db.products.update(productId, { stock: newStock, cost: newCost }); 
-            await db.invoices.add({ date: new Date().toISOString(), type: 'purchase', items: [{ name: prod.name, qty, price, total: price * qty }], total: price * qty, invoiceNo: 'COMPRA-' + Date.now() }); 
-            await db.expenses.add({ description: `Compra: ${prod.name} (${qty} unidades)`, amount: price * qty, date: new Date().toISOString().split('T')[0] }); 
+            await db.invoices.add({ date: new Date().toISOString(), type: 'purchase', fornecedorId: fornecedorId || null, fornecedorName: fornecedorName, items: [{ name: prod.name, qty, price, total: price * qty }], total: price * qty, invoiceNo: 'COMPRA-' + Date.now() }); 
+            await db.expenses.add({ description: `Compra: ${prod.name} (${qty} unidades) - ${fornecedorName}`, amount: price * qty, date: new Date().toISOString().split('T')[0] }); 
             closeModal('modal-purchase-invoice'); 
             renderStock(); renderInvoices(); renderExpenses(); renderFinance(); 
-            showToast(`${qty} unidades adicionadas ao estoque`); 
+            showToast(`${qty} unidades adicionadas ao estoque${fornecedorName ? ' de ' + fornecedorName : ''}`); 
         }
         
         async function openSalesInvoiceModal() { await loadProductSelects(); await loadCustomerSelect(); openModal('modal-sales-invoice'); }
         async function processSalesInvoice() { 
             const productId = parseInt(document.getElementById('sales-product-select').value); 
+            const customerId = parseInt(document.getElementById('sales-customer-select').value); 
             const qty = parseInt(document.getElementById('sales-quantity').value); 
             const price = parseFloat(document.getElementById('sales-price').value); 
-            const customerId = parseInt(document.getElementById('sales-customer-select').value); 
             if(!productId || !qty || !price) { showToast('Preencha todos os campos'); return; } 
             const prod = await db.products.get(productId); 
             if(prod.stock < qty) { showToast('Estoque insuficiente!'); return; } 
@@ -679,7 +673,6 @@
             showToast(`Venda registrada: ${config.currency} ${(price*qty).toFixed(2)}`); 
         }
         
-        // FORNECEDORES
         async function renderFornecedores() { 
             const fornecs = await db.fornecedores.toArray(); 
             document.getElementById('fornecedor-list').innerHTML = fornecs.map(f => `<div class="bg-white p-3 rounded-2xl border flex justify-between items-center"><div><h4 class="font-bold text-sm">${f.name}</h4><p class="text-[9px] text-slate-400">${f.phone || '-'}</p></div><i class="fas fa-chevron-right text-teal"></i></div>`).join(''); 
@@ -701,10 +694,10 @@
             else await db.fornecedores.add(data); 
             closeModal('modal-fornecedor'); 
             renderFornecedores(); 
+            await loadFornecedorSelects();
             showToast('Fornecedor salvo'); 
         }
         
-        // CUSTOMERS
         async function renderCustomers() { 
             const custs = await db.customers.toArray(); 
             document.getElementById('customer-list').innerHTML = custs.map(c => `<div onclick="viewCustomerDetail(${c.id})" class="bg-white p-3 rounded-2xl border flex justify-between items-center"><div><h4 class="font-bold text-sm">${c.name}</h4><p class="text-[9px] text-slate-400">${c.phone || '-'}</p></div><i class="fas fa-chevron-right text-teal"></i></div>`).join(''); 
@@ -739,7 +732,6 @@
             openModal('modal-customer-detail'); 
         }
         
-        // FINANCE & EXPENSES
         async function renderFinance() { 
             const sales = await db.sales.toArray(); 
             const products = await db.products.toArray(); 
@@ -781,7 +773,6 @@
         async function deleteExpense(id) { await db.expenses.delete(id); renderExpenses(); renderFinance(); }
         function openExpenseModal() { document.getElementById('expense-desc').value = ""; document.getElementById('expense-amount').value = ""; document.getElementById('expense-date').value = new Date().toISOString().split('T')[0]; openModal('modal-expense'); }
         
-        // REPORTS
         function getDateRange(period) { 
             let start, end = new Date(); 
             const now = new Date(); 
@@ -855,7 +846,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); 
         }
         
-        // SETTINGS & BACKUP
         async function exportBackup() { 
             const allData = { products: await db.products.toArray(), customers: await db.customers.toArray(), fornecedores: await db.fornecedores.toArray(), sales: await db.sales.toArray(), invoices: await db.invoices.toArray(), expenses: await db.expenses.toArray(), store: await db.store.toArray(), config: await db.config.toArray() }; 
             const blob = new Blob([JSON.stringify(allData)], {type: 'application/json'}); 

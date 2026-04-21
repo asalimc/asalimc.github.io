@@ -1,8 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SBO - Offline</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-gradient-to-br from-[#1e3a5f] to-[#0f2b4d] flex items-center justify-center h-screen">
-<div class="text-center text-white p-8"><div class="w-28 h-28 bg-white/10 backdrop-blur rounded-3xl flex items-center justify-center mx-auto mb-6"><i class="fas fa-cloud-upload-alt text-5xl text-[#c9a03d]"></i></div><h1 class="text-2xl font-black mb-3">Você está offline</h1><p class="text-slate-300 mb-8">Conecte-se à internet para acessar o sistema</p><button onclick="location.reload()" class="bg-[#c9a03d] text-[#1e3a5f] px-8 py-3 rounded-2xl font-bold shadow-lg"><i class="fas fa-sync-alt mr-2"></i> Tentar novamente</button></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SBO Sistem - Offline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#1e3a5f] to-[#0f2b4d] flex items-center justify-center min-h-screen">
+    <div class="text-center text-white p-8 max-w-md mx-auto">
+        <div class="w-32 h-32 bg-white/10 backdrop-blur-lg rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <i class="fas fa-cloud-upload-alt text-5xl text-[#c9a03d]"></i>
+        </div>
+        <h1 class="text-3xl font-black mb-3">Você está offline</h1>
+        <p class="text-slate-300 mb-2 text-lg">Sem conexão com a internet</p>
+        <p class="text-slate-400 text-sm mb-8">Conecte-se para acessar o sistema SBO</p>
+        
+        <div class="space-y-3">
+            <button onclick="location.reload()" class="bg-[#c9a03d] text-[#1e3a5f] w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all hover:scale-105 active:scale-95">
+                <i class="fas fa-sync-alt mr-2"></i> Tentar novamente
+            </button>
+            <button onclick="window.location.href='./'" class="bg-white/10 backdrop-blur text-white w-full py-4 rounded-2xl font-semibold text-lg transition-all hover:bg-white/20">
+                <i class="fas fa-home mr-2"></i> Voltar ao início
+            </button>
+        </div>
+        
+        <div class="mt-12 pt-6 border-t border-white/20">
+            <div class="flex justify-center space-x-4 text-slate-400 text-sm">
+                <i class="fas fa-database"></i>
+                <span>Dados locais salvos</span>
+                <i class="fas fa-lock ml-2"></i>
+                <span>Segurança ativa</span>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-4">SBO - Simone Bonifacio Oliveira</p>
+        </div>
+    </div>
 </body>
 </html>

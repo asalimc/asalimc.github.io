@@ -8,26 +8,41 @@
     <style>
         :root { --navy: #001f3f; --white: #ffffff; --blue: #00d4ff; --border: 4px solid #001f3f; }
         * { box-sizing: border-box; font-family: 'Sora', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--white); margin: 0; padding: 10px; color: var(--navy); min-height: 100vh; }
+        body { background-color: var(--white); margin: 0; padding: 10px; color: var(--navy); min-height: 100vh; overflow-x: hidden; }
+        
         .header { background: var(--navy); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 0px var(--blue); }
-        .header h1 { font-size: 14px; margin: 0 0 5px 0; font-weight: 900; text-transform: uppercase; }
-        .kur-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .kur-item { background: white; border: var(--border); padding: 8px; border-radius: 10px; }
-        .kur-item label { font-size: 9px; font-weight: 900; color: var(--navy); display: block; text-transform: uppercase; }
-        .kur-item input { width: 100%; border: none; font-size: 18px; font-weight: 900; color: #d35400; outline: none; background: transparent; }
-        .card { background: var(--white); border: var(--border); border-radius: 20px; padding: 15px; box-shadow: 8px 8px 0px var(--navy); margin-bottom: 20px; }
-        h2 { font-size: 15px; font-weight: 900; margin: 0 0 12px 0; border-bottom: 4px solid var(--navy); padding-bottom: 4px; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .input-group label { font-size: 8px; font-weight: 900; display: block; margin-bottom: 4px; }
-        .input-group input { width: 100%; padding: 10px; border: 2px solid var(--navy); border-radius: 8px; font-size: 16px; font-weight: 900; }
-        .summary-box { background: #f1f5f9; padding: 12px; border-radius: 12px; border: 2.5px solid var(--navy); margin-bottom: 12px; }
-        .line { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1.5px solid #cbd5e1; font-size: 11px; }
-        .line b { font-weight: 900; color: #000; font-size: 11px; }
-        .m-head { font-size: 10px; font-weight: 900; text-transform: uppercase; color: var(--navy); margin: 10px 0 6px; border-left: 4px solid var(--blue); padding-left: 6px; background: rgba(0,212,255,0.1); }
-        .offer-line { background: #e0f2fe; padding: 4px 8px; border-radius: 4px; margin: 2px 0; border: 1px solid var(--blue); }
-        .price-row { padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: #059669; color: white; margin-bottom: 6px; }
-        .p-val { font-size: 20px; font-weight: 900; color: #ffffff; }
-        #notif-btn { background: #ff4757; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-size: 12px; margin-top: 10px; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #b3303c; }
+        .header h1 { font-size: 14px; margin: 0 0 8px 0; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .kur-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .kur-item { background: white; border: var(--border); padding: 6px; border-radius: 10px; }
+        .kur-item label { font-size: 8px; font-weight: 900; color: var(--navy); display: block; text-transform: uppercase; margin-bottom: 2px; }
+        .kur-item input { width: 100%; border: none; font-size: 16px; font-weight: 900; color: #d35400; outline: none; background: transparent; text-align: center; }
+
+        .card { background: var(--white); border: var(--border); border-radius: 20px; padding: 15px; box-shadow: 6px 6px 0px var(--navy); margin-bottom: 20px; }
+        h2 { font-size: 14px; font-weight: 900; margin: 0 0 12px 0; border-bottom: 3px solid var(--navy); padding-bottom: 4px; }
+        
+        .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 15px; }
+        .input-group label { font-size: 7.5px; font-weight: 900; display: block; margin-bottom: 3px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 8px; border: 2px solid var(--navy); border-radius: 8px; font-size: 14px; font-weight: 900; text-align: center; }
+
+        .summary-box { background: #f1f5f9; padding: 10px; border-radius: 12px; border: 2px solid var(--navy); margin-bottom: 12px; }
+        .m-head { font-size: 9px; font-weight: 900; text-transform: uppercase; color: var(--navy); margin: 8px 0 5px; border-left: 3px solid var(--blue); padding-left: 5px; background: rgba(0,212,255,0.1); }
+        
+        .line { border-bottom: 1px solid #cbd5e1; padding: 5px 0; }
+        .line:last-child { border: none; }
+        .line-label { font-size: 8.5px; font-weight: 900; color: var(--navy); text-transform: uppercase; margin-bottom: 3px; display: block; }
+        .line-values { display: flex; justify-content: space-between; font-size: 10px; color: #000; gap: 4px; }
+        .line-values b { font-weight: 900; white-space: nowrap; flex: 1; }
+        .line-values b:nth-child(2) { text-align: center; }
+        .line-values b:nth-child(3) { text-align: right; }
+
+        .offer-line { background: #e0f2fe; padding: 6px 8px; border-radius: 6px; margin: 4px 0; border: 1.5px solid var(--blue); }
+
+        .price-row { padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; background: #059669; color: white; margin-top: 10px; border: 2px solid var(--navy); }
+        .price-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .p-val-group { display: flex; justify-content: space-around; width: 100%; font-size: 13px; font-weight: 900; }
+        .p-val-group span { white-space: nowrap; flex: 1; text-align: center; }
+
+        .status-bar { font-size: 9px; color: #00d4ff; font-weight: 900; margin-top: 5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -36,17 +51,16 @@
     <header class="header">
         <h1>MASTER KAHVE TERMİNALİ</h1>
         <div class="kur-bar">
-            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="triggerAjan()"></div>
-            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" step="0.0001" oninput="triggerAjan()"></div>
+            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" step="0.01" oninput="calc()"></div>
+            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" step="0.01" oninput="calc()"></div>
         </div>
-        <button id="notif-btn" onclick="setupPush()">KORUMAYI AKTİF ET</button>
+        <div class="status-bar" id="status">CANLI VERİ AKTİF ●</div>
     </header>
     <div id="mainGrid"></div>
 </div>
 
 <script>
-    // Dinamik Değişkenler (Ajanın takip ettiği merkez)
-    const STATS = { gumruk: 0.08, igv: 0.05, kdv: 0.10, navlun: 350, sigorta: 0.015, limanMasraf: 150 };
+    const STATS = { gumruk: 0.15, navlun: 350, sigorta: 0.015, limanMasraf: 150 };
     const PRODUCTS = [
         { id: 'ara', name: 'ARABICA RIO MINAS', brl: 1191, kar: 30 },
         { id: 'rob', name: 'ROBUSTA CONILON', brl: 886, kar: 5 },
@@ -54,24 +68,18 @@
         { id: 'bou', name: 'ARABICA BOURBON', brl: 1420, kar: 10 }
     ];
 
-    async function setupPush() {
-        if ('serviceWorker' in navigator) {
-            const permission = await Notification.requestPermission();
-            if (permission === "granted") updateUI(true);
-        }
-    }
-
     async function liveUpdate() {
         try {
-            const res = await fetch('https://open.er-api.com/v6/latest/USD');
-            const data = await res.json();
-            if (data && data.rates) {
-                document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
-                document.getElementById('uBrl').value = data.rates.BRL.toFixed(4);
-                triggerAjan();
-                updateUI(true);
+            const r = await fetch('https://open.er-api.com/v6/latest/USD');
+            const d = await r.json();
+            if (d && d.rates) {
+                document.getElementById('uTry').value = d.rates.TRY.toFixed(4);
+                document.getElementById('uBrl').value = d.rates.BRL.toFixed(4);
+                document.getElementById('status').innerText = "KURLAR GÜNCELLENDİ ●";
+                calc();
+                setTimeout(() => { document.getElementById('status').innerText = "CANLI VERİ AKTİF ●"; }, 3000);
             }
-        } catch (e) { console.log("Ajan kur verisi bekliyor..."); }
+        } catch (e) { document.getElementById('status').innerText = "BAĞLANTI BEKLENİYOR..."; }
     }
 
     function createCards() {
@@ -82,28 +90,20 @@
                 <div class="card">
                     <h2>${p.name}</h2>
                     <div class="input-row">
-                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="triggerAjan()"></div>
-                        <div class="input-group"><label>TOPLAM TON</label><input type="number" id="${p.id}Ton" value="1" step="0.1" oninput="triggerAjan()"></div>
-                        <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="triggerAjan()"></div>
+                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="calc()"></div>
+                        <div class="input-group"><label>TONAJ</label><input type="number" id="${p.id}Ton" value="1" step="0.1" oninput="calc()"></div>
+                        <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="calc()"></div>
                     </div>
                     <div class="summary-box" id="${p.id}Summary"></div>
-                    <div class="price-row"><span>NET HEDEF KÂR:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
+                    <div class="price-row">
+                        <span class="price-label">KAZANÇ</span>
+                        <div class="p-val-group" id="${p.id}FinalKar"></div>
+                    </div>
                 </div>
             `;
         });
         liveUpdate();
         setInterval(liveUpdate, 60000);
-    }
-
-    function updateUI(active) {
-        const btn = document.getElementById('notif-btn');
-        btn.innerText = active ? "ANALİZ MODU AKTİF ●" : "KORUMAYI AKTİF ET";
-        btn.style.background = active ? "#059669" : "#ff4757";
-    }
-
-    // Ajan: Tüm veri girişlerini ve dış kaynak değişimlerini anında senkronize eder
-    function triggerAjan() {
-        calc();
     }
 
     function calc() {
@@ -112,39 +112,51 @@
 
         PRODUCTS.forEach(p => {
             const brl60 = parseFloat(document.getElementById(p.id + 'In').value) || 0;
-            const tonaj = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
+            const ton = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
             const kO = (parseFloat(document.getElementById(p.id + 'Kar').value) || 0) / 100;
 
-            // 1. TEMEL MALİYET HESAPLAMA (1 TON BAZ)
-            const f1Usd = (brl60 / 60) * 1000 / uBrl;
-            const c1Usd = f1Usd + STATS.navlun + (f1Usd * STATS.sigorta);
-            const d1Try = (c1Usd + STATS.limanMasraf) * 1.15 * uTry; // %15 gümrük/igv yükü ile
+            const f1U = (brl60 / 60) * 1000 / uBrl;
+            const c1U = f1U + STATS.navlun + (f1U * STATS.sigorta);
+            const d1U = (c1U + STATS.limanMasraf) * 1.15;
 
-            // 2. MÜŞTERİ TEKLİF PANELİ (TONAJLI)
-            const fobSatis = (f1Usd * (1 + kO)) * tonaj * uTry;
-            const cifSatis = (c1Usd * (1 + kO)) * tonaj * uTry;
-            const ddpSatis = d1Try * (1 + kO) * tonaj;
-
-            // 3. OPERASYONEL ÖZET
-            const toplamCebindenCikan = d1Try * tonaj;
-            const netHedefKar = toplamCebindenCikan * kO;
+            const kazancU = (d1U * ton) * kO;
+            const fobS = (f1U * (1 + kO)) * ton;
+            const cifS = (c1U * (1 + kO)) * ton;
+            const ddpS = (d1U * (1 + kO)) * ton;
 
             document.getElementById(p.id+'Summary').innerHTML = `
-                <div class="m-head">MÜŞTERİ TEKLİFİ (${tonaj} TON İÇİN)</div>
-                <div class="line offer-line">FOB (BR Çıkış): <b>₺ ${Math.round(fobSatis).toLocaleString()}</b></div>
-                <div class="line offer-line">CIF (Liman): <b>₺ ${Math.round(cifSatis).toLocaleString()}</b></div>
-                <div class="line offer-line">DDP (Kapı): <b>₺ ${Math.round(ddpSatis).toLocaleString()}</b></div>
+                <div class="m-head">TEKLİF PANELİ (${ton} TON)</div>
+                <div class="line offer-line">
+                    <span class="line-label">FOB (Brezilya Çıkış)</span>
+                    <div class="line-values"><b>₺${Math.round(fobS * uTry).toLocaleString()}</b> <b>$${Math.round(fobS).toLocaleString()}</b> <b>R$${Math.round(fobS * uBrl).toLocaleString()}</b></div>
+                </div>
+                <div class="line offer-line">
+                    <span class="line-label">CIF (Liman Teslim)</span>
+                    <div class="line-values"><b>₺${Math.round(cifS * uTry).toLocaleString()}</b> <b>$${Math.round(cifS).toLocaleString()}</b> <b>R$${Math.round(cifS * uBrl).toLocaleString()}</b></div>
+                </div>
+                <div class="line offer-line">
+                    <span class="line-label">DDP (Gümrüklü Kapı)</span>
+                    <div class="line-values"><b>₺${Math.round(ddpS * uTry).toLocaleString()}</b> <b>$${Math.round(ddpS).toLocaleString()}</b> <b>R$${Math.round(ddpS * uBrl).toLocaleString()}</b></div>
+                </div>
                 
-                <div class="m-head">OPERASYONEL MALİYET ANALİZİ</div>
-                <div class="line">Toplam Gider: <b style="color:#d35400">₺ ${Math.round(toplamCebindenCikan).toLocaleString()}</b></div>
-                <div class="line">Birim KG Maliyet: <b>${(d1Try/1000).toFixed(2)} ₺</b></div>
-                <div class="line">DDP Ton ($): <b>$ ${Math.round(d1Try/uTry).toLocaleString()}</b></div>
+                <div class="m-head">GİDER ANALİZİ</div>
+                <div class="line">
+                    <span class="line-label">TOPLAM MALİYET</span>
+                    <div class="line-values"><b>₺${Math.round(d1U * ton * uTry).toLocaleString()}</b> <b>$${Math.round(d1U * ton).toLocaleString()}</b> <b>R$${Math.round(d1U * ton * uBrl).toLocaleString()}</b></div>
+                </div>
+                <div class="line">
+                    <span class="line-label">KG MALİYET (DDP)</span>
+                    <div class="line-values"><b>₺${(d1U*uTry/1000).toFixed(2)}</b> <b>$${(d1U/1000).toFixed(2)}</b> <b>R$${(d1U*uBrl/1000).toFixed(2)}</b></div>
+                </div>
             `;
             
-            document.getElementById(p.id+'FinalTl').innerText = Math.round(netHedefKar).toLocaleString() + " ₺";
+            document.getElementById(p.id+'FinalKar').innerHTML = `
+                <span>₺${Math.round(kazancU * uTry).toLocaleString()}</span>
+                <span>$${Math.round(kazancU).toLocaleString()}</span>
+                <span>R$${Math.round(kazancU * uBrl).toLocaleString()}</span>
+            `;
         });
     }
-
     window.onload = createCards;
 </script>
 </body>

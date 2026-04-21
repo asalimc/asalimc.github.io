@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KAHVE TİCARETİ | MASTER MOBİL</title>
+    <title>MASTER KAHVE TERMİNALİ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;900&display=swap" rel="stylesheet">
     <style>
         :root { --navy: #001f3f; --white: #ffffff; --blue: #00d4ff; --border: 4px solid #001f3f; }
@@ -11,7 +11,7 @@
         body { background-color: var(--white); margin: 0; padding: 10px; color: var(--navy); width: 100%; min-height: 100vh; }
         
         .header { background: var(--navy); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 0px var(--blue); }
-        .header h1 { font-size: 14px; margin: 0 0 10px 0; font-weight: 900; text-transform: uppercase; }
+        .header h1 { font-size: 14px; margin: 0 0 5px 0; font-weight: 900; text-transform: uppercase; }
         
         .kur-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .kur-item { background: white; border: var(--border); padding: 8px; border-radius: 10px; }
@@ -29,7 +29,7 @@
         .profit-input { background: #ecfdf5 !important; border-color: #059669 !important; }
         .ton-input { background: #f0faff !important; border-color: var(--blue) !important; }
 
-        /* OKUNAKLI VE NET MALİYET ALANI */
+        /* NET VE OKUNAKLI MALİYET ALANI */
         .summary-box { background: #f1f5f9; padding: 12px; border-radius: 12px; border: 2.5px solid var(--navy); margin-bottom: 12px; }
         .line { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 2px; font-size: 11px; }
         .line b { font-weight: 900; color: #000000; font-size: 12px; letter-spacing: -0.3px; }
@@ -40,20 +40,19 @@
         .p-val { font-size: 20px; font-weight: 900; color: var(--blue); }
         .profit-final { background: #059669; border: none; }
         
-        #notif-btn { background: #ff4757; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 900; font-size: 11px; margin-top: 10px; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #b3303c; transition: all 0.2s; }
-        #notif-btn:active { transform: translateY(2px); box-shadow: none; }
+        #notif-btn { background: #ff4757; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 900; font-size: 11px; margin-top: 10px; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #b3303c; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header class="header">
-        <h1>KAHVE TİCARETİ | MASTER MOBİL</h1>
+        <h1>MASTER KAHVE TERMİNALİ</h1>
         <div class="kur-bar">
-            <div class="kur-item"><label>USD / TRY</label><input type="number" inputmode="decimal" id="uTry" value="34.35" oninput="saveAndCalc()"></div>
-            <div class="kur-item"><label>USD / BRL</label><input type="number" inputmode="decimal" id="uBrl" value="5.85" oninput="saveAndCalc()"></div>
+            <div class="kur-item"><label>USD / TRY</label><input type="number" inputmode="decimal" id="uTry" value="34.35" oninput="fullSave()"></div>
+            <div class="kur-item"><label>USD / BRL</label><input type="number" inputmode="decimal" id="uBrl" value="5.85" oninput="fullSave()"></div>
         </div>
-        <button id="notif-btn" onclick="initNotifications()">BİLDİRİM VE TİTREŞİMİ DOĞRULA</button>
+        <button id="notif-btn" onclick="activateMasterNotif()">TAM KORUMAYI AKTİF ET</button>
     </header>
     <div class="main-grid" id="mainGrid"></div>
 </div>
@@ -67,86 +66,88 @@
         { id: 'bou', name: 'ARABICA BOURBON', brl: 1420, kar: 10 }
     ];
 
-    // Gelişmiş Bildirim ve Titreşim Başlatıcı
-    async function initNotifications() {
-        if (!("Notification" in window)) {
-            alert("Tarayıcınız bildirimleri desteklemiyor.");
-            return;
-        }
-
+    // ARKA PLAN VE TİTREŞİM AKTİVATÖRÜ
+    async function activateMasterNotif() {
         const permission = await Notification.requestPermission();
-        
         if (permission === "granted") {
-            // Titreşim Testi
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
+            // Titreşim dizisi: Sert bir başlangıç
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             
-            // Görsel Geri Bildirim
-            const btn = document.getElementById('notif-btn');
-            btn.innerText = "SİSTEM AKTİF ● TİTREŞİM AÇIK";
-            btn.style.background = "#059669";
-            btn.style.boxShadow = "0 4px 0 #047857";
+            updateUI(true);
             
-            // İlk Bildirim Testi
-            new Notification("Kahve Terminali", {
-                body: "Fiyat takip sistemi başarıyla bağlandı.",
-                icon: "https://cdn-icons-png.flaticon.com/512/2933/2933932.png"
+            // Ekranı uyandırmak için görsel bildirim gönder
+            const n = new Notification("SİSTEM BAĞLANDI", {
+                body: "Kur değişimleri artık ekran kapalıyken de iletilecek.",
+                tag: "market-alert",
+                requireInteraction: true, // Kullanıcı kapatana kadar ekranda kalır
+                silent: false // Ses çalmasına izin ver
             });
         } else {
-            alert("Bildirim izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.");
+            alert("Lütfen kilit simgesinden 'Bildirimler'e izin verin!");
         }
     }
 
-    function saveAndCalc() {
+    function updateUI(active) {
+        const btn = document.getElementById('notif-btn');
+        if (active) {
+            btn.innerText = "TAM KORUMA AKTİF ● (EKRAN + SES)";
+            btn.style.background = "#059669";
+            btn.style.boxShadow = "0 4px 0 #047857";
+        }
+    }
+
+    function fullSave() {
         localStorage.setItem('uTry', document.getElementById('uTry').value);
         localStorage.setItem('uBrl', document.getElementById('uBrl').value);
+        PRODUCTS.forEach(p => {
+            localStorage.setItem(p.id + 'In', document.getElementById(p.id + 'In').value);
+            localStorage.setItem(p.id + 'Ton', document.getElementById(p.id + 'Ton').value);
+            localStorage.setItem(p.id + 'Kar', document.getElementById(p.id + 'Kar').value);
+        });
         calc();
     }
 
-    async function checkMarketData() {
+    async function checkRatesLoop() {
         try {
             const res = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await res.json();
-            
             if(data && data.rates) {
                 const oldTry = parseFloat(localStorage.getItem('uTry')) || 0;
                 const newTry = data.rates.TRY;
-                const newBrl = data.rates.BRL;
-
-                // Fiyat Değişim Alarmları
-                if (oldTry !== 0 && Math.abs(newTry - oldTry) > 0.02) {
-                    if (Notification.permission === "granted") {
-                        new Notification("KUR GÜNCELLENDİ", {
-                            body: `Dolar: ${newTry.toFixed(2)} TL | BRL: ${newBrl.toFixed(2)}`,
-                            vibrate: [200, 100, 200]
-                        });
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                    }
+                
+                // 0.02 kuruşluk bile oynama olsa ekranı yak ve titre
+                if (oldTry !== 0 && Math.abs(newTry - oldTry) > 0.02 && Notification.permission === "granted") {
+                    new Notification("KRİTİK KUR DEĞİŞİMİ!", {
+                        body: `Dolar: ${newTry.toFixed(2)} TL | Hemen kontrol et!`,
+                        requireInteraction: true,
+                        vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 170, 40, 450, 110, 200, 110, 170, 40, 450]
+                    });
+                    if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
                 }
-
                 document.getElementById('uTry').value = newTry.toFixed(2);
-                document.getElementById('uBrl').value = newBrl.toFixed(2);
-                saveAndCalc();
+                document.getElementById('uBrl').value = data.rates.BRL.toFixed(2);
+                fullSave();
             }
-        } catch (e) {
-            console.warn("Bağlantı yok, yerel verilerle devam ediliyor.");
-        }
+        } catch (e) { console.log("Veri çekilemedi."); }
     }
 
     function createCards() {
         const grid = document.getElementById('mainGrid');
         PRODUCTS.forEach(p => {
+            const sB = localStorage.getItem(p.id + 'In') || p.brl;
+            const sT = localStorage.getItem(p.id + 'Ton') || 1;
+            const sK = localStorage.getItem(p.id + 'Kar') || p.kar;
+
             grid.innerHTML += `
                 <div class="card">
                     <h2>${p.name}</h2>
                     <div class="input-row">
-                        <div class="input-group"><label>BRL/60KG</label><input type="number" inputmode="decimal" id="${p.id}In" value="${p.brl}" oninput="calc()"></div>
-                        <div class="input-group"><label>TONAJ</label><input type="number" inputmode="decimal" id="${p.id}Ton" value="1" class="ton-input" oninput="calc()"></div>
-                        <div class="input-group"><label>KÂR %</label><input type="number" inputmode="decimal" id="${p.id}Kar" value="${p.kar}" class="profit-input" oninput="calc()"></div>
+                        <div class="input-group"><label>BRL/60KG</label><input type="number" inputmode="decimal" id="${p.id}In" value="${sB}" oninput="fullSave()"></div>
+                        <div class="input-group"><label>TONAJ</label><input type="number" inputmode="decimal" id="${p.id}Ton" value="${sT}" class="ton-input" oninput="fullSave()"></div>
+                        <div class="input-group"><label>KÂR %</label><input type="number" inputmode="decimal" id="${p.id}Kar" value="${sK}" class="profit-input" oninput="fullSave()"></div>
                     </div>
                     <div class="summary-box" id="${p.id}Summary"></div>
-                    <div class="price-row"><span>TOPLAM SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
+                    <div class="price-row"><span>SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
                     <div class="price-row profit-final"><span>NET KÂR:</span><span class="p-val" id="${p.id}NetProfit" style="color:#afffd0">0 ₺</span></div>
                 </div>
             `;
@@ -156,52 +157,48 @@
             document.getElementById('uTry').value = localStorage.getItem('uTry');
             document.getElementById('uBrl').value = localStorage.getItem('uBrl');
         }
+        
+        if (Notification.permission === "granted") updateUI(true);
 
-        checkMarketData();
-        setInterval(checkMarketData, 300000); // 5 dakikada bir kontrol
+        checkRatesLoop();
+        setInterval(checkRatesLoop, 180000); // 3 dakikada bir kontrol
         calc();
     }
 
     function calc() {
-        const tryKur = parseFloat(document.getElementById('uTry').value) || 0;
-        const brlKur = parseFloat(document.getElementById('uBrl').value) || 0;
+        const tK = parseFloat(document.getElementById('uTry').value) || 0;
+        const bK = parseFloat(document.getElementById('uBrl').value) || 0;
 
         PRODUCTS.forEach(p => {
-            const brlPrice = parseFloat(document.getElementById(p.id + 'In').value) || 0;
-            const tonMiktar = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
-            const karOrani = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
+            const bP = parseFloat(document.getElementById(p.id + 'In').value) || 0;
+            const tM = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
+            const kO = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
             
-            let tonBrlVal = (brlPrice / 60) * 1000;
-            let tonUsdVal = tonBrlVal / brlKur;
-            let tonTryVal = tonUsdVal * tryKur;
-
-            let fobUsd = tonUsdVal + STATS.limanMasraf;
-            let cifUsd = (fobUsd + STATS.navlun) * (1 + STATS.sigorta);
-            let ddpUsd = cifUsd * (1 + STATS.gumruk) * (1 + STATS.igv) * (1 + STATS.kdv);
-            let ddpTry = ddpUsd * tryKur;
-
-            let kgMaliyet = ddpTry / 1000;
-            let kgSatis = kgMaliyet * (1 + (karOrani / 100));
-            let toplamSatis = kgSatis * 1000 * tonMiktar;
-            let netKar = toplamSatis - (ddpTry * tonMiktar);
+            let tBrl = (bP / 60) * 1000;
+            let tUsd = tBrl / bK;
+            let tTry = tUsd * tK;
+            let fUsd = tUsd + STATS.limanMasraf;
+            let cUsd = (fUsd + STATS.navlun) * (1 + STATS.sigorta);
+            let dTry = cUsd * (1 + STATS.gumruk) * (1 + STATS.igv) * (1 + STATS.kdv) * tK;
+            let kM = dTry / 1000;
+            let kS = kM * (1 + (kO / 100));
+            let tS = kS * 1000 * tM;
 
             document.getElementById(p.id+'Summary').innerHTML = `
-                <div class="m-head">Ham Maliyet (1 Ton)</div>
-                <div class="line">BRL Ton: <b>${Math.round(tonBrlVal).toLocaleString()} R$</b></div>
-                <div class="line">USD Ton: <b>${Math.round(tonUsdVal).toLocaleString()} $</b></div>
-                <div class="line">TRY Ton: <b>${Math.round(tonTryVal).toLocaleString()} ₺</b></div>
-                
-                <div class="m-head">Lojistik & Gümrük (USD/Ton)</div>
-                <div class="line">FOB Ton: <b>${Math.round(fobUsd).toLocaleString()} $</b></div>
-                <div class="line">CIF Ton: <b>${Math.round(cifUsd).toLocaleString()} $</b></div>
-                <div class="line">DDP (Gümrüklü): <b>${Math.round(ddpTry).toLocaleString()} ₺</b></div>
-                
-                <div class="m-head">Birim Fiyat (KG)</div>
-                <div class="line">KG Maliyet: <b>${kgMaliyet.toFixed(2)} ₺</b></div>
-                <div class="line">KG Satış: <b>${kgSatis.toFixed(2)} ₺</b></div>
+                <div class="m-head">Maliyet Analizi (1 Ton)</div>
+                <div class="line">BRL Ton: <b>${Math.round(tBrl).toLocaleString()} R$</b></div>
+                <div class="line">USD Ton: <b>${Math.round(tUsd).toLocaleString()} $</b></div>
+                <div class="line">TRY Ton: <b>${Math.round(tTry).toLocaleString()} ₺</b></div>
+                <div class="m-head">DDP & Lojistik</div>
+                <div class="line">FOB Ton: <b>${Math.round(fUsd).toLocaleString()} $</b></div>
+                <div class="line">CIF Ton: <b>${Math.round(cUsd).toLocaleString()} $</b></div>
+                <div class="line">DDP TRY: <b>${Math.round(dTry).toLocaleString()} ₺</b></div>
+                <div class="m-head">Birim (KG)</div>
+                <div class="line">KG Maliyet: <b>${kM.toFixed(2)} ₺</b></div>
+                <div class="line">KG Satış: <b>${kS.toFixed(2)} ₺</b></div>
             `;
-            document.getElementById(p.id+'FinalTl').innerText = Math.round(toplamSatis).toLocaleString() + " ₺";
-            document.getElementById(p.id+'NetProfit').innerText = Math.round(netKar).toLocaleString() + " ₺";
+            document.getElementById(p.id+'FinalTl').innerText = Math.round(tS).toLocaleString() + " ₺";
+            document.getElementById(p.id+'NetProfit').innerText = Math.round(tS - (dTry * tM)).toLocaleString() + " ₺";
         });
     }
 

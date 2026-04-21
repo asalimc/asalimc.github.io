@@ -26,7 +26,6 @@
         .m-head { font-size: 10px; font-weight: 900; text-transform: uppercase; color: var(--navy); margin: 10px 0 6px; border-left: 4px solid var(--blue); padding-left: 6px; background: rgba(0,212,255,0.1); }
         .price-row { padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--navy); color: white; margin-bottom: 6px; }
         .p-val { font-size: 20px; font-weight: 900; color: var(--blue); }
-        .profit-final { background: #059669; border: none; }
         #notif-btn { background: #ff4757; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-size: 12px; margin-top: 10px; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #b3303c; }
     </style>
 </head>
@@ -36,10 +35,10 @@
     <header class="header">
         <h1>MASTER KAHVE TERMİNALİ</h1>
         <div class="kur-bar">
-            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" oninput="fullSave()"></div>
-            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" oninput="fullSave()"></div>
+            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" oninput="analyzeChange('Dolar', this.value)"></div>
+            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" oninput="analyzeChange('Real', this.value)"></div>
         </div>
-        <button id="notif-btn" onclick="setupPush()">KORUMAYI AKTİF ET (TEST İÇİN ÇİFT TIKLA)</button>
+        <button id="notif-btn" onclick="setupPush()">KORUMAYI AKTİF ET</button>
     </header>
     <div id="mainGrid"></div>
 </div>
@@ -53,38 +52,44 @@
         { id: 'bou', name: 'ARABICA BOURBON', brl: 1420, kar: 10 }
     ];
 
+    let lastValues = {};
+
     async function setupPush() {
         if ('serviceWorker' in navigator) {
-            try {
-                const reg = await navigator.serviceWorker.register('sw.js', { scope: './' });
-                const permission = await Notification.requestPermission();
-                if (permission === "granted") {
-                    updateUI(true);
-                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                    reg.showNotification("SİSTEM AKTİF", { body: "Arka plan koruması devrede.", icon: "https://cdn-icons-png.flaticon.com/512/2933/2933932.png" });
-                }
-            } catch (e) { alert("Hata: " + e); }
+            const reg = await navigator.serviceWorker.register('sw.js', { scope: './' });
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                updateUI(true);
+                reg.showNotification("SİSTEM ANALİZE BAŞLADI", { body: "Tüm fiyat hareketleri takip ediliyor.", icon: "https://cdn-icons-png.flaticon.com/512/2933/2933932.png" });
+            }
         }
     }
 
-    // Çift tıklama testi için
-    document.getElementById('notif-btn').addEventListener('dblclick', async () => {
-        alert("5 saniye içinde ekranı kapatın, test bildirimi gelecek.");
-        const reg = await navigator.serviceWorker.ready;
-        setTimeout(() => {
-            reg.showNotification("🚨 MASTER TEST", {
-                body: "Ekran kapalıyken bildirim ve titreşim başarılı!",
-                requireInteraction: true,
-                vibrate: [500, 100, 500, 100, 500]
-            });
-        }, 5000);
-    });
+    // AKILLI ANALİZ MOTORU
+    function analyzeChange(label, newValue) {
+        const val = parseFloat(newValue);
+        const oldVal = lastValues[label] || val;
+        
+        if (val !== oldVal) {
+            const diff = val - oldVal;
+            const direction = diff > 0 ? "YÜKSELDİ 📈" : "DÜŞTÜ 📉";
+            const message = `${label} ${direction} | Eski: ${oldVal} -> Yeni: ${val}`;
+            
+            triggerNotif(label + " Hareketi!", message);
+            lastValues[label] = val;
+            fullSave();
+        }
+    }
 
-    function updateUI(active) {
-        const btn = document.getElementById('notif-btn');
-        btn.innerText = active ? "KORUMA AKTİF (ARKA PLAN) ●" : "KORUMAYI AKTİF ET";
-        btn.style.background = active ? "#059669" : "#ff4757";
-        btn.style.boxShadow = active ? "0 4px 0 #047857" : "0 4px 0 #b3303c";
+    async function triggerNotif(title, body) {
+        if (Notification.permission === "granted") {
+            const reg = await navigator.serviceWorker.ready;
+            reg.showNotification(title, {
+                body: body,
+                vibrate: [500, 100, 500],
+                requireInteraction: true
+            });
+        }
     }
 
     function fullSave() {
@@ -93,24 +98,15 @@
         calc();
     }
 
-    async function checkRates() {
+    async function autoCheck() {
         try {
             const res = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await res.json();
             if(data && data.rates) {
-                const oldTry = parseFloat(localStorage.getItem('uTry')) || 0;
-                const newTry = data.rates.TRY;
-                if (oldTry !== 0 && Math.abs(newTry - oldTry) > 0.02 && Notification.permission === "granted") {
-                    const reg = await navigator.serviceWorker.ready;
-                    reg.showNotification("KRİTİK KUR DEĞİŞİMİ", { 
-                        body: `Dolar: ${newTry.toFixed(2)} TL`, 
-                        vibrate: [500, 200, 500],
-                        requireInteraction: true 
-                    });
-                }
-                document.getElementById('uTry').value = newTry.toFixed(2);
+                analyzeChange("Dolar", data.rates.TRY.toFixed(2));
+                analyzeChange("Real", data.rates.BRL.toFixed(2));
+                document.getElementById('uTry').value = data.rates.TRY.toFixed(2);
                 document.getElementById('uBrl').value = data.rates.BRL.toFixed(2);
-                fullSave();
             }
         } catch (e) {}
     }
@@ -122,20 +118,29 @@
                 <div class="card">
                     <h2>${p.name}</h2>
                     <div class="input-row">
-                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="calc()"></div>
+                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="analyzeChange('${p.name}', this.value)"></div>
                         <div class="input-group"><label>TON</label><input type="number" id="${p.id}Ton" value="1" oninput="calc()"></div>
                         <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="calc()"></div>
                     </div>
                     <div class="summary-box" id="${p.id}Summary"></div>
                     <div class="price-row"><span>SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
-                    <div class="price-row profit-final"><span>KÂR:</span><span class="p-val" id="${p.id}NetProfit" style="color:#afffd0">0 ₺</span></div>
                 </div>
             `;
+            lastValues[p.name] = p.brl;
         });
+        lastValues['Dolar'] = parseFloat(document.getElementById('uTry').value);
+        lastValues['Real'] = parseFloat(document.getElementById('uBrl').value);
+        
         if (Notification.permission === "granted") updateUI(true);
-        checkRates();
-        setInterval(checkRates, 300000);
+        autoCheck();
+        setInterval(autoCheck, 300000);
         calc();
+    }
+
+    function updateUI(active) {
+        const btn = document.getElementById('notif-btn');
+        btn.innerText = active ? "ANALİZ MODU AKTİF ●" : "KORUMAYI AKTİF ET";
+        btn.style.background = active ? "#059669" : "#ff4757";
     }
 
     function calc() {
@@ -147,7 +152,7 @@
             const kO = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
             let tBrl = (bP / 60) * 1000;
             let tUsd = tBrl / bK;
-            let dTry = (tUsd + STATS.limanMasraf + STATS.navlun) * 1.15 * tK;
+            let dTry = (tUsd + STATS.limanMasraf + STATS.navlun) * 1.15 * tK; // Gümrük ve vergi yükü %15 varsayıldı
             let kS = (dTry / 1000) * (1 + (kO / 100));
             document.getElementById(p.id+'Summary').innerHTML = `
                 <div class="m-head">Maliyet Analizi</div>
@@ -156,7 +161,6 @@
                 <div class="line">KG Maliyet: <b>${(dTry/1000).toFixed(2)} ₺</b></div>
             `;
             document.getElementById(p.id+'FinalTl').innerText = Math.round(kS * 1000 * tM).toLocaleString() + " ₺";
-            document.getElementById(p.id+'NetProfit').innerText = Math.round((kS * 1000 * tM) - (dTry * tM)).toLocaleString() + " ₺";
         });
     }
     window.onload = createCards;

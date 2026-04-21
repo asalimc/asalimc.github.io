@@ -24,8 +24,9 @@
         .line { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1.5px solid #cbd5e1; font-size: 11px; }
         .line b { font-weight: 900; color: #000; font-size: 11px; }
         .m-head { font-size: 10px; font-weight: 900; text-transform: uppercase; color: var(--navy); margin: 10px 0 6px; border-left: 4px solid var(--blue); padding-left: 6px; background: rgba(0,212,255,0.1); }
-        .price-row { padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--navy); color: white; margin-bottom: 6px; }
-        .p-val { font-size: 20px; font-weight: 900; color: var(--blue); }
+        .offer-line { background: #e0f2fe; padding: 4px 8px; border-radius: 4px; margin: 2px 0; border: 1px solid var(--blue); }
+        .price-row { padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: #059669; color: white; margin-bottom: 6px; }
+        .p-val { font-size: 20px; font-weight: 900; color: #ffffff; }
         #notif-btn { background: #ff4757; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-size: 12px; margin-top: 10px; width: 100%; cursor: pointer; box-shadow: 0 4px 0 #b3303c; }
     </style>
 </head>
@@ -35,8 +36,8 @@
     <header class="header">
         <h1>MASTER KAHVE TERMİNALİ</h1>
         <div class="kur-bar">
-            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
-            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" step="0.0001" oninput="calc()"></div>
+            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="triggerAjan()"></div>
+            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" step="0.0001" oninput="triggerAjan()"></div>
         </div>
         <button id="notif-btn" onclick="setupPush()">KORUMAYI AKTİF ET</button>
     </header>
@@ -44,6 +45,7 @@
 </div>
 
 <script>
+    // Dinamik Değişkenler (Ajanın takip ettiği merkez)
     const STATS = { gumruk: 0.08, igv: 0.05, kdv: 0.10, navlun: 350, sigorta: 0.015, limanMasraf: 150 };
     const PRODUCTS = [
         { id: 'ara', name: 'ARABICA RIO MINAS', brl: 1191, kar: 30 },
@@ -66,9 +68,10 @@
             if (data && data.rates) {
                 document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
                 document.getElementById('uBrl').value = data.rates.BRL.toFixed(4);
-                calc();
+                triggerAjan();
+                updateUI(true);
             }
-        } catch (e) { console.log("Kur ajanı beklemede..."); }
+        } catch (e) { console.log("Ajan kur verisi bekliyor..."); }
     }
 
     function createCards() {
@@ -79,12 +82,12 @@
                 <div class="card">
                     <h2>${p.name}</h2>
                     <div class="input-row">
-                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="calc()"></div>
-                        <div class="input-group"><label>TOPLAM TON</label><input type="number" id="${p.id}Ton" value="1" step="0.1" oninput="calc()"></div>
-                        <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="calc()"></div>
+                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="triggerAjan()"></div>
+                        <div class="input-group"><label>TOPLAM TON</label><input type="number" id="${p.id}Ton" value="1" step="0.1" oninput="triggerAjan()"></div>
+                        <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="triggerAjan()"></div>
                     </div>
                     <div class="summary-box" id="${p.id}Summary"></div>
-                    <div class="price-row"><span>TOPLAM SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
+                    <div class="price-row"><span>NET HEDEF KÂR:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
                 </div>
             `;
         });
@@ -98,6 +101,11 @@
         btn.style.background = active ? "#059669" : "#ff4757";
     }
 
+    // Ajan: Tüm veri girişlerini ve dış kaynak değişimlerini anında senkronize eder
+    function triggerAjan() {
+        calc();
+    }
+
     function calc() {
         const uTry = parseFloat(document.getElementById('uTry').value) || 1;
         const uBrl = parseFloat(document.getElementById('uBrl').value) || 1;
@@ -105,41 +113,35 @@
         PRODUCTS.forEach(p => {
             const brl60 = parseFloat(document.getElementById(p.id + 'In').value) || 0;
             const tonaj = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
-            const karOrani = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
+            const kO = (parseFloat(document.getElementById(p.id + 'Kar').value) || 0) / 100;
 
-            // 1 TONLUK BAZ HESAPLAMALAR
-            const fob1TonUsd = (brl60 / 60) * 1000 / uBrl;
-            const cif1TonUsd = fob1TonUsd + STATS.navlun + (fob1TonUsd * STATS.sigorta);
-            const ddp1TonTry = (cif1TonUsd + STATS.limanMasraf) * 1.15 * uTry;
+            // 1. TEMEL MALİYET HESAPLAMA (1 TON BAZ)
+            const f1Usd = (brl60 / 60) * 1000 / uBrl;
+            const c1Usd = f1Usd + STATS.navlun + (f1Usd * STATS.sigorta);
+            const d1Try = (c1Usd + STATS.limanMasraf) * 1.15 * uTry; // %15 gümrük/igv yükü ile
 
-            // TONAJLI DİNAMİK HESAPLAMALAR (Ajan Devrede)
-            const tonFobBrl = ((brl60 / 60) * 1000) * tonaj;
-            const tonFobUsd = fob1TonUsd * tonaj;
-            const tonFobTry = tonFobUsd * uTry;
+            // 2. MÜŞTERİ TEKLİF PANELİ (TONAJLI)
+            const fobSatis = (f1Usd * (1 + kO)) * tonaj * uTry;
+            const cifSatis = (c1Usd * (1 + kO)) * tonaj * uTry;
+            const ddpSatis = d1Try * (1 + kO) * tonaj;
 
-            const tonCifUsd = cif1TonUsd * tonaj;
-            const tonCifTry = tonCifUsd * uTry;
-            const tonCifBrl = tonCifUsd * uBrl;
-
-            const tonDdpTry = ddp1TonTry * tonaj;
-            const tonDdpUsd = tonDdpTry / uTry;
-            const tonDdpBrl = tonDdpTry / (uTry / uBrl);
-
-            const kgMaliyet = ddp1TonTry / 1000;
-            const toplamSatis = tonDdpTry * (1 + (karOrani / 100));
+            // 3. OPERASYONEL ÖZET
+            const toplamCebindenCikan = d1Try * tonaj;
+            const netHedefKar = toplamCebindenCikan * kO;
 
             document.getElementById(p.id+'Summary').innerHTML = `
-                <div class="m-head">FOB (${tonaj} TON / BREZİLYA)</div>
-                <div class="line">Toplam: <b>R$ ${Math.round(tonFobBrl).toLocaleString()}</b> <b>$ ${Math.round(tonFobUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonFobTry).toLocaleString()}</b></div>
+                <div class="m-head">MÜŞTERİ TEKLİFİ (${tonaj} TON İÇİN)</div>
+                <div class="line offer-line">FOB (BR Çıkış): <b>₺ ${Math.round(fobSatis).toLocaleString()}</b></div>
+                <div class="line offer-line">CIF (Liman): <b>₺ ${Math.round(cifSatis).toLocaleString()}</b></div>
+                <div class="line offer-line">DDP (Kapı): <b>₺ ${Math.round(ddpSatis).toLocaleString()}</b></div>
                 
-                <div class="m-head">CIF (${tonaj} TON / LİMAN)</div>
-                <div class="line">Toplam: <b>$ ${Math.round(tonCifUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonCifTry).toLocaleString()}</b> <b>R$ ${Math.round(tonCifBrl).toLocaleString()}</b></div>
-                
-                <div class="m-head">DDP (${tonaj} TON / GÜMRÜKLÜ)</div>
-                <div class="line">Toplam: <b>$ ${Math.round(tonDdpUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonDdpTry).toLocaleString()}</b> <b>R$ ${Math.round(tonDdpBrl).toLocaleString()}</b></div>
-                <div class="line">Birim KG Maliyet: <b>${kgMaliyet.toFixed(2)} ₺</b></div>
+                <div class="m-head">OPERASYONEL MALİYET ANALİZİ</div>
+                <div class="line">Toplam Gider: <b style="color:#d35400">₺ ${Math.round(toplamCebindenCikan).toLocaleString()}</b></div>
+                <div class="line">Birim KG Maliyet: <b>${(d1Try/1000).toFixed(2)} ₺</b></div>
+                <div class="line">DDP Ton ($): <b>$ ${Math.round(d1Try/uTry).toLocaleString()}</b></div>
             `;
-            document.getElementById(p.id+'FinalTl').innerText = Math.round(toplamSatis).toLocaleString() + " ₺";
+            
+            document.getElementById(p.id+'FinalTl').innerText = Math.round(netHedefKar).toLocaleString() + " ₺";
         });
     }
 

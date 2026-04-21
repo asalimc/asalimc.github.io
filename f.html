@@ -22,7 +22,7 @@
         .input-group input { width: 100%; padding: 10px; border: 2px solid var(--navy); border-radius: 8px; font-size: 16px; font-weight: 900; }
         .summary-box { background: #f1f5f9; padding: 12px; border-radius: 12px; border: 2.5px solid var(--navy); margin-bottom: 12px; }
         .line { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1.5px solid #cbd5e1; font-size: 11px; }
-        .line b { font-weight: 900; color: #000; font-size: 12px; }
+        .line b { font-weight: 900; color: #000; font-size: 11px; }
         .m-head { font-size: 10px; font-weight: 900; text-transform: uppercase; color: var(--navy); margin: 10px 0 6px; border-left: 4px solid var(--blue); padding-left: 6px; background: rgba(0,212,255,0.1); }
         .price-row { padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--navy); color: white; margin-bottom: 6px; }
         .p-val { font-size: 20px; font-weight: 900; color: var(--blue); }
@@ -35,8 +35,8 @@
     <header class="header">
         <h1>MASTER KAHVE TERMİNALİ</h1>
         <div class="kur-bar">
-            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" oninput="analyzeChange('Dolar', this.value)"></div>
-            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" oninput="analyzeChange('Real', this.value)"></div>
+            <div class="kur-item"><label>USD / TRY</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
+            <div class="kur-item"><label>USD / BRL</label><input type="number" id="uBrl" value="5.85" step="0.0001" oninput="calc()"></div>
         </div>
         <button id="notif-btn" onclick="setupPush()">KORUMAYI AKTİF ET</button>
     </header>
@@ -52,89 +52,44 @@
         { id: 'bou', name: 'ARABICA BOURBON', brl: 1420, kar: 10 }
     ];
 
-    let lastValues = {};
-
     async function setupPush() {
         if ('serviceWorker' in navigator) {
-            const reg = await navigator.serviceWorker.register('sw.js', { scope: './' });
             const permission = await Notification.requestPermission();
-            if (permission === "granted") {
-                updateUI(true);
-                reg.showNotification("SİSTEM ANALİZE BAŞLADI", { body: "Tüm fiyat hareketleri takip ediliyor.", icon: "https://cdn-icons-png.flaticon.com/512/2933/2933932.png" });
-            }
+            if (permission === "granted") updateUI(true);
         }
     }
 
-    // AKILLI ANALİZ MOTORU
-    function analyzeChange(label, newValue) {
-        const val = parseFloat(newValue);
-        const oldVal = lastValues[label] || val;
-        
-        if (val !== oldVal) {
-            const diff = val - oldVal;
-            const direction = diff > 0 ? "YÜKSELDİ 📈" : "DÜŞTÜ 📉";
-            const message = `${label} ${direction} | Eski: ${oldVal} -> Yeni: ${val}`;
-            
-            triggerNotif(label + " Hareketi!", message);
-            lastValues[label] = val;
-            fullSave();
-        }
-    }
-
-    async function triggerNotif(title, body) {
-        if (Notification.permission === "granted") {
-            const reg = await navigator.serviceWorker.ready;
-            reg.showNotification(title, {
-                body: body,
-                vibrate: [500, 100, 500],
-                requireInteraction: true
-            });
-        }
-    }
-
-    function fullSave() {
-        localStorage.setItem('uTry', document.getElementById('uTry').value);
-        localStorage.setItem('uBrl', document.getElementById('uBrl').value);
-        calc();
-    }
-
-    async function autoCheck() {
+    async function liveUpdate() {
         try {
             const res = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await res.json();
-            if(data && data.rates) {
-                analyzeChange("Dolar", data.rates.TRY.toFixed(2));
-                analyzeChange("Real", data.rates.BRL.toFixed(2));
-                document.getElementById('uTry').value = data.rates.TRY.toFixed(2);
-                document.getElementById('uBrl').value = data.rates.BRL.toFixed(2);
+            if (data && data.rates) {
+                document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
+                document.getElementById('uBrl').value = data.rates.BRL.toFixed(4);
+                calc();
             }
-        } catch (e) {}
+        } catch (e) { console.log("Kur ajanı beklemede..."); }
     }
 
     function createCards() {
         const grid = document.getElementById('mainGrid');
+        grid.innerHTML = '';
         PRODUCTS.forEach(p => {
             grid.innerHTML += `
                 <div class="card">
                     <h2>${p.name}</h2>
                     <div class="input-row">
-                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="analyzeChange('${p.name}', this.value)"></div>
-                        <div class="input-group"><label>TON</label><input type="number" id="${p.id}Ton" value="1" oninput="calc()"></div>
+                        <div class="input-group"><label>BRL/60KG</label><input type="number" id="${p.id}In" value="${p.brl}" oninput="calc()"></div>
+                        <div class="input-group"><label>TOPLAM TON</label><input type="number" id="${p.id}Ton" value="1" step="0.1" oninput="calc()"></div>
                         <div class="input-group"><label>KÂR %</label><input type="number" id="${p.id}Kar" value="${p.kar}" oninput="calc()"></div>
                     </div>
                     <div class="summary-box" id="${p.id}Summary"></div>
-                    <div class="price-row"><span>SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
+                    <div class="price-row"><span>TOPLAM SATIŞ:</span><span class="p-val" id="${p.id}FinalTl">0 ₺</span></div>
                 </div>
             `;
-            lastValues[p.name] = p.brl;
         });
-        lastValues['Dolar'] = parseFloat(document.getElementById('uTry').value);
-        lastValues['Real'] = parseFloat(document.getElementById('uBrl').value);
-        
-        if (Notification.permission === "granted") updateUI(true);
-        autoCheck();
-        setInterval(autoCheck, 300000);
-        calc();
+        liveUpdate();
+        setInterval(liveUpdate, 60000);
     }
 
     function updateUI(active) {
@@ -144,25 +99,50 @@
     }
 
     function calc() {
-        const tK = parseFloat(document.getElementById('uTry').value) || 0;
-        const bK = parseFloat(document.getElementById('uBrl').value) || 0;
+        const uTry = parseFloat(document.getElementById('uTry').value) || 1;
+        const uBrl = parseFloat(document.getElementById('uBrl').value) || 1;
+
         PRODUCTS.forEach(p => {
-            const bP = parseFloat(document.getElementById(p.id + 'In').value) || 0;
-            const tM = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
-            const kO = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
-            let tBrl = (bP / 60) * 1000;
-            let tUsd = tBrl / bK;
-            let dTry = (tUsd + STATS.limanMasraf + STATS.navlun) * 1.15 * tK; // Gümrük ve vergi yükü %15 varsayıldı
-            let kS = (dTry / 1000) * (1 + (kO / 100));
+            const brl60 = parseFloat(document.getElementById(p.id + 'In').value) || 0;
+            const tonaj = parseFloat(document.getElementById(p.id + 'Ton').value) || 0;
+            const karOrani = parseFloat(document.getElementById(p.id + 'Kar').value) || 0;
+
+            // 1 TONLUK BAZ HESAPLAMALAR
+            const fob1TonUsd = (brl60 / 60) * 1000 / uBrl;
+            const cif1TonUsd = fob1TonUsd + STATS.navlun + (fob1TonUsd * STATS.sigorta);
+            const ddp1TonTry = (cif1TonUsd + STATS.limanMasraf) * 1.15 * uTry;
+
+            // TONAJLI DİNAMİK HESAPLAMALAR (Ajan Devrede)
+            const tonFobBrl = ((brl60 / 60) * 1000) * tonaj;
+            const tonFobUsd = fob1TonUsd * tonaj;
+            const tonFobTry = tonFobUsd * uTry;
+
+            const tonCifUsd = cif1TonUsd * tonaj;
+            const tonCifTry = tonCifUsd * uTry;
+            const tonCifBrl = tonCifUsd * uBrl;
+
+            const tonDdpTry = ddp1TonTry * tonaj;
+            const tonDdpUsd = tonDdpTry / uTry;
+            const tonDdpBrl = tonDdpTry / (uTry / uBrl);
+
+            const kgMaliyet = ddp1TonTry / 1000;
+            const toplamSatis = tonDdpTry * (1 + (karOrani / 100));
+
             document.getElementById(p.id+'Summary').innerHTML = `
-                <div class="m-head">Maliyet Analizi</div>
-                <div class="line">USD Ton: <b>${Math.round(tUsd).toLocaleString()} $</b></div>
-                <div class="line">DDP TRY: <b>${Math.round(dTry).toLocaleString()} ₺</b></div>
-                <div class="line">KG Maliyet: <b>${(dTry/1000).toFixed(2)} ₺</b></div>
+                <div class="m-head">FOB (${tonaj} TON / BREZİLYA)</div>
+                <div class="line">Toplam: <b>R$ ${Math.round(tonFobBrl).toLocaleString()}</b> <b>$ ${Math.round(tonFobUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonFobTry).toLocaleString()}</b></div>
+                
+                <div class="m-head">CIF (${tonaj} TON / LİMAN)</div>
+                <div class="line">Toplam: <b>$ ${Math.round(tonCifUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonCifTry).toLocaleString()}</b> <b>R$ ${Math.round(tonCifBrl).toLocaleString()}</b></div>
+                
+                <div class="m-head">DDP (${tonaj} TON / GÜMRÜKLÜ)</div>
+                <div class="line">Toplam: <b>$ ${Math.round(tonDdpUsd).toLocaleString()}</b> <b>₺ ${Math.round(tonDdpTry).toLocaleString()}</b> <b>R$ ${Math.round(tonDdpBrl).toLocaleString()}</b></div>
+                <div class="line">Birim KG Maliyet: <b>${kgMaliyet.toFixed(2)} ₺</b></div>
             `;
-            document.getElementById(p.id+'FinalTl').innerText = Math.round(kS * 1000 * tM).toLocaleString() + " ₺";
+            document.getElementById(p.id+'FinalTl').innerText = Math.round(toplamSatis).toLocaleString() + " ₺";
         });
     }
+
     window.onload = createCards;
 </script>
 </body>

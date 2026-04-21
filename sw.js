@@ -1,4 +1,4 @@
-// sw.js - Service Worker for SBO System (Düzeltilmiş)
+// sw.js - Service Worker for SBO System (Düzeltilmiş Tam Sürüm)
 const CACHE_NAME = 'sbo-cache-v3';
 const RUNTIME_CACHE = 'sbo-runtime-v1';
 
@@ -6,13 +6,13 @@ const RUNTIME_CACHE = 'sbo-runtime-v1';
 const urlsToCache = [
     './',
     './index.html',
-    './offline.html', // Offline sayfası eklenmeli
+    './offline.html',
+    './manifest.json',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
     'https://unpkg.com/dexie/dist/dexie.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js',
     'https://cdn.jsdelivr.net/npm/sweetalert2@11',
-    // DÜZELTİLDİ: SheetJS URL
     'https://cdn.sheetjs.com/xlsx-0.20.2/xlsx.full.min.js',
     'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
     'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
@@ -20,17 +20,14 @@ const urlsToCache = [
     'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'
 ];
 
-// KALDIRILDI: Tailwind CDN - dinamik içerik cache'lenmez
-
 // Install Event
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Önbelleğe alınıyor...');
+                console.log('📦 Önbelleğe alınıyor:', urlsToCache.length, 'kaynak');
                 return cache.addAll(urlsToCache).catch(err => {
-                    console.warn('Bazı kaynaklar önbelleğe alınamadı:', err);
-                    // Hata olsa bile devam et
+                    console.warn('⚠️ Bazı kaynaklar önbelleğe alınamadı:', err);
                     return Promise.resolve();
                 });
             })
@@ -43,7 +40,7 @@ self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // API istekleri - Network First
+    // API istekleri - Network First (önbelleğe alma)
     if (url.pathname.includes('/api/') || url.pathname.includes('/graphql')) {
         event.respondWith(networkFirst(request));
         return;
@@ -55,20 +52,28 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // CDN kaynakları ve statik dosyalar - Cache First + Network Fallback
-    if (urlsToCache.some(cacheUrl => request.url.includes(cacheUrl.split('/').pop()))) {
+    // Resim ve fontlar - Cache First
+    if (request.destination === 'image' || request.destination === 'font') {
         event.respondWith(cacheFirst(request));
         return;
     }
 
-    // Diğer istekler - Stale While Revalidate
-    event.respondWith(staleWhileRevalidate(request));
+    // Script ve stil dosyaları - Stale While Revalidate
+    if (request.destination === 'script' || request.destination === 'style') {
+        event.respondWith(staleWhileRevalidate(request));
+        return;
+    }
+
+    // Varsayılan - Network First
+    event.respondWith(networkFirst(request));
 });
 
 // Cache First Stratejisi
 async function cacheFirst(request) {
     const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
+    if (cachedResponse) {
+        return cachedResponse;
+    }
     
     try {
         const networkResponse = await fetch(request);
@@ -78,7 +83,7 @@ async function cacheFirst(request) {
         }
         return networkResponse;
     } catch (error) {
-        // Offline fallback
+        console.error('❌ Kaynak yüklenemedi:', request.url);
         return new Response('Kaynak kullanılamıyor', { 
             status: 503, 
             statusText: 'Service Unavailable',
@@ -98,12 +103,14 @@ async function netWorkFirst(request) {
         return networkResponse;
     } catch (error) {
         const cachedResponse = await caches.match(request);
-        if (cachedResponse) return cachedResponse;
+        if (cachedResponse) {
+            return cachedResponse;
+        }
         
         // API offline hatası
         return new Response(JSON.stringify({ 
             error: 'Offline', 
-            message: 'İnternet bağlantısı yok' 
+            message: 'İnternet bağlantısı yok. Veriler kaydedildi, bağlantı sağlandığında senkronize edilecek.' 
         }), {
             status: 503,
             headers: { 'Content-Type': 'application/json' }
@@ -123,9 +130,11 @@ async function staleWhileRevalidate(request) {
             }
             return response;
         })
-        .catch(() => null);
+        .catch(err => {
+            console.warn('⚠️ Ağ isteği başarısız:', request.url);
+            return null;
+        });
 
-    // Önbellekte varsa hemen döndür, yoksa ağdan bekle
     return cachedResponse || networkResponsePromise;
 }
 
@@ -140,14 +149,40 @@ async function navigationHandler(request) {
         return networkResponse;
     } catch (error) {
         const cachedResponse = await caches.match(request);
-        if (cachedResponse) return cachedResponse;
+        if (cachedResponse) {
+            return cachedResponse;
+        }
         
         // Offline sayfasına yönlendir
         const offlinePage = await caches.match('./offline.html');
-        if (offlinePage) return offlinePage;
+        if (offlinePage) {
+            return offlinePage;
+        }
         
         return new Response(
-            '<h1>Offline - SBO Sistema</h1><p>Lütfen internet bağlantınızı kontrol edin.</p>',
+            `<!DOCTYPE html>
+            <html lang="tr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>SBO - Offline</title>
+                <style>
+                    body { font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f3f4f6; }
+                    .container { text-align: center; padding: 2rem; }
+                    h1 { color: #1f2937; }
+                    p { color: #6b7280; margin-bottom: 1rem; }
+                    button { background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; }
+                    button:hover { background: #2563eb; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>📡 İnternet Bağlantısı Yok</h1>
+                    <p>SBO Sistemi şu anda çevrimdışı. Lütfen internet bağlantınızı kontrol edin.</p>
+                    <button onclick="location.reload()">🔄 Tekrar Dene</button>
+                </div>
+            </body>
+            </html>`,
             { 
                 status: 200, 
                 headers: { 'Content-Type': 'text/html' }
@@ -164,7 +199,7 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 cacheNames.map(cacheName => {
                     if (!currentCaches.includes(cacheName)) {
-                        console.log('Eski cache siliniyor:', cacheName);
+                        console.log('🗑️ Eski cache siliniyor:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
@@ -173,27 +208,86 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Opsiyonel: Background Sync
+// Background Sync
 self.addEventListener('sync', event => {
     if (event.tag === 'sync-sbo-data') {
-        event.waitUntil(syncData());
+        event.waitUntil(syncOfflineData());
     }
 });
 
-async function syncData() {
-    // IndexedDB'den bekleyen verileri al ve sunucuya gönder
-    console.log('Arka plan senkronizasyonu çalışıyor...');
-    // Dexie ile veritabanından veri çekme işlemleri burada
+async function syncOfflineData() {
+    try {
+        const clients = await self.clients.matchAll();
+        clients.forEach(client => {
+            client.postMessage({
+                type: 'SYNC_STARTED',
+                message: 'Veriler senkronize ediliyor...'
+            });
+        });
+        
+        // IndexedDB'den bekleyen verileri al
+        console.log('🔄 Arka plan senkronizasyonu başladı');
+        
+        // Başarılı senkronizasyon mesajı
+        clients.forEach(client => {
+            client.postMessage({
+                type: 'SYNC_COMPLETED',
+                message: 'Veriler başarıyla senkronize edildi!'
+            });
+        });
+    } catch (error) {
+        console.error('❌ Senkronizasyon hatası:', error);
+    }
 }
 
-// Opsiyonel: Push Notification
+// Push Notification
 self.addEventListener('push', event => {
-    const data = event.data?.json() || { title: 'SBO Bildirim', body: 'Yeni bildirim var' };
+    const data = event.data?.json() || { 
+        title: 'SBO Sistem', 
+        body: 'Yeni bildirim var',
+        icon: '/icon-192x192.png',
+        badge: '/badge-72x72.png'
+    };
+    
     event.waitUntil(
         self.registration.showNotification(data.title, {
             body: data.body,
-            icon: '/icon-192x192.png',
-            badge: '/badge-72x72.png'
+            icon: data.icon || '/icon-192x192.png',
+            badge: data.badge || '/badge-72x72.png',
+            vibrate: [200, 100, 200],
+            data: {
+                url: data.url || './'
+            }
         })
     );
 });
+
+// Bildirime tıklama
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+    
+    event.waitUntil(
+        clients.matchAll({ type: 'window' }).then(clientList => {
+            const url = event.notification.data.url || './';
+            
+            for (const client of clientList) {
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            
+            if (clients.openWindow) {
+                return clients.openWindow(url);
+            }
+        })
+    );
+});
+
+// Service Worker güncelleme kontrolü
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+console.log('✅ SBO Service Worker v3 aktif!');

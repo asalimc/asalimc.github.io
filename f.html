@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ASC CAFÉ | Real-Time Terminal</title>
+    <title>ASC CAFÉ | Global Trading Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Sora:wght@800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -22,13 +22,12 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; color: var(--text); }
 
-        /* Arayüz */
         .app-header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
         .brand { font-family: 'Sora', sans-serif; font-size: 20px; letter-spacing: 6px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
 
         .market-bar { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; background: #000; }
         .market-card { background: var(--surface); padding: 12px; border-radius: 8px; min-width: 140px; flex: 1; border: 1px solid var(--border); }
-        .market-card label { font-size: 8px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 4px; }
+        .market-card label { font-size: 8px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
         .market-card input { width: 100%; border: none; font-size: 16px; font-weight: 800; color: #fff; background: transparent; outline: none; }
         .market-card.loading { opacity: 0.5; animation: pulse 1.5s infinite; }
 
@@ -36,19 +35,19 @@
 
         .container { padding: 20px 15px 100px; max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
         .product-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .product-card h2 { font-size: 13px; margin: 0 0 15px; color: var(--primary); font-weight: 800; border-left: 3px solid var(--primary); padding-left: 12px; text-transform: uppercase; }
+        .product-card h2 { font-size: 13px; margin: 0 0 15px; color: var(--primary); font-weight: 800; border-left: 3px solid var(--primary); padding-left: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .input-box { background: #1a1c1e; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-        .input-box label { display: block; font-size: 9px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; }
+        .input-box label { display: block; font-size: 9px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
         .input-box input { width: 100%; border: none; background: transparent; font-size: 17px; font-weight: 700; color: #fff; outline: none; }
 
         .quick-ton { display: flex; gap: 8px; margin-bottom: 15px; }
-        .quick-ton button { flex: 1; padding: 12px; font-size: 10px; font-weight: 800; background: #3f444a; border: none; border-radius: 6px; color: #fff; cursor: pointer; }
+        .quick-ton button { flex: 1; padding: 12px; font-size: 10px; font-weight: 800; background: #3f444a; border: none; border-radius: 6px; color: #fff; cursor: pointer; text-transform: uppercase; }
         .quick-ton button:active { background: var(--primary); color: #000; }
 
         .res-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
-        .res-item label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .res-item label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .res-val b { font-size: 16px; color: var(--primary); }
 
         .profit-analysis { margin-top: 15px; background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; border: 1px solid var(--success); }
@@ -57,25 +56,24 @@
 
         .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: var(--primary); color: #000; border-radius: 50%; border: none; font-size: 28px; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.5); z-index: 99; cursor: pointer; }
 
-        /* Modal */
+        /* Modal & PDF Styling */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 1000; overflow-y: auto; }
         .modal-content { width: 100%; max-width: 900px; margin: 0 auto; padding: 10px; }
         .modal-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 1001; }
         .btn { padding: 15px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
 
-        /* PDF Görünümü */
         #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 50px; color: #000; position: relative; overflow: hidden; font-family: 'Times New Roman', serif; }
         
         .pdf-watermark-container {
-            position: absolute; top: 280px; left: 0; width: 100%; height: 500px;
+            position: absolute; top: 300px; left: 0; width: 100%; height: 450px;
             display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-            pointer-events: none; opacity: 0.04; transform: rotate(-30deg) scale(1.2); z-index: 1; 
+            pointer-events: none; opacity: 0.04; transform: rotate(-30deg) scale(1.3); z-index: 1; 
         }
         .wm-text { font-size: 55px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
 
-        .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 5px solid #000; padding-bottom: 20px; margin-bottom: 30px; position: relative; z-index: 2; }
+        .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 30px; position: relative; z-index: 2; }
         .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; position: relative; z-index: 2; }
-        .pdf-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; text-align: left; font-size: 11px; font-weight: 900; }
+        .pdf-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; text-align: left; font-size: 10px; font-weight: 900; text-transform: uppercase; }
         .pdf-table td { border: 1px solid #000; padding: 12px; font-size: 13px; font-weight: 700; }
 
         @media (min-width: 768px) {
@@ -94,22 +92,22 @@
     </header>
 
     <div class="market-bar">
-        <div class="market-card" id="uTryCard"><label>USD/TRY (ANLIK)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
+        <div class="market-card" id="uTryCard"><label>USD / TRY (LIVE)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
         <div class="market-card"><label>NY ARABICA (LB)</label><input type="number" id="iceNy" value="288.45" oninput="calc()"></div>
         <div class="market-card"><label>LDN ROBUSTA (MT)</label><input type="number" id="iceLdn" value="3339" oninput="calc()"></div>
     </div>
 
     <main class="container" id="mainGrid"></main>
 
-    <button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-invoice"></i></button>
+    <button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-contract"></i></button>
 
     <div id="modal">
         <div class="modal-content">
             <div class="modal-actions">
-                <button class="btn" style="background:#444; color:white;" onclick="hidePdf()">KAPAT</button>
-                <button class="btn" style="background:#d4af37; color:black;" onclick="downloadPdf()">PDF KAYDET</button>
+                <button class="btn" style="background:#444; color:white;" onclick="hidePdf()">CLOSE</button>
+                <button class="btn" style="background:#d4af37; color:black;" onclick="downloadPdf()">EXPORT PDF</button>
                 <button class="btn" style="background:#2563eb; color:white;" onclick="shareWhatsapp()">WHATSAPP</button>
-                <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">YAZDIR</button>
+                <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">PRINT</button>
             </div>
             <div class="pdf-wrapper" style="display:flex; justify-content:center;">
                 <div id="pdfPage">
@@ -122,31 +120,27 @@
 
     <script>
         const PRODUCTS = [
-            { id: 'ar', name: 'ARABICA NY GREEN COFFEE BEANS', type: 'NY' },
-            { id: 'ro', name: 'ROBUSTA CONILON BRAZILIAN SELECT', type: 'LDN' }
+            { id: 'ar', name: 'PREMIUM ARABICA NY GREEN COFFEE', type: 'NY' },
+            { id: 'ro', name: 'SELECTED ROBUSTA CONILON BRAZIL', type: 'LDN' }
         ];
 
-        // --- Kökten Çözüm: Canlı Kur Fonksiyonu ---
         async function updateLiveRates() {
             const card = document.getElementById('uTryCard');
             card.classList.add('loading');
             try {
-                // Tarayıcı önbelleğini aşmak için timestamp ekliyoruz
                 const response = await fetch('https://open.er-api.com/v6/latest/USD?t=' + Date.now());
                 const data = await response.json();
                 if (data.rates && data.rates.TRY) {
                     document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
-                    console.log("Kur Güncellendi: " + data.rates.TRY);
-                    calc(); // Kurlar değişince tüm hesapları yenile
+                    calc();
                 }
             } catch (error) {
-                console.error("Kur çekilemedi, manuel değere devam ediliyor.");
+                console.error("Currency sync failed.");
             } finally {
                 card.classList.remove('loading');
             }
         }
 
-        // Periyodik olarak her 5 dakikada bir güncelle
         setInterval(updateLiveRates, 300000);
 
         function generateRef() { return "ASC-" + Math.random().toString(36).substring(2, 9).toUpperCase(); }
@@ -176,12 +170,12 @@
                     <div class="product-card">
                         <h2>${p.name}</h2>
                         <div class="input-row">
-                            <div class="input-box"><label>TONAJ (MT)</label><input type="number" id="${p.id}T" value="1" oninput="calc()"></div>
-                            <div class="input-box"><label>KÂR %</label><input type="number" id="${p.id}K" value="15" oninput="calc()"></div>
+                            <div class="input-box"><label>VOLUME (MT)</label><input type="number" id="${p.id}T" value="1" oninput="calc()"></div>
+                            <div class="input-box"><label>PROFIT %</label><input type="number" id="${p.id}K" value="15" oninput="calc()"></div>
                         </div>
                         <div class="quick-ton">
-                            <button onclick="setTon('${p.id}', 1)">1T</button>
-                            <button onclick="setTon('${p.id}', 19.2)">19.2T</button>
+                            <button onclick="setTon('${p.id}', 1)">1 MT (LCL)</button>
+                            <button onclick="setTon('${p.id}', 19.2)">19.2 MT (FCL)</button>
                         </div>
                         <div id="${p.id}Results"></div>
                     </div>
@@ -194,18 +188,18 @@
             PRODUCTS.forEach(p => {
                 const d = getCalculations(p.id, p.type);
                 document.getElementById(p.id+'Results').innerHTML = `
-                    <div class="res-item"><label>FOB TOTAL</label><div class="res-val"><b>$${Math.round(d.fob*d.ton).toLocaleString()}</b></div></div>
-                    <div class="res-item"><label>CIF TOTAL</label><div class="res-val"><b>$${Math.round(d.cif*d.ton).toLocaleString()}</b></div></div>
-                    <div class="res-item" style="border:none"><label>DDP TOTAL</label><div class="res-val"><b>$${Math.round(d.ddp*d.ton).toLocaleString()}</b></div></div>
+                    <div class="res-item"><label>FOB TOTAL</label><div class="res-val"><b>$ ${Math.round(d.fob*d.ton).toLocaleString()}</b></div></div>
+                    <div class="res-item"><label>CIF TOTAL</label><div class="res-val"><b>$ ${Math.round(d.cif*d.ton).toLocaleString()}</b></div></div>
+                    <div class="res-item" style="border:none"><label>DDP TOTAL</label><div class="res-val"><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></div></div>
                     <div class="profit-analysis">
-                        <div class="p-grid"><small style="font-weight:800; color:var(--success)">KÂR TAHMİNİ (USD)</small><b>$${Math.round(d.profit).toLocaleString()}</b></div>
+                        <div class="p-grid"><small style="font-weight:800; color:var(--success)">ESTIMATED MARGIN (USD)</small><b>$ ${Math.round(d.profit).toLocaleString()}</b></div>
                     </div>
                 `;
             });
         }
 
         function showPdf() {
-            const client = prompt("Müşteri/Firma İsmi:") || "DEĞERLİ İŞ ORTAĞIMIZ";
+            const client = prompt("Client / Company Name:") || "VALUED BUSINESS PARTNER";
             const refNo = generateRef();
             document.getElementById('wmGrid').innerHTML = Array(9).fill('<div class="wm-text">ASC CAFÉ</div>').join('');
 
@@ -213,16 +207,16 @@
                 <div class="pdf-header">
                     <div>
                         <h1 style="margin:0; font-size:38px; color:#000;">ASC CAFÉ</h1>
-                        <p style="font-size:11px; font-weight:900; color:#333; margin:5px 0;">GLOBAL COFFEE SUPPLY & TRADE HUB</p>
+                        <p style="font-size:11px; font-weight:900; color:#333; margin:5px 0; letter-spacing:1px;">GLOBAL COFFEE SUPPLY & TRADE HUB</p>
                     </div>
                     <div style="text-align:right">
-                        <div style="background:#000; color:#fff; padding:8px 15px; font-weight:900; font-size:12px; margin-bottom:10px;">REF: ${refNo}</div>
-                        <p style="font-size:12px; margin:0; font-weight:bold;">TARİH: ${new Date().toLocaleDateString('tr-TR')}</p>
+                        <div style="background:#000; color:#fff; padding:8px 15px; font-weight:900; font-size:12px; margin-bottom:10px;">OFFER REF: ${refNo}</div>
+                        <p style="font-size:12px; margin:0; font-weight:bold;">DATE: ${new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}</p>
                     </div>
                 </div>
                 
                 <div style="margin-bottom:35px; position:relative; z-index:2;">
-                    <p style="font-size:13px; font-weight:bold; color:#555; margin-bottom:5px;">TEKLİF SUNULAN:</p>
+                    <p style="font-size:13px; font-weight:bold; color:#555; margin-bottom:5px;">OFFER PREPARED FOR:</p>
                     <p style="font-size:18px; margin:0; font-weight:bold; text-decoration:underline;">${client.toUpperCase()}</p>
                 </div>
             `;
@@ -233,27 +227,28 @@
                     <div style="margin-bottom:30px; position:relative; z-index:2;">
                         <div style="background:#000; color:#fff; padding:6px 12px; font-size:13px; font-weight:bold; margin-bottom:1px;">${p.name} - ${d.ton} MT</div>
                         <table class="pdf-table">
-                            <tr><th>INCOTERM 2020</th><th>BİRİM (KG/USD)</th><th>TOPLAM (USD)</th><th>TOPLAM (TRY)</th></tr>
-                            <tr><td>FOB (Free On Board)</td><td>$${(d.fob/1000).toFixed(2)}</td><td>$${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
-                            <tr><td>CIF (Cost, Ins, Freight)</td><td>$${(d.cif/1000).toFixed(2)}</td><td>$${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
-                            <tr style="background:#f9f9f9;"><td><b>DDP (Delivered Duty Paid)</b></td><td><b>$${(d.ddp/1000).toFixed(2)}</b></td><td><b>$${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
+                            <tr><th>INCOTERM 2020</th><th>UNIT PRICE (KG/USD)</th><th>TOTAL VALUE (USD)</th><th>LOCAL EST. (TRY)</th></tr>
+                            <tr><td>FOB (Free On Board)</td><td>$ ${(d.fob/1000).toFixed(2)}</td><td>$ ${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
+                            <tr><td>CIF (Cost, Ins, Freight)</td><td>$ ${(d.cif/1000).toFixed(2)}</td><td>$ ${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
+                            <tr style="background:#f9f9f9;"><td><b>DDP (Delivered Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
                         </table>
                     </div>`;
             });
 
             html += `
                 <div style="font-size:10.5px; padding:15px; border:1px solid #000; line-height:1.6; position:relative; z-index:2; margin-top:20px; background:#fff;">
-                    <b style="border-bottom:1px solid #000;">ULUSLARARASI TİCARİ KOŞULLAR VE YASAL ŞERHLER:</b><br>
-                    • <b>FOB:</b> Yükleme satıcıya, nakliye ve sigorta sorumluluğu alıcıya aittir.<br>
-                    • <b>CIF:</b> Nakliye ve temel sigorta dahil varış limanı teslimidir.<br>
-                    • <b>DDP:</b> Gümrükleme, tüm vergiler ve harçlar dahil kapı teslimidir.<br>
-                    • Emtia borsa hareketliliği nedeniyle işbu resmi teklif <b>48 saat</b> geçerlidir.
+                    <b style="border-bottom:1px solid #000; text-transform:uppercase;">International Trade Terms & Legal Clauses:</b><br>
+                    • <b>Incoterms:</b> All prices are based on ICC Incoterms® 2020 standards.<br>
+                    • <b>FOB:</b> Loading & local customs by seller. Freight & insurance by buyer.<br>
+                    • <b>CIF:</b> Freight and basic marine insurance included to destination port.<br>
+                    • <b>DDP:</b> All import duties, taxes, and final delivery included to buyer's warehouse.<br>
+                    • <b>Validity:</b> Due to market volatility, this official quote is valid for <b>48 hours</b>.
                 </div>
                 
-                <div style="margin-top:50px; display:flex; justify-content:space-between; font-size:12px; font-weight:bold; position:relative; z-index:2;">
-                    <div>TÜRKİYE: +90 544 590 60 14</div>
+                <div style="margin-top:50px; display:flex; justify-content:space-between; font-size:11px; font-weight:bold; position:relative; z-index:2;">
+                    <div>TURKEY HQ: +90 544 590 60 14</div>
                     <div>BRASILIA DF: +55 19 981 55 29 42</div>
-                    <div style="text-align:center; border-top:1px solid #000; min-width:150px; padding-top:5px;">ASC OFFICIAL STAMP</div>
+                    <div style="text-align:center; border-top:1px solid #000; min-width:160px; padding-top:5px;">ASC OFFICIAL EXECUTION</div>
                 </div>
             `;
             document.getElementById('pdfInner').innerHTML = html;
@@ -266,11 +261,11 @@
             const el = document.getElementById('pdfPage');
             html2pdf().set({ margin:0, filename:'ASC_Official_Offer.pdf', html2canvas:{scale:3}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} }).from(el).save();
         }
-        function shareWhatsapp() { window.open(`https://wa.me/?text=${encodeURIComponent("ASC CAFÉ Kurumsal Teklif Referans No ile oluşturulmuştur.")}`, '_blank'); }
+        function shareWhatsapp() { window.open(`https://wa.me/?text=${encodeURIComponent("ASC CAFÉ: Your official export offer has been generated with Ref No.")}`, '_blank'); }
         
         window.onload = () => {
             build();
-            updateLiveRates(); // Sayfa açılır açılmaz kurları çek
+            updateLiveRates();
         };
     </script>
 </body>

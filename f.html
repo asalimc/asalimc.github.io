@@ -131,59 +131,69 @@
             z-index: 999;
         }
 
-        /* MODAL & PDF RESPONSIVE */
+        /* MODAL & PDF RESPONSIVE FIX */
         #modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .modal-content {
             width: 100%;
             max-width: 850px;
-            margin: 20px auto;
-            padding: 10px;
+            margin: 0 auto;
+            padding: 15px;
         }
         .modal-actions {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 0 0 15px 15px;
         }
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+        .btn { padding: 14px; border-radius: 10px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; }
 
-        /* PDF SCALING FOR MOBILE */
-        .pdf-container {
+        /* AKILLI ÖLÇEKLENDİRME KONTEYNIRI */
+        .pdf-wrapper {
             width: 100%;
-            overflow-x: auto; /* Mobilde taşarsa kaydırılabilir */
-            background: #ccc;
-            border-radius: 8px;
+            overflow-x: hidden; /* Taşmayı engelle */
             display: flex;
             justify-content: center;
-        }
-        #pdfPage {
-            background: white;
-            width: 794px; /* A4 Genişliği */
-            min-height: 1123px;
-            padding: 50px;
-            transform-origin: top center;
+            background: transparent;
         }
 
-        @media (max-width: 800px) {
-            #pdfPage {
-                transform: scale(0.42); /* Mobilde PDF'i ekrana sığdır */
-                margin-bottom: -650px; /* Transform sonrası boşluğu temizle */
-            }
+        #pdfPage {
+            background: white;
+            width: 794px; /* Standart A4 Genişliği */
+            min-height: 1123px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transform-origin: top center; /* Üst ortadan küçült */
+        }
+
+        /* MOBİL İÇİN OTOMATİK ÖLÇEKLEME */
+        @media (max-width: 820px) {
             .modal-actions { grid-template-columns: 1fr; }
+            #pdfPage {
+                /* Ekran genişliğine göre dinamik küçültme */
+                transform: scale(calc(100vw / 860)); 
+                margin-bottom: -600px; /* Transform sonrası oluşan boşluğu temizle */
+            }
         }
 
         @media (min-width: 768px) {
             .container { grid-template-columns: 1fr 1fr; }
         }
 
-        /* PDF TABLE & TYPOGRAPHY */
+        /* PDF TABLO STİLLERİ */
         .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .pdf-table th { background: #f8fafc; border: 1px solid #000; padding: 10px; text-align: left; font-size: 10px; }
         .pdf-table td { border: 1px solid #000; padding: 12px; font-size: 12px; font-weight: 700; }
@@ -208,29 +218,39 @@
     <div id="modal">
         <div class="modal-content">
             <div class="modal-actions">
-                <button class="btn" style="background:#f1f5f9;" onclick="hidePdf()">KAPAT</button>
+                <button class="btn" style="background:#f1f5f9; color:#0f172a;" onclick="hidePdf()">KAPAT</button>
                 <button class="btn" style="background:#2563eb; color:white;" onclick="downloadPdf()">KAYDET (PDF)</button>
                 <button class="btn" style="background:#059669; color:white;" onclick="window.print()">YAZDIR</button>
             </div>
-            <div class="pdf-container">
+            <div class="pdf-wrapper">
                 <div id="pdfPage">
-                    <div style="border-bottom:4px solid #1e3a8a; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between;">
+                    <div style="border-bottom:4px solid #1e3a8a; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <h1 style="margin:0; font-family:'Sora'; color:#1e3a8a;">ASC GLOBAL</h1>
-                            <p style="font-size:12px; font-weight:700; color:#64748b;">Dış Ticaret ve Lojistik</p>
+                            <h1 style="margin:0; font-family:'Sora'; color:#1e3a8a; font-size:28px;">ASC GLOBAL</h1>
+                            <p style="font-size:12px; font-weight:700; color:#64748b; margin:5px 0;">Global Supply & Trade</p>
                         </div>
                         <div style="text-align:right">
-                            <div style="border:2px solid #000; padding:10px; font-weight:900;">TEKLİF FORMU</div>
-                            <p id="dDate" style="font-size:10px; margin-top:5px;"></p>
+                            <div style="border:2px solid #000; padding:8px 15px; font-weight:900; font-size:14px;">RESMİ TEKLİF</div>
+                            <p id="dDate" style="font-size:10px; margin-top:5px; font-weight:600;"></p>
                         </div>
                     </div>
-                    <div id="dClient" style="background:#f1f5f9; padding:15px; font-weight:800; margin-bottom:30px; border:1px solid #000;">SAYIN: </div>
+                    <div id="dClient" style="background:#f1f5f9; padding:15px; font-weight:800; margin-bottom:30px; border:1px solid #000; font-size:16px;">SAYIN: </div>
                     <div id="dContent"></div>
-                    <div style="margin-top:50px; font-size:11px; background:#f8fafc; padding:20px; border:1px solid #e2e8f0;">
-                        <b>NOTLAR:</b><br>
-                        • Fiyatlar anlık borsa verileri baz alınarak hesaplanmıştır.<br>
-                        • Teklif, resmi proforma fatura düzenlenene kadar geçerlidir.<br>
-                        • Lojistik süreçleri Incoterms 2020 standartlarındadır.
+                    <div style="margin-top:40px; font-size:11px; background:#f8fafc; padding:20px; border:1px solid #e2e8f0; line-height:1.6;">
+                        <b style="color:#1e3a8a;">ŞARTLAR VE NOTLAR:</b><br>
+                        • Teklifteki fiyatlar anlık borsa ve döviz verilerine göre hesaplanmış olup bağlayıcı değildir.<br>
+                        • Kesin fiyatlandırma sipariş onayındaki proforma fatura ile netleşecektir.<br>
+                        • Lojistik maliyetleri Incoterms 2020 standartlarına göre düzenlenmiştir.
+                    </div>
+                    <div style="margin-top:60px; display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="font-size:11px; font-weight:600;">
+                            İletişim:<br>
+                            TR: +90 544 590 60 14<br>
+                            BR: +55 19 981 55 29 42
+                        </div>
+                        <div style="text-align:center; border-top:1px solid #000; width:200px; padding-top:10px; font-size:11px; font-weight:800;">
+                            Authorized Signature
+                        </div>
                     </div>
                 </div>
             </div>
@@ -240,8 +260,8 @@
     <script>
         const CONSTS = { navlun: 350, sigorta: 0.015, liman: 150 };
         const ITEMS = [
-            { id: 'ar', name: 'ARABICA NY BEANS', type: 'NY' },
-            { id: 'ro', name: 'ROBUSTA CONILON', type: 'LDN' }
+            { id: 'ar', name: 'ARABICA NY GREEN COFFEE', type: 'NY' },
+            { id: 'ro', name: 'ROBUSTA CONILON PREMIUM', type: 'LDN' }
         ];
 
         async function start() {
@@ -257,7 +277,7 @@
                 ]);
                 document.getElementById('iceNy').value = JSON.parse((await ny.json()).contents).chart.result[0].meta.regularMarketPrice;
                 document.getElementById('iceLdn').value = JSON.parse((await ldn.json()).contents).chart.result[0].meta.regularMarketPrice;
-            } catch(e) { console.log("Veri çekilemedi."); }
+            } catch(e) { console.warn("Veri güncellenemedi."); }
             build();
         }
 
@@ -269,8 +289,8 @@
                     <div class="product-card">
                         <h2>${i.name}</h2>
                         <div class="input-row">
-                            <div class="input-box"><label>TONAJ</label><input type="number" id="${i.id}T" value="1" oninput="calc()"></div>
-                            <div class="input-box"><label>KÂR %</label><input type="number" id="${i.id}K" value="15" oninput="calc()"></div>
+                            <div class="input-box"><label>MİKTAR (TON)</label><input type="number" id="${i.id}T" value="1" oninput="calc()"></div>
+                            <div class="input-box"><label>KÂR MARJI %</label><input type="number" id="${i.id}K" value="15" oninput="calc()"></div>
                         </div>
                         <div id="${i.id}Res"></div>
                     </div>
@@ -289,17 +309,17 @@
                 const kar = (parseFloat(document.getElementById(i.id+'K').value) || 0) / 100;
                 let borsa = (i.type === 'NY') ? (ny/100)*2204.62 : ldn;
 
-                // Kâr oranı her aşamaya yansıtılır
+                // Dinamik Kâr Dahil Hesaplama
                 const fobB = borsa * (1 + kar);
                 const cifB = (borsa + CONSTS.navlun + (borsa * CONSTS.sigorta)) * (1 + kar);
                 const ddpB = (cifB + (CONSTS.liman * (1 + kar))) * 1.15;
 
                 document.getElementById(i.id+'Res').innerHTML = `
-                    <div class="res-item"><label>FOB TOPLAM</label><div class="res-val"><b>$${Math.round(fobB*ton).toLocaleString()}</b><span>₺${Math.round(fobB*ton*kur).toLocaleString()}</span></div></div>
-                    <div class="res-item"><label>CIF TOPLAM</label><div class="res-val"><b>$${Math.round(cifB*ton).toLocaleString()}</b><span>₺${Math.round(cifB*ton*kur).toLocaleString()}</span></div></div>
-                    <div class="res-item" style="border:none"><label>DDP TOPLAM</label><div class="res-val"><b>$${Math.round(ddpB*ton).toLocaleString()}</b><span>₺${Math.round(ddpB*ton*kur).toLocaleString()}</span></div></div>
+                    <div class="res-item"><label>FOB TOTAL</label><div class="res-val"><b>$${Math.round(fobB*ton).toLocaleString()}</b><span>₺${Math.round(fobB*ton*kur).toLocaleString()}</span></div></div>
+                    <div class="res-item"><label>CIF TOTAL</label><div class="res-val"><b>$${Math.round(cifB*ton).toLocaleString()}</b><span>₺${Math.round(cifB*ton*kur).toLocaleString()}</span></div></div>
+                    <div class="res-item" style="border:none"><label>DDP TOTAL</label><div class="res-val"><b>$${Math.round(ddpB*ton).toLocaleString()}</b><span>₺${Math.round(ddpB*ton*kur).toLocaleString()}</span></div></div>
                     <div class="maliyet-box">
-                        <small>BİRİM KG MALİYETİ (DDP + KÂR)</small>
+                        <small>KG BİRİM MALİYETİ (DDP + KÂR DAHİL)</small>
                         <div>$${(ddpB/1000).toFixed(2)} / ₺${((ddpB/1000)*kur).toFixed(2)}</div>
                     </div>
                 `;
@@ -307,7 +327,7 @@
         }
 
         function showPdf() {
-            const c = prompt("Müşteri Adı:");
+            const c = prompt("Müşteri / Firma Adı:");
             if(!c) return;
             document.getElementById('dClient').innerText = "SAYIN: " + c.toUpperCase();
             document.getElementById('dDate').innerText = "TARİH: " + new Date().toLocaleDateString('tr-TR');
@@ -325,25 +345,34 @@
 
                 h += `
                     <div style="margin-bottom:30px;">
-                        <h3 style="color:#1e3a8a; border-bottom:2px solid #1e3a8a; padding-bottom:5px;">${i.name} (${ton} TON)</h3>
+                        <h3 style="color:#1e3a8a; border-bottom:2px solid #1e3a8a; padding-bottom:5px; margin-bottom:15px; font-size:16px;">${i.name} (${ton} MT)</h3>
                         <table class="pdf-table">
-                            <tr><th>TESLİM</th><th>KG FİYAT ($)</th><th>TOPLAM ($)</th><th>TOPLAM (₺)</th></tr>
+                            <tr><th>TERMS</th><th>PER KG ($)</th><th>TOTAL USD</th><th>TOTAL TRY</th></tr>
                             <tr><td>FOB</td><td>$${(fobB/1000).toFixed(2)}</td><td>$${Math.round(fobB*ton).toLocaleString()}</td><td>₺${Math.round(fobB*ton*kur).toLocaleString()}</td></tr>
                             <tr><td>CIF</td><td>$${(cifB/1000).toFixed(2)}</td><td>$${Math.round(cifB*ton).toLocaleString()}</td><td>₺${Math.round(cifB*ton*kur).toLocaleString()}</td></tr>
-                            <tr style="background:#f0fff4;"><td>DDP</td><td>$${(ddpB/1000).toFixed(2)}</td><td>$${Math.round(ddpB*ton).toLocaleString()}</td><td>₺${Math.round(ddpB*ton*kur).toLocaleString()}</td></tr>
+                            <tr style="background:#f0fff4;"><td><b>DDP</b></td><td><b>$${(ddpB/1000).toFixed(2)}</b></td><td><b>$${Math.round(ddpB*ton).toLocaleString()}</b></td><td><b>₺${Math.round(ddpB*ton*kur).toLocaleString()}</b></td></tr>
                         </table>
                     </div>
                 `;
             });
             document.getElementById('dContent').innerHTML = h;
             document.getElementById('modal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Arka plan kaymasını engelle
         }
 
-        function hidePdf() { document.getElementById('modal').style.display = 'none'; }
+        function hidePdf() { 
+            document.getElementById('modal').style.display = 'none'; 
+            document.body.style.overflow = 'auto';
+        }
         
         function downloadPdf() {
             const el = document.getElementById('pdfPage');
-            html2pdf().set({ margin:0, filename:'ASC_Teklif.pdf', html2canvas:{scale:2}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} }).from(el).save();
+            html2pdf().set({ 
+                margin:0, 
+                filename:'ASC_Official_Offer.pdf', 
+                html2canvas:{scale:2, useCORS:true, letterRendering:true}, 
+                jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} 
+            }).from(el).save();
         }
 
         window.onload = start;

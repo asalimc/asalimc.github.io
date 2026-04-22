@@ -9,240 +9,743 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg: #0f1113; 
+            --bg: #0f1113;
             --surface: #1e2022;
             --primary: #d4af37;
             --success: #10b981;
+            --danger: #ef4444;
             --text: #e2e8f0;
             --border: #333639;
+            --muted: #94a3b8;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; color: var(--text); overflow-x: hidden; }
 
-        .app-header { background: #000; padding: clamp(15px, 4vw, 25px); text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        .brand { font-family: 'Sora', sans-serif; font-size: clamp(16px, 5vw, 20px); letter-spacing: 4px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        /* ─── HEADER ─── */
+        .app-header { background: #000; padding: clamp(15px,4vw,25px); text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
+        .brand { font-family: 'Sora', sans-serif; font-size: clamp(16px,5vw,20px); letter-spacing: 4px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
 
-        .market-bar { display: flex; gap: 10px; padding: 12px; overflow-x: auto; scrollbar-width: none; background: #000; -webkit-overflow-scrolling: touch; }
-        .market-card { background: var(--surface); padding: 10px; border-radius: 8px; min-width: 130px; flex: 1; border: 1px solid var(--border); }
-        .market-card label { font-size: 7px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 2px; text-transform: uppercase; }
+        /* ─── MARKET BAR ─── */
+        .market-bar { display: flex; gap: 10px; padding: 12px; overflow-x: auto; scrollbar-width: none; background: #000; -webkit-overflow-scrolling: touch; border-bottom: 1px solid var(--border); }
+        .market-card { background: var(--surface); padding: 10px; border-radius: 8px; min-width: 115px; flex: 1; border: 1px solid var(--border); }
+        .market-card label { font-size: 7px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 2px; text-transform: uppercase; line-height: 1.4; }
         .market-card input { width: 100%; border: none; font-size: 15px; font-weight: 800; color: #fff; background: transparent; }
 
+        /* ─── PARAMS PANEL ─── */
+        .params-panel { background: #000; border-bottom: 1px solid var(--border); }
+        .params-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 15px; cursor: pointer; user-select: none; }
+        .params-header span { font-size: 9px; font-weight: 800; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
+        .params-header i { color: var(--primary); font-size: 11px; transition: transform 0.3s; }
+        .params-header.open i { transform: rotate(180deg); }
+        .params-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .params-body.open { max-height: 700px; overflow-y: auto; }
+        .params-grid { display: grid; grid-template-columns: 1fr; }
+        @media (min-width: 768px) { .params-grid { grid-template-columns: 1fr 1fr 1fr; } }
+        .param-col { padding: 14px 15px; border-bottom: 1px solid var(--border); }
+        @media (min-width: 768px) { .param-col { border-bottom: none; border-right: 1px solid var(--border); } .param-col:last-child { border-right: none; } }
+        .param-col-title { font-size: 8px; font-weight: 800; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
+        .param-field { margin-bottom: 9px; }
+        .param-field label { display: block; font-size: 7.5px; font-weight: 700; color: #666; margin-bottom: 3px; line-height: 1.3; }
+        .param-field input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 14px; font-weight: 700; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .dest-btns { display: flex; gap: 5px; margin-bottom: 10px; }
+        .dest-btn { flex: 1; padding: 7px 4px; font-size: 7.5px; font-weight: 800; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: #666; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .dest-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+        .param-note { font-size: 7px; color: #444; margin-top: 6px; line-height: 1.5; }
+
+        /* ─── MAIN GRID ─── */
         .container { padding: 15px 15px 100px; max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 15px; }
+        @media (min-width: 768px) { .container { display: grid; grid-template-columns: 1fr 1fr; } }
+
+        /* ─── PRODUCT CARDS ─── */
         .product-card { background: var(--surface); border-radius: 12px; padding: 18px; border: 1px solid var(--border); }
         .product-card h2 { font-size: 12px; margin: 0 0 12px; color: var(--primary); font-weight: 800; border-left: 3px solid var(--primary); padding-left: 10px; text-transform: uppercase; }
-
-        .unit-display { background: rgba(212,175,55,0.05); border: 1px dashed var(--primary); padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .unit-display label { font-size: 9px; font-weight: 800; color: var(--primary); }
+        .unit-display { background: rgba(212,175,55,0.05); border: 1px dashed var(--primary); padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .unit-display label { font-size: 8px; font-weight: 800; color: var(--primary); }
         .unit-display b { font-size: 14px; color: #fff; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .input-box { background: #000; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .input-box label { display: block; font-size: 7.5px; font-weight: 800; color: #666; margin-bottom: 2px; line-height: 1.3; }
+        .input-box input { width: 100%; border: none; background: transparent; font-size: 15px; font-weight: 700; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-actions { display: flex; gap: 5px; margin-bottom: 10px; }
+        .quick-actions button { flex: 1; padding: 8px 4px; font-size: 7.5px; font-weight: 800; background: #333; border: none; border-radius: 6px; color: #fff; cursor: pointer; }
 
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .input-box { background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-        .input-box label { display: block; font-size: 8px; font-weight: 800; color: #666; margin-bottom: 2px; }
-        .input-box input { width: 100%; border: none; background: transparent; font-size: 16px; font-weight: 700; color: #fff; }
+        /* ─── CONTAINER BADGES ─── */
+        .cont-row { display: flex; gap: 6px; margin-bottom: 10px; }
+        .cont-badge { flex: 1; background: rgba(212,175,55,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 7px; text-align: center; }
+        .cont-badge span { display: block; font-size: 7px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+        .cont-badge b { font-size: 12px; color: var(--primary); display: block; margin-top: 1px; }
 
-        .quick-actions { display: flex; gap: 6px; margin-bottom: 12px; }
-        .quick-actions button { flex: 1; padding: 10px; font-size: 9px; font-weight: 800; background: #333; border: none; border-radius: 6px; color: #fff; }
+        /* ─── BREAKDOWN ─── */
+        .breakdown-toggle { font-size: 8.5px; font-weight: 800; color: #555; cursor: pointer; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; user-select: none; padding: 6px 0; border-top: 1px solid var(--border); }
+        .breakdown-toggle:hover { color: var(--primary); }
+        .breakdown { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .breakdown.open { max-height: 800px; }
+        .bd-section { margin-bottom: 8px; }
+        .bd-title { font-size: 7.5px; font-weight: 800; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; padding-top: 2px; }
+        .bd-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .bd-row span { font-size: 9px; color: #555; }
+        .bd-row b { font-size: 9px; color: #aaa; font-weight: 700; }
+        .bd-subtotal { display: flex; justify-content: space-between; padding: 6px 8px; background: rgba(212,175,55,0.07); border-radius: 4px; margin-top: 3px; margin-bottom: 4px; }
+        .bd-subtotal span { font-size: 9px; font-weight: 800; color: var(--primary); }
+        .bd-subtotal b { font-size: 13px; font-weight: 800; color: var(--primary); }
 
-        .res-line { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
-        .res-line span { font-size: 10px; font-weight: 700; color: #94a3b8; }
+        /* ─── RESULTS ─── */
+        .res-line { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .res-line span { font-size: 10px; font-weight: 700; color: var(--muted); }
         .res-line b { font-size: 15px; color: var(--primary); }
+        .margin-box { margin-top: 12px; padding: 12px; border-radius: 8px; border: 1px solid var(--success); display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.1); }
 
-        .margin-box { margin-top: 12px; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border: 1px solid var(--success); display: flex; justify-content: space-between; align-items: center; }
-        .margin-box span { font-size: 10px; font-weight: 800; color: var(--success); }
-        .margin-box b { font-size: 17px; color: var(--success); }
-
+        /* ─── FAB ─── */
         .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; font-size: 24px; color: #000; box-shadow: 0 8px 20px rgba(0,0,0,0.5); z-index: 100; cursor: pointer; }
 
+        /* ─── MODAL ─── */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; overflow-y: auto; }
         .modal-content { width: 100%; max-width: 900px; margin: auto; padding: 10px; }
         .modal-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px 0; position: sticky; top: 0; background: #000; z-index: 1001; }
+        @media (min-width: 768px) { .modal-btns { grid-template-columns: repeat(4, 1fr); } }
         .btn { padding: 12px; border-radius: 6px; border: none; font-weight: 800; font-size: 10px; text-transform: uppercase; cursor: pointer; }
 
-        /* PDF Styling - Full Page Use */
-        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 50px 60px; color: #000; position: relative; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; justify-content: space-between; }
-        .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin: 25px 0; }
-        .pdf-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; font-size: 11px; text-align: left; font-weight: 900; text-transform: uppercase; }
-        .pdf-table td { border: 1px solid #000; padding: 15px 12px; font-size: 13px; font-weight: 700; }
-
-        @media (min-width: 768px) { .container { display: grid; grid-template-columns: 1fr 1fr; } .modal-btns { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 820px) { .pdf-wrap { transform: scale(calc(100vw / 850)); transform-origin: top center; margin-bottom: -550px; } }
+        /* ─── PDF ─── */
+        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 40px 50px; color: #000; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; }
+        .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 18px; margin-bottom: 22px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin: 0; }
+        .pdf-table th { background: #f0f0f0; border: 1px solid #000; padding: 7px 9px; font-size: 9px; text-align: left; font-weight: 900; text-transform: uppercase; }
+        .pdf-table td { border: 1px solid #ccc; padding: 8px 9px; font-size: 11px; font-weight: 600; }
+        @media (max-width: 820px) { .pdf-wrap { transform: scale(calc(100vw / 850)); transform-origin: top center; } }
     </style>
 </head>
 <body>
 
-    <header class="app-header"><div class="brand">ASC CAFÉ</div></header>
+<header class="app-header"><div class="brand">ASC CAFÉ</div></header>
 
-    <div class="market-bar">
-        <div class="market-card"><label>USD/TRY (LIVE)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
-        <div class="market-card"><label>NY ARABICA (LB)</label><input type="number" id="iceNy" value="288.45" oninput="calc()"></div>
-        <div class="market-card"><label>LDN ROBUSTA (MT)</label><input type="number" id="iceLdn" value="3339" oninput="calc()"></div>
+<!-- MARKET BAR: 4 canlı gösterge -->
+<div class="market-bar">
+    <div class="market-card"><label id="uTryLabel">USD/TRY (LIVE)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
+    <div class="market-card"><label id="uBrlLabel">USD/BRL (LIVE)</label><input type="number" id="uBrl" value="5.72" step="0.0001" oninput="calc()"></div>
+    <div class="market-card"><label>NY ARABICA (¢/LB)</label><input type="number" id="iceNy" value="288.45" oninput="calc()"></div>
+    <div class="market-card"><label>LDN ROBUSTA ($/MT)</label><input type="number" id="iceLdn" value="3339" oninput="calc()"></div>
+</div>
+
+<!-- MALİYET PARAMETRELERİ PANELİ -->
+<div class="params-panel">
+    <div class="params-header" id="paramsHeader" onclick="toggleParams()">
+        <span>⚙ &nbsp;MALİYET PARAMETRELERİ — BREZILYA / NAVLUN / TÜRKİYE</span>
+        <i class="fa-solid fa-chevron-down" id="paramsChevron"></i>
     </div>
+    <div class="params-body" id="paramsBody">
+        <div class="params-grid">
 
-    <main class="container" id="grid"></main>
-
-    <button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-invoice"></i></button>
-
-    <div id="modal">
-        <div class="modal-content">
-            <div class="modal-btns">
-                <button class="btn" style="background:#333; color:#fff;" onclick="hidePdf()">CLOSE / KAPAT</button>
-                <button class="btn" style="background:var(--primary); color:#000;" onclick="downloadPdf()">SAVE / KAYDET</button>
-                <button class="btn" style="background:#25d366; color:#fff;" onclick="shareWa()">WHATSAPP</button>
-                <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">PRINT / YAZDIR</button>
+            <!-- BREZILYA ÇIKIŞ MALİYETLERİ -->
+            <div class="param-col">
+                <div class="param-col-title">🇧🇷 Brezilya Çıkış Maliyetleri</div>
+                <div class="param-field">
+                    <label>Consecafé / Fundepag Fonu ($/MT)</label>
+                    <input type="number" id="pConse" value="60" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>SGS + Fitosanitasyon Sertifikası ($/beyan)</label>
+                    <input type="number" id="pSgs" value="200" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>Santos / Paranaguá Liman THC + Belge ($/MT)</label>
+                    <input type="number" id="pBrThc" value="100" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>Ambalaj — 60kg Jüt Çuval + GrainPro ($/MT)</label>
+                    <input type="number" id="pPack" value="175" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-note">⚠ SGS ve Fitosanitasyon beyan başına sabit maliyet olduğundan toplam tonaja bölünerek $/MT'ye dönüştürülür.</div>
             </div>
-            <div class="pdf-wrap">
-                <div id="pdfPage"><div id="pdfInner" style="height:100%; display:flex; flex-direction:column;"></div></div>
+
+            <!-- NAVLUN & DESTİNASYON -->
+            <div class="param-col">
+                <div class="param-col-title">🚢 Navlun & Destinasyon</div>
+                <div class="dest-btns">
+                    <button id="dest0" class="dest-btn active" onclick="setDest(0)">İSTANBUL</button>
+                    <button id="dest1" class="dest-btn" onclick="setDest(1)">İZMİR</button>
+                    <button id="dest2" class="dest-btn" onclick="setDest(2)">MERSİN</button>
+                </div>
+                <div class="param-field">
+                    <label id="freightLabel">Navlun: Santos → İSTANBUL / AMBARLİ ($/MT)</label>
+                    <input type="number" id="pFreight" value="380" min="0" oninput="syncFreight()">
+                </div>
+                <div class="param-field">
+                    <label>Marine Sigorta Oranı (% — CIF üzerinden, standart: 0.10–0.15%)</label>
+                    <input type="number" id="pIns" value="0.12" step="0.01" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-note">Her destinasyonun navlun değeri ayrı ayrı kaydedilir. Butona tıkladığınızda o porta ait değere geçilir.</div>
             </div>
+
+            <!-- TÜRKİYE GİRİŞ MALİYETLERİ -->
+            <div class="param-col">
+                <div class="param-col-title">🇹🇷 Türkiye Giriş Maliyetleri</div>
+                <div class="param-field">
+                    <label>İthalat Gümrük Vergisi % (GTİP 0901.11.00 → MFN: %0)</label>
+                    <input type="number" id="pDuty" value="0" step="0.1" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>KDV % (Türkiye'de yeşil kahve → %10)</label>
+                    <input type="number" id="pVat" value="10" step="0.1" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>Türkiye Liman / THC + Antrepo ($/MT)</label>
+                    <input type="number" id="pTrPort" value="65" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-field">
+                    <label>Gümrük Müşaviri Ücreti ($/beyan)</label>
+                    <input type="number" id="pBroker" value="250" min="0" oninput="syncParams()">
+                </div>
+                <div class="param-note">KDV matrahı: CIF + Gümrük Vergisi. Gümrük müşaviri beyan başına sabit olup tonaja bölünür.</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ÜRÜN KARTLARI -->
+<main class="container" id="grid"></main>
+
+<button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-invoice"></i></button>
+
+<!-- PDF MODAL -->
+<div id="modal">
+    <div class="modal-content">
+        <div class="modal-btns">
+            <button class="btn" style="background:#333;color:#fff;" onclick="hidePdf()">CLOSE / KAPAT</button>
+            <button class="btn" style="background:var(--primary);color:#000;" onclick="downloadPdf()">SAVE / KAYDET</button>
+            <button id="waBtn" class="btn" style="background:#25d366;color:#fff;" onclick="shareWa()">WHATSAPP</button>
+            <button class="btn" style="background:#fff;border:1px solid #000;" onclick="window.print()">PRINT / YAZDIR</button>
+        </div>
+        <div class="pdf-wrap" id="pdfWrap">
+            <div id="pdfPage"><div id="pdfInner" style="flex:1;display:flex;flex-direction:column;"></div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// ÜRÜNLER
+// ═══════════════════════════════════════════════
+const PRODS = [
+    { id: 'ar', name: 'NATURAL NY2/3 17/18 SSFC', type: 'NY',  diffUnit: '¢/lb', diffDefault: 20  },
+    { id: 'ro', name: 'BREZİLYA ROBUSTA (CONILON)',  type: 'LDN', diffUnit: '$/MT', diffDefault: 150 }
+];
+
+// ═══════════════════════════════════════════════
+// MALİYET SABİTLERİ (merkezi, syncParams ile güncellenir)
+// ═══════════════════════════════════════════════
+const COSTS = {
+    consecafe:    60,
+    sgsFixed:     200,
+    brazilThc:    100,
+    packaging:    175,
+    destinations: [
+        { name: 'İSTANBUL', port: 'AMBARLİ',  freight: 380 },
+        { name: 'İZMİR',    port: 'ALİAĞA',   freight: 360 },
+        { name: 'MERSİN',   port: 'MERSİN',   freight: 340 }
+    ],
+    activeDest:    0,
+    insuranceRate: 0.0012,   // 0.12%
+    importDuty:    0.00,     // GTİP 0901.11.00 MFN %0
+    vat:           0.10,     // %10
+    turkeyPort:    65,
+    customsBroker: 250
+};
+
+// ═══════════════════════════════════════════════
+// PARAMETRE SYNC
+// ═══════════════════════════════════════════════
+function syncParams() {
+    COSTS.consecafe    = parseFloat(document.getElementById('pConse').value)  || 0;
+    COSTS.sgsFixed     = parseFloat(document.getElementById('pSgs').value)    || 0;
+    COSTS.brazilThc    = parseFloat(document.getElementById('pBrThc').value)  || 0;
+    COSTS.packaging    = parseFloat(document.getElementById('pPack').value)   || 0;
+    COSTS.insuranceRate = (parseFloat(document.getElementById('pIns').value)  || 0) / 100;
+    COSTS.importDuty   = (parseFloat(document.getElementById('pDuty').value)  || 0) / 100;
+    COSTS.vat          = (parseFloat(document.getElementById('pVat').value)   || 0) / 100;
+    COSTS.turkeyPort   = parseFloat(document.getElementById('pTrPort').value) || 0;
+    COSTS.customsBroker = parseFloat(document.getElementById('pBroker').value)|| 0;
+    calc();
+}
+
+function syncFreight() {
+    COSTS.destinations[COSTS.activeDest].freight = parseFloat(document.getElementById('pFreight').value) || 0;
+    calc();
+}
+
+function setDest(i) {
+    COSTS.activeDest = i;
+    document.querySelectorAll('.dest-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+    const dest = COSTS.destinations[i];
+    const ports = ['AMBARLİ', 'ALİAĞA', 'MERSİN'];
+    document.getElementById('freightLabel').textContent = `Navlun: Santos → ${dest.name} / ${ports[i]} ($/MT)`;
+    document.getElementById('pFreight').value = dest.freight;
+    calc();
+}
+
+// ═══════════════════════════════════════════════
+// CANLI KUR ÇEKİMİ
+// ═══════════════════════════════════════════════
+async function fetchLiveRates() {
+    const tryLbl = document.getElementById('uTryLabel');
+    const brlLbl = document.getElementById('uBrlLabel');
+    tryLbl.innerHTML = 'USD/TRY <span style="color:var(--primary)">⟳ SYNC</span>';
+    brlLbl.innerHTML = 'USD/BRL <span style="color:var(--primary)">⟳ SYNC</span>';
+    try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data.rates) throw new Error('No rates');
+        if (data.rates.TRY) {
+            document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
+            tryLbl.innerHTML = 'USD/TRY <span style="color:var(--success);font-size:6px">● LIVE</span>';
+        }
+        if (data.rates.BRL) {
+            document.getElementById('uBrl').value = data.rates.BRL.toFixed(4);
+            brlLbl.innerHTML = 'USD/BRL <span style="color:var(--success);font-size:6px">● LIVE</span>';
+        }
+        calc();
+    } catch(e) {
+        tryLbl.innerHTML = 'USD/TRY <span style="color:var(--danger);font-size:6px">⚠ MANUAL</span>';
+        brlLbl.innerHTML = 'USD/BRL <span style="color:var(--danger);font-size:6px">⚠ MANUAL</span>';
+        console.error('Rate fetch error:', e.message);
+    }
+}
+
+// ═══════════════════════════════════════════════
+// HESAPLAMA MOTORU
+// ═══════════════════════════════════════════════
+function getVals(id, type) {
+    const kur = parseFloat(document.getElementById('uTry').value) || 34.35;
+    const brl = parseFloat(document.getElementById('uBrl').value) || 5.72;
+
+    // Borsa fiyatı $/MT cinsinden
+    const exchRaw = (type === 'NY')
+        ? (parseFloat(document.getElementById('iceNy').value) / 100) * 2204.62
+        : parseFloat(document.getElementById('iceLdn').value) || 0;
+
+    // Diferansiyel (basis): NY → ¢/lb'dan $/MT'ye, LDN zaten $/MT
+    const diffInput = parseFloat(document.getElementById(id + 'Diff').value) || 0;
+    const diffMt = (type === 'NY') ? (diffInput / 100) * 2204.62 : diffInput;
+
+    const purchasePrice = exchRaw + diffMt;  // gerçek alış fiyatı $/MT
+    const ton    = parseFloat(document.getElementById(id + 'T').value) || 0;
+    const karPct = (parseFloat(document.getElementById(id + 'K').value) || 0) / 100;
+
+    // ── BREZILYA MALİYETLERİ ($/MT) ──────────────────────────
+    const consecafe  = COSTS.consecafe;
+    const sgsPerMt   = ton > 0 ? COSTS.sgsFixed / ton : COSTS.sgsFixed;
+    const brazilThc  = COSTS.brazilThc;
+    const packaging  = COSTS.packaging;
+    const brazilTot  = consecafe + sgsPerMt + brazilThc + packaging;
+
+    const costFob = purchasePrice + brazilTot;
+
+    // ── NAVLUN & SİGORTA ──────────────────────────────────────
+    const freight   = COSTS.destinations[COSTS.activeDest].freight;
+    const insurance = (costFob + freight) * COSTS.insuranceRate;
+    const costCif   = costFob + freight + insurance;
+
+    // ── TÜRKİYE MALİYETLERİ ($/MT) ───────────────────────────
+    // KDV matrahı: CIF + gümrük vergisi
+    const importDuty  = costCif * COSTS.importDuty;
+    const vatBase     = costCif + importDuty;
+    const vatAmt      = vatBase * COSTS.vat;
+    const turkeyPort  = COSTS.turkeyPort;
+    const brokerPerMt = ton > 0 ? COSTS.customsBroker / ton : COSTS.customsBroker;
+    const turkeyTot   = importDuty + vatAmt + turkeyPort + brokerPerMt;
+
+    const costDdp = costCif + turkeyTot;  // maliyet (kar marjsız)
+
+    // ── SATIŞ FİYATLARI (kar marjlı) ─────────────────────────
+    const sellFob = costFob * (1 + karPct);
+    const sellCif = costCif * (1 + karPct);
+    const sellDdp = costDdp * (1 + karPct);
+
+    const profitPerMt = costDdp * karPct;  // = sellDdp - costDdp
+    const netMargin   = profitPerMt * ton;
+
+    // ── BAŞABAŞ ANALİZİ ───────────────────────────────────────
+    // Sabit beyan maliyetlerini karşılamak için gereken minimum ton
+    const fixedDeclCosts  = COSTS.sgsFixed + COSTS.customsBroker;
+    const breakevenMt     = (profitPerMt > 0)
+        ? fixedDeclCosts / profitPerMt
+        : null;
+
+    // ── KONTEYNER ─────────────────────────────────────────────
+    const cont20 = ton > 0 ? Math.ceil(ton / 18.5) : 0;
+    const cont40 = ton > 0 ? Math.ceil(ton / 26.5) : 0;
+
+    return {
+        exchRaw, diffMt, purchasePrice, ton, kur, brl, karPct,
+        brazilCosts: { consecafe, sgsPerMt, brazilThc, packaging, total: brazilTot },
+        costFob, freight, insurance, costCif,
+        importDuty, vatAmt, turkeyPort, brokerPerMt, turkeyTot,
+        costDdp, sellFob, sellCif, sellDdp,
+        profitPerMt, netMargin, breakevenMt,
+        cont20, cont40
+    };
+}
+
+// ═══════════════════════════════════════════════
+// KART OLUŞTURMA
+// ═══════════════════════════════════════════════
+function build() {
+    document.getElementById('grid').innerHTML = PRODS.map(p => `
+        <div class="product-card">
+            <h2>${p.name}</h2>
+
+            <div class="unit-display" id="${p.id}Unit">
+                <label>DDP SATIŞ FİYATI (KG)</label>
+                <b id="${p.id}UnitVal">—</b>
+            </div>
+
+            <div class="input-row">
+                <div class="input-box">
+                    <label>TONAJ (MT)</label>
+                    <input type="number" id="${p.id}T" value="1" min="0" step="0.5" oninput="calc()">
+                </div>
+                <div class="input-box">
+                    <label>DİFERANSİYEL<br>${p.diffUnit === '¢/lb' ? '(¢/lb BASIS)' : '($/MT BASIS)'}</label>
+                    <input type="number" id="${p.id}Diff" value="${p.diffDefault}" step="${p.type === 'NY' ? '0.25' : '5'}" oninput="calc()">
+                </div>
+                <div class="input-box">
+                    <label>KÂR MARJI %</label>
+                    <input type="number" id="${p.id}K" value="0" step="0.5" min="0" oninput="calc()">
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button onclick="setTon('${p.id}',1)">1 MT</button>
+                <button onclick="setTon('${p.id}',18.5)">18.5 MT<br><span style="font-size:6px;opacity:.7">20' FCL</span></button>
+                <button onclick="setTon('${p.id}',26.5)">26.5 MT<br><span style="font-size:6px;opacity:.7">40' FCL</span></button>
+            </div>
+
+            <div id="${p.id}ContInfo"></div>
+
+            <div class="breakdown-toggle" onclick="toggleBreakdown('${p.id}')">
+                <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i>
+                MALİYET DÖKÜMÜ (TIK)
+            </div>
+            <div class="breakdown" id="${p.id}Breakdown"></div>
+
+            <div id="${p.id}Res"></div>
+        </div>
+    `).join('');
+    calc();
+}
+
+function setTon(id, v) {
+    document.getElementById(id + 'T').value = v;
+    calc();
+}
+
+// ═══════════════════════════════════════════════
+// EKRAN GÜNCELLEME
+// ═══════════════════════════════════════════════
+function fmt(n)  { return Math.round(n).toLocaleString('tr-TR'); }
+function fmtD(n) { return Math.round(n).toLocaleString('tr-TR'); }
+
+function calc() {
+    PRODS.forEach(p => {
+        const d = getVals(p.id, p.type);
+
+        // ── Birim fiyat başlığı ──
+        const kgSell = d.sellDdp / 1000;
+        document.getElementById(p.id + 'UnitVal').textContent =
+            `$ ${kgSell.toFixed(3)} / ₺ ${(kgSell * d.kur).toFixed(2)}`;
+
+        // ── Konteyner bilgisi ──
+        document.getElementById(p.id + 'ContInfo').innerHTML = d.ton > 0 ? `
+            <div class="cont-row">
+                <div class="cont-badge"><span>20' FCL</span><b>${d.cont20} Kont.</b></div>
+                <div class="cont-badge"><span>40' FCL</span><b>${d.cont40} Kont.</b></div>
+                <div class="cont-badge"><span>Maliyet BRL/MT</span><b>R$ ${fmtD(d.costFob * d.brl)}</b></div>
+                <div class="cont-badge"><span>FOB $/KG</span><b>$ ${(d.costFob/1000).toFixed(3)}</b></div>
+            </div>` : '';
+
+        // ── Maliyet dökümü ──
+        const insRateStr = (COSTS.insuranceRate * 100).toFixed(2);
+        document.getElementById(p.id + 'Breakdown').innerHTML = `
+            <div class="bd-section">
+                <div class="bd-title">🇧🇷 Brezilya Taraf</div>
+                <div class="bd-row"><span>Borsa (${p.type === 'NY' ? 'NY ICE' : 'LDN ICE'})</span><b>$ ${fmtD(d.exchRaw)}/MT</b></div>
+                <div class="bd-row"><span>Diferansiyel / Basis</span><b>${d.diffMt >= 0 ? '+' : ''}$ ${fmtD(d.diffMt)}/MT</b></div>
+                <div class="bd-row"><span>Consecafé / Fundepag</span><b>$ ${fmtD(d.brazilCosts.consecafe)}/MT</b></div>
+                <div class="bd-row"><span>SGS + Fitosanitasyon (÷ ${d.ton}MT)</span><b>$ ${d.brazilCosts.sgsPerMt.toFixed(1)}/MT</b></div>
+                <div class="bd-row"><span>Santos/Paranaguá THC + Belge</span><b>$ ${fmtD(d.brazilCosts.brazilThc)}/MT</b></div>
+                <div class="bd-row"><span>Ambalaj (Jüt / GrainPro)</span><b>$ ${fmtD(d.brazilCosts.packaging)}/MT</b></div>
+                <div class="bd-subtotal"><span>FOB (Santos)</span><b>$ ${fmtD(d.costFob)}/MT</b></div>
+            </div>
+            <div class="bd-section">
+                <div class="bd-title">🚢 Nakliye — ${COSTS.destinations[COSTS.activeDest].name}</div>
+                <div class="bd-row"><span>Navlun (Santos → ${COSTS.destinations[COSTS.activeDest].port})</span><b>$ ${fmtD(d.freight)}/MT</b></div>
+                <div class="bd-row"><span>Marine Sigorta (%${insRateStr})</span><b>$ ${d.insurance.toFixed(1)}/MT</b></div>
+                <div class="bd-subtotal"><span>CIF (${COSTS.destinations[COSTS.activeDest].port})</span><b>$ ${fmtD(d.costCif)}/MT</b></div>
+            </div>
+            <div class="bd-section">
+                <div class="bd-title">🇹🇷 Türkiye Taraf</div>
+                <div class="bd-row"><span>Gümrük Vergisi (%${(COSTS.importDuty*100).toFixed(1)} — GTİP 0901.11)</span><b>$ ${d.importDuty.toFixed(1)}/MT</b></div>
+                <div class="bd-row"><span>KDV (%${(COSTS.vat*100).toFixed(0)} — matrah: CIF+vergi)</span><b>$ ${fmtD(d.vatAmt)}/MT</b></div>
+                <div class="bd-row"><span>Türkiye Liman / THC + Antrepo</span><b>$ ${fmtD(d.turkeyPort)}/MT</b></div>
+                <div class="bd-row"><span>Gümrük Müşaviri (÷ ${d.ton}MT)</span><b>$ ${d.brokerPerMt.toFixed(1)}/MT</b></div>
+                <div class="bd-subtotal"><span>DDP Maliyet (karsız)</span><b>$ ${fmtD(d.costDdp)}/MT</b></div>
+            </div>`;
+
+        // ── Ana sonuçlar ──
+        const isLoss  = d.netMargin < 0;
+        const mColor  = isLoss ? 'var(--danger)' : 'var(--success)';
+        const mBg     = isLoss ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)';
+        const mBorder = isLoss ? 'var(--danger)' : 'var(--success)';
+
+        let beText = '';
+        if (d.karPct === 0) {
+            beText = 'Kâr marjı giriniz';
+        } else if (d.breakevenMt !== null) {
+            const beIcon = d.ton >= d.breakevenMt ? '✓' : '⚠';
+            beText = `${beIcon} Başabaş: ${d.breakevenMt.toFixed(1)} MT &nbsp;|&nbsp; Kâr/MT: $${fmt(d.profitPerMt)}`;
+        } else {
+            beText = `Kâr/MT: $${fmt(d.profitPerMt)}`;
+        }
+
+        document.getElementById(p.id + 'Res').innerHTML = `
+            <div class="res-line"><span>FOB TOPLAM</span><b>$ ${fmt(d.sellFob * d.ton)}</b></div>
+            <div class="res-line"><span>CIF TOPLAM</span><b>$ ${fmt(d.sellCif * d.ton)}</b></div>
+            <div class="res-line" style="border:none"><span>DDP TOPLAM</span><b>$ ${fmt(d.sellDdp * d.ton)}</b></div>
+            <div class="margin-box" style="background:${mBg};border-color:${mBorder}">
+                <div>
+                    <div style="font-size:10px;font-weight:800;color:${mColor}">${isLoss ? '⚠ NET ZARAR' : '✓ NET KÂR'} (USD)</div>
+                    <div style="font-size:8px;color:#666;margin-top:3px">${beText}</div>
+                </div>
+                <b style="color:${mColor};font-size:17px">${isLoss ? '-$' : '$'} ${fmt(Math.abs(d.netMargin))}</b>
+            </div>`;
+    });
+}
+
+// ═══════════════════════════════════════════════
+// UI TOGGLE
+// ═══════════════════════════════════════════════
+function toggleParams() {
+    document.getElementById('paramsBody').classList.toggle('open');
+    document.getElementById('paramsHeader').classList.toggle('open');
+}
+function toggleBreakdown(id) {
+    document.getElementById(id + 'Breakdown').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════
+// PDF OLUŞTURMA
+// ═══════════════════════════════════════════════
+function showPdf() {
+    const client = prompt("Müşteri / Firma Adı (Client Name):") || "VALUED PARTNER";
+    const ref    = "ASC-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase();
+    const now    = new Date();
+    const dateStr = now.toLocaleDateString('tr-TR');
+    const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    const dest   = COSTS.destinations[COSTS.activeDest];
+
+    const uTry = parseFloat(document.getElementById('uTry').value).toFixed(4);
+    const uBrl = parseFloat(document.getElementById('uBrl').value).toFixed(4);
+    const nyV  = document.getElementById('iceNy').value;
+    const ldnV = document.getElementById('iceLdn').value;
+
+    let html = `
+    <div class="pdf-header">
+        <div>
+            <h1 style="margin:0;font-size:36px;letter-spacing:-1px">ASC CAFÉ</h1>
+            <p style="font-size:10px;font-weight:bold;letter-spacing:4px;color:#444;margin:3px 0 1px">GLOBAL COFFEE TRADING &amp; LOGISTICS</p>
+            <p style="font-size:9px;color:#888;margin:0">BRAZIL ORIGIN  ▸  TURKEY DELIVERY</p>
+        </div>
+        <div style="text-align:right">
+            <div style="background:#000;color:#fff;padding:7px 16px;font-weight:900;font-size:11px;margin-bottom:5px;letter-spacing:1px">OFFER REF: ${ref}</div>
+            <p style="font-size:11px;font-weight:bold;margin:2px 0">DATE: ${dateStr}  ${timeStr}</p>
+            <p style="font-size:9px;color:#888;margin:1px 0">VALID FOR 48 HOURS FROM ISSUE TIME</p>
+            <p style="font-size:9px;font-weight:bold;margin:1px 0">DEST: ${dest.name} / ${dest.port}</p>
         </div>
     </div>
 
-    <script>
-        const PRODS = [
-            { id: 'ar', name: 'NATURAL NY2/3 17/18 SSFC', type: 'NY' },
-            { id: 'ro', name: 'BREZİLYA ROBUSTA (CONILON)', type: 'LDN' }
-        ];
+    <div style="margin-bottom:16px;border-left:6px solid #000;padding-left:14px">
+        <p style="font-size:9px;color:#666;margin:0;font-weight:bold;text-transform:uppercase">Offer Prepared For:</p>
+        <p style="font-size:20px;font-weight:bold;margin:2px 0;color:#000">${client.toUpperCase()}</p>
+    </div>
 
-        async function fetchLiveCurrency() {
-            try {
-                const res = await fetch('https://open.er-api.com/v6/latest/USD');
-                const data = await res.json();
-                if(data.rates && data.rates.TRY) {
-                    document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
-                    calc();
-                }
-            } catch(e) { console.error("Rate sync error"); }
-        }
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin-bottom:18px">
+        ${[['USD/TRY','₺ '+uTry],['USD/BRL','R$ '+uBrl],['NY ARABICA',nyV+' ¢/lb'],['LDN ROBUSTA','$'+ldnV+'/MT']].map(([l,v])=>`
+        <div style="background:#f5f5f5;padding:7px;border:1px solid #ddd;text-align:center">
+            <div style="font-size:8px;color:#888;font-weight:bold">${l}</div>
+            <div style="font-size:12px;font-weight:900">${v}</div>
+        </div>`).join('')}
+    </div>`;
 
-        function getVals(id, type) {
-            const kur = parseFloat(document.getElementById('uTry').value) || 34.35;
-            const borsa = (type === 'NY') ? (parseFloat(document.getElementById('iceNy').value)/100)*2204.62 : parseFloat(document.getElementById('iceLdn').value);
-            const ton = parseFloat(document.getElementById(id+'T').value) || 0;
-            const karPct = (parseFloat(document.getElementById(id+'K').value) || 0) / 100;
-            
-            const costFob = borsa;
-            const costCif = borsa + 350 + (borsa * 0.015);
-            const costDdp = (costCif + 150) * 1.15;
+    PRODS.forEach(p => {
+        const d = getVals(p.id, p.type);
+        const diffInput = parseFloat(document.getElementById(p.id + 'Diff').value) || 0;
+        const diffLabel = p.type === 'NY'
+            ? `Basis: ${diffInput >= 0 ? '+' : ''}${diffInput} ¢/lb`
+            : `Basis: ${diffInput >= 0 ? '+' : ''}${diffInput} $/MT`;
 
-            const sellFob = costFob * (1 + karPct);
-            const sellCif = costCif * (1 + karPct);
-            const sellDdp = costDdp * (1 + karPct);
-            const netMargin = (sellDdp - costDdp) * ton;
+        html += `
+        <div style="margin-bottom:20px;border:1px solid #000">
+            <div style="background:#f2f2f2;border-bottom:2px solid #000;padding:9px 14px;font-size:11px;font-weight:900;display:flex;justify-content:space-between;align-items:center">
+                <span>${p.name}</span>
+                <span style="font-size:10px">${d.ton} MT &nbsp;|&nbsp; ${diffLabel}</span>
+            </div>
 
-            return { fob: sellFob, cif: sellCif, ddp: sellDdp, ton, kur, margin: netMargin };
-        }
-
-        function build() {
-            document.getElementById('grid').innerHTML = PRODS.map(p => `
-                <div class="product-card">
-                    <h2>${p.name}</h2>
-                    <div class="unit-display" id="${p.id}Unit"></div>
-                    <div class="input-row">
-                        <div class="input-box"><label>TONNAGE / TONAJ</label><input type="number" id="${p.id}T" value="1" oninput="calc()"></div>
-                        <div class="input-box"><label>PROFIT / KÂR %</label><input type="number" id="${p.id}K" value="0" oninput="calc()"></div>
-                    </div>
-                    <div class="quick-actions">
-                        <button onclick="document.getElementById('${p.id}T').value=1; calc()">1 MT</button>
-                        <button onclick="document.getElementById('${p.id}T').value=19.2; calc()">19.2 MT</button>
-                    </div>
-                    <div id="${p.id}Res"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;font-size:9px;border-bottom:1px solid #ccc">
+                <div style="padding:10px;border-right:1px solid #eee">
+                    <div style="font-weight:900;font-size:8px;text-transform:uppercase;color:#555;margin-bottom:5px">🇧🇷 BREZILYA TARAF</div>
+                    ${[
+                        [`Borsa (${p.type})`, `$ ${fmtD(d.exchRaw)}`],
+                        ['Diferansiyel', `${d.diffMt>=0?'+':''}$ ${fmtD(d.diffMt)}`],
+                        ['Consecafé', `$ ${fmtD(d.brazilCosts.consecafe)}`],
+                        ['SGS/Phyto', `$ ${d.brazilCosts.sgsPerMt.toFixed(1)}`],
+                        ['Santos THC', `$ ${fmtD(d.brazilCosts.brazilThc)}`],
+                        ['Ambalaj', `$ ${fmtD(d.brazilCosts.packaging)}`],
+                    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f0f0"><span style="color:#666">${l}</span><b>${v}</b></div>`).join('')}
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:2px solid #000;margin-top:2px;font-weight:900"><span>FOB/MT</span><span>$ ${fmtD(d.costFob)}</span></div>
                 </div>
-            `).join('');
-            calc();
-        }
-
-        function calc() {
-            PRODS.forEach(p => {
-                const d = getVals(p.id, p.type);
-                const kgUsd = (d.ddp/1000).toFixed(2);
-                document.getElementById(p.id+'Unit').innerHTML = `<span>UNIT PRICE (KG)</span><b>$ ${kgUsd} / ₺ ${(kgUsd*d.kur).toFixed(2)}</b>`;
-                document.getElementById(p.id+'Res').innerHTML = `
-                    <div class="res-line"><span>FOB TOTAL</span><b>$ ${Math.round(d.fob*d.ton).toLocaleString()}</b></div>
-                    <div class="res-line"><span>CIF TOTAL</span><b>$ ${Math.round(d.cif*d.ton).toLocaleString()}</b></div>
-                    <div class="res-line" style="border:none"><span>DDP TOTAL</span><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></div>
-                    <div class="margin-box"><span>NET MARGIN (USD)</span><b>$ ${Math.max(0, Math.round(d.margin)).toLocaleString()}</b></div>
-                `;
-            });
-        }
-
-        function showPdf() {
-            const client = prompt("Client / Company Name:") || "VALUED PARTNER";
-            const ref = "ASC-" + Math.random().toString(36).substring(7).toUpperCase();
-            let html = `
-                <div class="pdf-header">
-                    <div><h1 style="margin:0; font-size:42px; letter-spacing:-1px;">ASC CAFÉ</h1><p style="font-size:11px; font-weight:bold; letter-spacing:4px; color:#444;">GLOBAL COFFEE TRADING & LOGISTICS</p></div>
-                    <div style="text-align:right">
-                        <div style="background:#000; color:#fff; padding:8px 18px; font-weight:900; font-size:13px; margin-bottom:8px;">OFFER REF: ${ref}</div>
-                        <p style="font-size:12px; font-weight:bold;">DATE: ${new Date().toLocaleDateString('tr-TR')}</p>
-                    </div>
+                <div style="padding:10px;border-right:1px solid #eee">
+                    <div style="font-weight:900;font-size:8px;text-transform:uppercase;color:#555;margin-bottom:5px">🚢 NAKLİYE</div>
+                    ${[
+                        ['Navlun', `$ ${fmtD(d.freight)}`],
+                        ['Sigorta', `$ ${d.insurance.toFixed(1)}`],
+                    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f0f0"><span style="color:#666">${l}</span><b>${v}</b></div>`).join('')}
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:2px solid #000;margin-top:2px;font-weight:900"><span>CIF/MT</span><span>$ ${fmtD(d.costCif)}</span></div>
                 </div>
-
-                <div style="margin-bottom:30px; border-left:6px solid #000; padding-left:20px;">
-                    <p style="font-size:12px; color:#666; margin:0; font-weight:bold; text-transform:uppercase;">OFFER PREPARED FOR:</p>
-                    <p style="font-size:24px; font-weight:bold; margin:5px 0; color:#000;">${client.toUpperCase()}</p>
+                <div style="padding:10px">
+                    <div style="font-weight:900;font-size:8px;text-transform:uppercase;color:#555;margin-bottom:5px">🇹🇷 TÜRKİYE TARAF</div>
+                    ${[
+                        [`Gümrük (%${(COSTS.importDuty*100).toFixed(0)})`, `$ ${d.importDuty.toFixed(1)}`],
+                        [`KDV (%${(COSTS.vat*100).toFixed(0)})`, `$ ${fmtD(d.vatAmt)}`],
+                        ['Liman/THC', `$ ${fmtD(d.turkeyPort)}`],
+                        ['Gümrük Müşaviri', `$ ${d.brokerPerMt.toFixed(1)}`],
+                    ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f0f0"><span style="color:#666">${l}</span><b>${v}</b></div>`).join('')}
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:2px solid #000;margin-top:2px;font-weight:900"><span>DDP Maliyet/MT</span><span>$ ${fmtD(d.costDdp)}</span></div>
                 </div>
+            </div>
 
-                <div style="flex-grow: 1;">`;
+            <table class="pdf-table">
+                <tr>
+                    <th style="width:24%">Incoterm 2020</th>
+                    <th style="width:16%">$/KG</th>
+                    <th style="width:20%">Toplam USD</th>
+                    <th style="width:20%">Toplam TRY</th>
+                    <th style="width:20%">Toplam BRL</th>
+                </tr>
+                <tr>
+                    <td>FOB (Free On Board)</td>
+                    <td>$ ${(d.sellFob/1000).toFixed(3)}</td>
+                    <td>$ ${fmt(d.sellFob*d.ton)}</td>
+                    <td>₺ ${fmt(d.sellFob*d.ton*d.kur)}</td>
+                    <td>R$ ${fmt(d.sellFob*d.ton*d.brl)}</td>
+                </tr>
+                <tr>
+                    <td>CIF (Cost, Ins, Freight)</td>
+                    <td>$ ${(d.sellCif/1000).toFixed(3)}</td>
+                    <td>$ ${fmt(d.sellCif*d.ton)}</td>
+                    <td>₺ ${fmt(d.sellCif*d.ton*d.kur)}</td>
+                    <td>R$ ${fmt(d.sellCif*d.ton*d.brl)}</td>
+                </tr>
+                <tr style="background:#f7f7f7">
+                    <td><b>DDP (Delivered Duty Paid)</b></td>
+                    <td><b>$ ${(d.sellDdp/1000).toFixed(3)}</b></td>
+                    <td><b>$ ${fmt(d.sellDdp*d.ton)}</b></td>
+                    <td><b>₺ ${fmt(d.sellDdp*d.ton*d.kur)}</b></td>
+                    <td><b>R$ ${fmt(d.sellDdp*d.ton*d.brl)}</b></td>
+                </tr>
+            </table>
+        </div>`;
+    });
 
-            PRODS.forEach(p => {
-                const d = getVals(p.id, p.type);
-                html += `
-                <div style="margin-bottom:40px;">
-                    <div style="background:#f4f4f4; border:1px solid #000; padding:12px 20px; font-size:13px; font-weight:bold; display:flex; justify-content:space-between;">
-                        <span>COMMODITY: ${p.name}</span>
-                        <span>QUANTITY: ${d.ton} MT</span>
-                    </div>
-                    <table class="pdf-table">
-                        <tr><th style="width:30%">Incoterm 2020</th><th style="width:20%">Unit (USD/KG)</th><th style="width:25%">Total (USD)</th><th style="width:25%">Total (TRY)</th></tr>
-                        <tr><td>FOB (Free On Board)</td><td>$ ${(d.fob/1000).toFixed(2)}</td><td>$ ${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
-                        <tr><td>CIF (Cost, Ins, Freight)</td><td>$ ${(d.cif/1000).toFixed(2)}</td><td>$ ${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
-                        <tr style="background:#fafafa;"><td><b>DDP (Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
-                    </table>
-                </div>`;
-            });
+    html += `
+    <div style="display:flex;gap:20px;padding:18px 0;border-top:1px solid #eee;margin-top:5px;flex:1">
+        <div style="flex:1;font-size:8.5px;line-height:1.7">
+            <b style="font-size:10px;border-bottom:2px solid #000;display:block;margin-bottom:7px">TERMS &amp; CONDITIONS (EN)</b>
+            • <b>FOB:</b> Goods loaded on vessel at Santos/Paranaguá. SGS + Phyto included.<br>
+            • <b>CIF:</b> Marine insurance &amp; ocean freight included to stated destination port.<br>
+            • <b>DDP:</b> All import duties, VAT &amp; delivery to buyer's warehouse included.<br>
+            • <b>Pricing:</b> ICE exchange + stated differential. Valid 48h from ${dateStr} ${timeStr}.<br>
+            • <b>Payment:</b> 100% SWIFT T/T prior to release. L/C negotiable.<br>
+            • <b>HS Code:</b> 0901.11.00 (Green coffee, not roasted, not decaffeinated).<br>
+            • <b>Quality:</b> Export grade. SGS weight/quality cert &amp; Phytosanitary provided.
+        </div>
+        <div style="flex:1;font-size:8.5px;line-height:1.7;border-left:1px solid #eee;padding-left:20px">
+            <b style="font-size:10px;border-bottom:2px solid #000;display:block;margin-bottom:7px">TİCARİ ŞARTLAR (TR)</b>
+            • <b>FOB:</b> Ürün Santos/Paranaguá limanında gemiye yüklenmiş teslim. SGS dahil.<br>
+            • <b>CIF:</b> Marine sigorta ve navlun dahil, belirtilen varış limanına kadar.<br>
+            • <b>DDP:</b> Gümrük, KDV ve depo teslimatı dahil.<br>
+            • <b>Fiyat:</b> ICE borsası + diferansiyel bazlı. ${dateStr} ${timeStr} itibarıyla 48 saat geçerli.<br>
+            • <b>Ödeme:</b> Teslimat öncesi %100 SWIFT T/T. Akreditif görüşülebilir.<br>
+            • <b>GTİP:</b> 0901.11.00 (Kavurulmamış yeşil kahve, kafeinsizleştirilmemiş).<br>
+            • <b>Kalite:</b> İhracat standardı. SGS ağırlık/kalite belgesi ve Fitosanitasyon sağlanır.
+        </div>
+    </div>
 
-            html += `
-                </div> <div style="display: flex; gap: 30px; padding-bottom: 40px; border-top: 1px solid #eee; padding-top: 30px;">
-                    <div style="flex: 1; font-size: 10px; line-height: 1.7; text-align: justify;">
-                        <b style="font-size:12px; border-bottom:2px solid #000; display:block; margin-bottom:10px;">TERMS & CONDITIONS (EN)</b>
-                        • <b>FOB:</b> Goods loaded on vessel at origin.<br>
-                        • <b>CIF:</b> Goods, insurance, and freight included.<br>
-                        • <b>DDP:</b> Duties and delivery to door included.<br>
-                        • <b>Pricing:</b> Based on live ICE market. Valid 48h.<br>
-                        • <b>Payment:</b> SWIFT Transfer prior to release.<br>
-                        • <b>Quality:</b> Export grade, SGS/Phyto provided.
-                    </div>
-                    <div style="flex: 1; font-size: 10px; line-height: 1.7; text-align: justify; border-left: 1px solid #eee; padding-left: 30px;">
-                        <b style="font-size:12px; border-bottom:2px solid #000; display:block; margin-bottom:10px;">TİCARİ ŞARTLAR (TR)</b>
-                        • <b>FOB:</b> Ürün gemiye yüklenmiş fiyattır.<br>
-                        • <b>CIF:</b> Sigorta ve navlun dahil fiyattır.<br>
-                        • <b>DDP:</b> Gümrük ve adrese teslim dahil fiyattır.<br>
-                        • <b>Fiyat:</b> Canlı borsa odaklıdır. 48s geçerlidir.<br>
-                        • <b>Ödeme:</b> Teslimat öncesi SWIFT havale.<br>
-                        • <b>Kalite:</b> İhracat standartı, SGS onaylı.
-                    </div>
-                </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:bold;color:#111;border-top:3px solid #000;padding-top:18px">
+        <div>TURKEY OFFICE:<br><span style="color:#555;font-weight:400">+90 544 590 60 14</span></div>
+        <div style="text-align:center">BRAZIL OFFICE:<br><span style="color:#555;font-weight:400">+55 19 981 55 29 42</span></div>
+        <div style="text-align:right">ASC CAFÉ GLOBAL<br>TRADING DIVISION</div>
+    </div>`;
 
-                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; color:#111; border-top:3px solid #000; padding-top:25px;">
-                    <div>TURKEY OFFICE:<br><span style="color:#555; font-weight:400;">+90 544 590 60 14</span></div>
-                    <div style="text-align:center;">BRAZIL OFFICE:<br><span style="color:#555; font-weight:400;">+55 19 981 55 29 42</span></div>
-                    <div style="text-align:right;">ASC CAFÉ GLOBAL<br>TRADING DIVISION</div>
-                </div>`;
-            
-            document.getElementById('pdfInner').innerHTML = html;
-            document.getElementById('modal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
+    document.getElementById('pdfInner').innerHTML = html;
+    document.getElementById('modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(fixPdfWrapMargin);
+}
+
+function hidePdf() {
+    document.getElementById('modal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function downloadPdf() {
+    const opt = { margin: 0, filename: 'ASC_Premium_Offer.pdf', html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+    html2pdf().set(opt).from(document.getElementById('pdfPage')).save();
+}
+
+async function shareWa() {
+    const btn  = document.getElementById('waBtn');
+    const orig = btn.textContent;
+    btn.textContent = '⏳ GENERATING...';
+    btn.disabled = true;
+    try {
+        const opt = { margin: 0, filename: 'ASC_Premium_Offer.pdf', html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        const blob = await html2pdf().set(opt).from(document.getElementById('pdfPage')).outputPdf('blob');
+        const file = new File([blob], 'ASC_Premium_Offer.pdf', { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: 'ASC CAFÉ Premium Offer', text: 'Please find our coffee offer attached.' });
+        } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'ASC_Premium_Offer.pdf';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+            setTimeout(() => window.open("https://wa.me/?text=ASC%20CAF%C3%89%20Premium%20Offer%20%E2%80%94%20PDF%20ektedir.", "_blank"), 600);
         }
+    } catch(e) {
+        if (e.name !== 'AbortError') window.open("https://wa.me/?text=ASC%20CAF%C3%89%20Premium%20Offer", "_blank");
+    } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+    }
+}
 
-        function hidePdf() { document.getElementById('modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
-        function downloadPdf() { 
-            const opt = { margin: 0, filename: 'ASC_Premium_Offer.pdf', html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            html2pdf().set(opt).from(document.getElementById('pdfPage')).save(); 
-        }
-        function shareWa() { window.open("https://wa.me/?text=ASC%20CAFÉ%20Premium%20Offer%20is%20Ready", "_blank"); }
+// PDF mobil ölçek düzeltmesi
+function fixPdfWrapMargin() {
+    const wrap = document.getElementById('pdfWrap');
+    const page = document.getElementById('pdfPage');
+    if (window.innerWidth <= 820) {
+        const scale = window.innerWidth / 850;
+        const loss  = page.offsetHeight * (1 - scale);
+        wrap.style.marginBottom = `-${Math.round(loss)}px`;
+    } else {
+        wrap.style.marginBottom = '';
+    }
+}
+window.addEventListener('resize', fixPdfWrapMargin);
 
-        window.onload = () => { build(); fetchLiveCurrency(); };
-    </script>
+window.onload = () => { build(); fetchLiveRates(); };
+</script>
 </body>
 </html>

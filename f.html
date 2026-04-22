@@ -9,264 +9,238 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --bg: #1a1c1e; 
-            --surface: #2d2f31;
+            --bg: #0f1113; 
+            --surface: #1e2022;
             --primary: #d4af37;
-            --accent: #ffffff;
             --success: #10b981;
             --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border: #3f444a;
+            --border: #333639;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; color: var(--text); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; color: var(--text); overflow-x: hidden; }
 
-        .app-header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        .brand { font-family: 'Sora', sans-serif; font-size: 20px; letter-spacing: 6px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .app-header { background: #000; padding: clamp(15px, 4vw, 25px); text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 100; }
+        .brand { font-family: 'Sora', sans-serif; font-size: clamp(16px, 5vw, 20px); letter-spacing: 4px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
 
-        .market-bar { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; background: #000; }
-        .market-card { background: var(--surface); padding: 12px; border-radius: 8px; min-width: 140px; flex: 1; border: 1px solid var(--border); }
-        .market-card label { font-size: 8px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
-        .market-card input { width: 100%; border: none; font-size: 16px; font-weight: 800; color: #fff; background: transparent; outline: none; }
-        .market-card.loading { opacity: 0.5; animation: pulse 1.5s infinite; }
+        .market-bar { display: flex; gap: 10px; padding: 12px; overflow-x: auto; scrollbar-width: none; background: #000; -webkit-overflow-scrolling: touch; }
+        .market-card { background: var(--surface); padding: 10px; border-radius: 8px; min-width: 130px; flex: 1; border: 1px solid var(--border); }
+        .market-card label { font-size: 7px; font-weight: 800; color: var(--primary); display: block; margin-bottom: 2px; text-transform: uppercase; }
+        .market-card input { width: 100%; border: none; font-size: 15px; font-weight: 800; color: #fff; background: transparent; }
 
-        @keyframes pulse { 50% { opacity: 0.3; } }
+        .container { padding: 15px 15px 100px; max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 15px; }
+        .product-card { background: var(--surface); border-radius: 12px; padding: 18px; border: 1px solid var(--border); }
+        .product-card h2 { font-size: 12px; margin: 0 0 12px; color: var(--primary); font-weight: 800; border-left: 3px solid var(--primary); padding-left: 10px; text-transform: uppercase; }
 
-        .container { padding: 20px 15px 100px; max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
-        .product-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .product-card h2 { font-size: 13px; margin: 0 0 15px; color: var(--primary); font-weight: 800; border-left: 3px solid var(--primary); padding-left: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .unit-display { background: rgba(212,175,55,0.05); border: 1px dashed var(--primary); padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .unit-display label { font-size: 9px; font-weight: 800; color: var(--primary); }
+        .unit-display b { font-size: 14px; color: #fff; }
 
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .input-box { background: #1a1c1e; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-        .input-box label { display: block; font-size: 9px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
-        .input-box input { width: 100%; border: none; background: transparent; font-size: 17px; font-weight: 700; color: #fff; outline: none; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .input-box { background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .input-box label { display: block; font-size: 8px; font-weight: 800; color: #666; margin-bottom: 2px; }
+        .input-box input { width: 100%; border: none; background: transparent; font-size: 16px; font-weight: 700; color: #fff; }
 
-        .quick-ton { display: flex; gap: 8px; margin-bottom: 15px; }
-        .quick-ton button { flex: 1; padding: 12px; font-size: 10px; font-weight: 800; background: #3f444a; border: none; border-radius: 6px; color: #fff; cursor: pointer; text-transform: uppercase; }
-        .quick-ton button:active { background: var(--primary); color: #000; }
+        .quick-actions { display: flex; gap: 6px; margin-bottom: 12px; }
+        .quick-actions button { flex: 1; padding: 10px; font-size: 9px; font-weight: 800; background: #333; border: none; border-radius: 6px; color: #fff; }
 
-        .res-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
-        .res-item label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .res-val b { font-size: 16px; color: var(--primary); }
+        .res-line { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
+        .res-line span { font-size: 10px; font-weight: 700; color: #94a3b8; }
+        .res-line b { font-size: 15px; color: var(--primary); }
 
-        .profit-analysis { margin-top: 15px; background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; border: 1px solid var(--success); }
-        .p-grid { display: flex; justify-content: space-between; align-items: center; }
-        .p-grid b { font-size: 18px; color: var(--success); }
+        .margin-box { margin-top: 12px; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border: 1px solid var(--success); display: flex; justify-content: space-between; align-items: center; }
+        .margin-box span { font-size: 10px; font-weight: 800; color: var(--success); }
+        .margin-box b { font-size: 17px; color: var(--success); }
 
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: var(--primary); color: #000; border-radius: 50%; border: none; font-size: 28px; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.5); z-index: 99; cursor: pointer; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; border: none; font-size: 24px; color: #000; box-shadow: 0 8px 20px rgba(0,0,0,0.5); z-index: 100; cursor: pointer; }
 
-        /* Modal & PDF Styling */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 1000; overflow-y: auto; }
-        .modal-content { width: 100%; max-width: 900px; margin: 0 auto; padding: 10px; }
-        .modal-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 1001; }
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; overflow-y: auto; }
+        .modal-content { width: 100%; max-width: 900px; margin: auto; padding: 10px; }
+        .modal-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px 0; position: sticky; top: 0; background: #000; z-index: 1001; }
+        .btn { padding: 12px; border-radius: 6px; border: none; font-weight: 800; font-size: 10px; text-transform: uppercase; cursor: pointer; }
 
-        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 50px; color: #000; position: relative; overflow: hidden; font-family: 'Times New Roman', serif; }
-        
-        .pdf-watermark-container {
-            position: absolute; top: 300px; left: 0; width: 100%; height: 450px;
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-            pointer-events: none; opacity: 0.04; transform: rotate(-30deg) scale(1.3); z-index: 1; 
-        }
-        .wm-text { font-size: 55px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 45px; color: #000; position: relative; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; }
+        .pdf-header { display: flex; justify-content: space-between; border-bottom: 2.5px solid #000; padding-bottom: 12px; margin-bottom: 25px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .pdf-table th { background: #f4f4f4; border: 1px solid #000; padding: 8px; font-size: 9px; text-align: left; font-weight: 900; text-transform: uppercase; }
+        .pdf-table td { border: 1px solid #000; padding: 10px; font-size: 11px; font-weight: 700; }
 
-        .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid #000; padding-bottom: 20px; margin-bottom: 30px; position: relative; z-index: 2; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; position: relative; z-index: 2; }
-        .pdf-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; text-align: left; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .pdf-table td { border: 1px solid #000; padding: 12px; font-size: 13px; font-weight: 700; }
-
-        @media (min-width: 768px) {
-            .container { grid-template-columns: 1fr 1fr; display: grid; }
-            .modal-actions { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (max-width: 820px) {
-            .pdf-wrapper { transform: scale(calc(100vw / 900)); transform-origin: top center; margin-bottom: -550px; }
-        }
+        @media (min-width: 768px) { .container { display: grid; grid-template-columns: 1fr 1fr; } .modal-btns { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 820px) { .pdf-wrap { transform: scale(calc(100vw / 850)); transform-origin: top center; margin-bottom: -550px; } }
     </style>
 </head>
 <body>
 
-    <header class="app-header">
-        <div class="brand">ASC CAFÉ</div>
-    </header>
+    <header class="app-header"><div class="brand">ASC CAFÉ</div></header>
 
     <div class="market-bar">
-        <div class="market-card" id="uTryCard"><label>USD / TRY (LIVE)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
+        <div class="market-card"><label>USD/TRY (LIVE)</label><input type="number" id="uTry" value="34.35" step="0.0001" oninput="calc()"></div>
         <div class="market-card"><label>NY ARABICA (LB)</label><input type="number" id="iceNy" value="288.45" oninput="calc()"></div>
         <div class="market-card"><label>LDN ROBUSTA (MT)</label><input type="number" id="iceLdn" value="3339" oninput="calc()"></div>
     </div>
 
-    <main class="container" id="mainGrid"></main>
+    <main class="container" id="grid"></main>
 
-    <button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-contract"></i></button>
+    <button class="fab" onclick="showPdf()"><i class="fa-solid fa-file-invoice"></i></button>
 
     <div id="modal">
         <div class="modal-content">
-            <div class="modal-actions">
-                <button class="btn" style="background:#444; color:white;" onclick="hidePdf()">CLOSE</button>
-                <button class="btn" style="background:#d4af37; color:black;" onclick="downloadPdf()">EXPORT PDF</button>
-                <button class="btn" style="background:#2563eb; color:white;" onclick="shareWhatsapp()">WHATSAPP</button>
-                <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">PRINT</button>
+            <div class="modal-btns">
+                <button class="btn" style="background:#333; color:#fff;" onclick="hidePdf()">CLOSE / KAPAT</button>
+                <button class="btn" style="background:var(--primary); color:#000;" onclick="downloadPdf()">SAVE / KAYDET</button>
+                <button class="btn" style="background:#25d366; color:#fff;" onclick="shareWa()">WHATSAPP</button>
+                <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">PRINT / YAZDIR</button>
             </div>
-            <div class="pdf-wrapper" style="display:flex; justify-content:center;">
-                <div id="pdfPage">
-                    <div class="pdf-watermark-container" id="wmGrid"></div>
-                    <div id="pdfInner"></div>
-                </div>
+            <div class="pdf-wrap">
+                <div id="pdfPage"><div id="pdfInner"></div></div>
             </div>
         </div>
     </div>
 
     <script>
-        const PRODUCTS = [
-            { id: 'ar', name: 'PREMIUM ARABICA NY GREEN COFFEE', type: 'NY' },
-            { id: 'ro', name: 'SELECTED ROBUSTA CONILON BRAZIL', type: 'LDN' }
+        const PRODS = [
+            { id: 'ar', name: 'NATURAL NY2/3 17/18 SSFC', type: 'NY' },
+            { id: 'ro', name: 'BREZİLYA ROBUSTA (CONILON)', type: 'LDN' }
         ];
 
-        async function updateLiveRates() {
-            const card = document.getElementById('uTryCard');
-            card.classList.add('loading');
+        async function fetchLiveCurrency() {
             try {
-                const response = await fetch('https://open.er-api.com/v6/latest/USD?t=' + Date.now());
-                const data = await response.json();
-                if (data.rates && data.rates.TRY) {
+                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                const data = await res.json();
+                if(data.rates && data.rates.TRY) {
                     document.getElementById('uTry').value = data.rates.TRY.toFixed(4);
                     calc();
                 }
-            } catch (error) {
-                console.error("Currency sync failed.");
-            } finally {
-                card.classList.remove('loading');
-            }
+            } catch(e) { console.error("Currency API connection error"); }
         }
 
-        setInterval(updateLiveRates, 300000);
-
-        function generateRef() { return "ASC-" + Math.random().toString(36).substring(2, 9).toUpperCase(); }
-
-        function setTon(id, val) { document.getElementById(id + 'T').value = val; calc(); }
-
-        function getCalculations(id, type) {
+        function getVals(id, type) {
             const kur = parseFloat(document.getElementById('uTry').value) || 34.35;
-            const borsaBase = (type === 'NY') ? (parseFloat(document.getElementById('iceNy').value)/100)*2204.62 : parseFloat(document.getElementById('iceLdn').value);
-            const ton = parseFloat(document.getElementById(id+'T').value) || 1;
-            const karO = (parseFloat(document.getElementById(id+'K').value) || 0) / 100;
+            const borsaRaw = (type === 'NY') ? (parseFloat(document.getElementById('iceNy').value)/100)*2204.62 : parseFloat(document.getElementById('iceLdn').value);
+            const ton = parseFloat(document.getElementById(id+'T').value) || 0;
+            const karPct = (parseFloat(document.getElementById(id+'K').value) || 0) / 100;
             
-            const navlun = ton < 5 ? 450 : 350; 
-            const liman = ton < 5 ? 200 : 150;
-            const fob = borsaBase * (1 + karO);
-            const cif = (borsaBase + navlun + (borsaBase * 0.015)) * (1 + karO);
-            const ddp = (cif + (liman * (1 + karO))) * 1.15;
-            const netMaliyet = (((borsaBase + navlun + (borsaBase * 0.015)) + liman) * 1.15);
-            return { fob, cif, ddp, ton, kur, profit: (ddp - netMaliyet) * ton };
+            const costFob = borsaRaw;
+            const costCif = borsaRaw + 350 + (borsaRaw * 0.015);
+            const costDdp = (costCif + 150) * 1.15;
+
+            const sellFob = costFob * (1 + karPct);
+            const sellCif = costCif * (1 + karPct);
+            const sellDdp = costDdp * (1 + karPct);
+            const netMargin = (sellDdp - costDdp) * ton;
+
+            return { fob: sellFob, cif: sellCif, ddp: sellDdp, ton, kur, margin: netMargin };
         }
 
         function build() {
-            const g = document.getElementById('mainGrid');
-            g.innerHTML = '';
-            PRODUCTS.forEach(p => {
-                g.innerHTML += `
-                    <div class="product-card">
-                        <h2>${p.name}</h2>
-                        <div class="input-row">
-                            <div class="input-box"><label>VOLUME (MT)</label><input type="number" id="${p.id}T" value="1" oninput="calc()"></div>
-                            <div class="input-box"><label>PROFIT %</label><input type="number" id="${p.id}K" value="15" oninput="calc()"></div>
-                        </div>
-                        <div class="quick-ton">
-                            <button onclick="setTon('${p.id}', 1)">1 MT (LCL)</button>
-                            <button onclick="setTon('${p.id}', 19.2)">19.2 MT (FCL)</button>
-                        </div>
-                        <div id="${p.id}Results"></div>
+            document.getElementById('grid').innerHTML = PRODS.map(p => `
+                <div class="product-card">
+                    <h2>${p.name}</h2>
+                    <div class="unit-display" id="${p.id}Unit"></div>
+                    <div class="input-row">
+                        <div class="input-box"><label>TONNAGE / TONAJ</label><input type="number" id="${p.id}T" value="1" oninput="calc()"></div>
+                        <div class="input-box"><label>PROFIT / KÂR %</label><input type="number" id="${p.id}K" value="0" oninput="calc()"></div>
                     </div>
-                `;
-            });
+                    <div class="quick-actions">
+                        <button onclick="document.getElementById('${p.id}T').value=1; calc()">1 MT</button>
+                        <button onclick="document.getElementById('${p.id}T').value=19.2; calc()">19.2 MT</button>
+                    </div>
+                    <div id="${p.id}Res"></div>
+                </div>
+            `).join('');
             calc();
         }
 
         function calc() {
-            PRODUCTS.forEach(p => {
-                const d = getCalculations(p.id, p.type);
-                document.getElementById(p.id+'Results').innerHTML = `
-                    <div class="res-item"><label>FOB TOTAL</label><div class="res-val"><b>$ ${Math.round(d.fob*d.ton).toLocaleString()}</b></div></div>
-                    <div class="res-item"><label>CIF TOTAL</label><div class="res-val"><b>$ ${Math.round(d.cif*d.ton).toLocaleString()}</b></div></div>
-                    <div class="res-item" style="border:none"><label>DDP TOTAL</label><div class="res-val"><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></div></div>
-                    <div class="profit-analysis">
-                        <div class="p-grid"><small style="font-weight:800; color:var(--success)">ESTIMATED MARGIN (USD)</small><b>$ ${Math.round(d.profit).toLocaleString()}</b></div>
-                    </div>
+            PRODS.forEach(p => {
+                const d = getVals(p.id, p.type);
+                const kgUsd = (d.ddp/1000).toFixed(2);
+                document.getElementById(p.id+'Unit').innerHTML = `<span>UNIT PRICE (KG)</span><b>$ ${kgUsd} / ₺ ${(kgUsd*d.kur).toFixed(2)}</b>`;
+                document.getElementById(p.id+'Res').innerHTML = `
+                    <div class="res-line"><span>FOB TOTAL</span><b>$ ${Math.round(d.fob*d.ton).toLocaleString()}</b></div>
+                    <div class="res-line"><span>CIF TOTAL</span><b>$ ${Math.round(d.cif*d.ton).toLocaleString()}</b></div>
+                    <div class="res-line" style="border:none"><span>DDP TOTAL</span><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></div>
+                    <div class="margin-box"><span>NET MARGIN (USD)</span><b>$ ${Math.max(0, Math.round(d.margin)).toLocaleString()}</b></div>
                 `;
             });
         }
 
         function showPdf() {
-            const client = prompt("Client / Company Name:") || "VALUED BUSINESS PARTNER";
-            const refNo = generateRef();
-            document.getElementById('wmGrid').innerHTML = Array(9).fill('<div class="wm-text">ASC CAFÉ</div>').join('');
-
+            const client = prompt("Client / Company:") || "VALUED PARTNER";
+            const ref = "ASC-OFFER-" + Math.random().toString(36).substring(7).toUpperCase();
             let html = `
                 <div class="pdf-header">
-                    <div>
-                        <h1 style="margin:0; font-size:38px; color:#000;">ASC CAFÉ</h1>
-                        <p style="font-size:11px; font-weight:900; color:#333; margin:5px 0; letter-spacing:1px;">GLOBAL COFFEE SUPPLY & TRADE HUB</p>
-                    </div>
+                    <div><h1 style="margin:0; font-size:30px; letter-spacing:-1px;">ASC CAFÉ</h1><p style="font-size:9px; font-weight:bold; letter-spacing:2px; color:#444;">GLOBAL COFFEE TRADING & LOGISTICS</p></div>
                     <div style="text-align:right">
-                        <div style="background:#000; color:#fff; padding:8px 15px; font-weight:900; font-size:12px; margin-bottom:10px;">OFFER REF: ${refNo}</div>
-                        <p style="font-size:12px; margin:0; font-weight:bold;">DATE: ${new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}</p>
+                        <div style="background:#000; color:#fff; padding:6px 12px; font-weight:900; font-size:11px; margin-bottom:5px;">REF: ${ref}</div>
+                        <p style="font-size:10px; font-weight:bold;">DATE: ${new Date().toLocaleDateString('tr-TR')}</p>
                     </div>
                 </div>
-                
-                <div style="margin-bottom:35px; position:relative; z-index:2;">
-                    <p style="font-size:13px; font-weight:bold; color:#555; margin-bottom:5px;">OFFER PREPARED FOR:</p>
-                    <p style="font-size:18px; margin:0; font-weight:bold; text-decoration:underline;">${client.toUpperCase()}</p>
+                <div style="margin-bottom:25px; border-left:4px solid #000; padding-left:15px;">
+                    <p style="font-size:11px; color:#666; margin:0; font-weight:bold;">OFFER PREPARED FOR:</p>
+                    <p style="font-size:18px; font-weight:bold; margin:5px 0;">${client.toUpperCase()}</p>
                 </div>
             `;
 
-            PRODUCTS.forEach(p => {
-                const d = getCalculations(p.id, p.type);
+            PRODS.forEach(p => {
+                const d = getVals(p.id, p.type);
                 html += `
-                    <div style="margin-bottom:30px; position:relative; z-index:2;">
-                        <div style="background:#000; color:#fff; padding:6px 12px; font-size:13px; font-weight:bold; margin-bottom:1px;">${p.name} - ${d.ton} MT</div>
-                        <table class="pdf-table">
-                            <tr><th>INCOTERM 2020</th><th>UNIT PRICE (KG/USD)</th><th>TOTAL VALUE (USD)</th><th>LOCAL EST. (TRY)</th></tr>
-                            <tr><td>FOB (Free On Board)</td><td>$ ${(d.fob/1000).toFixed(2)}</td><td>$ ${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
-                            <tr><td>CIF (Cost, Ins, Freight)</td><td>$ ${(d.cif/1000).toFixed(2)}</td><td>$ ${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
-                            <tr style="background:#f9f9f9;"><td><b>DDP (Delivered Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
-                        </table>
-                    </div>`;
+                <div style="margin-bottom:25px;">
+                    <div style="background:#f4f4f4; border:1px solid #000; padding:10px 15px; font-size:11px; font-weight:bold; display:flex; justify-content:space-between;">
+                        <span>COMMODITY: ${p.name}</span>
+                        <span>VOLUME: ${d.ton} MT</span>
+                    </div>
+                    <table class="pdf-table">
+                        <tr><th>Incoterm 2020</th><th>Unit Price (USD/KG)</th><th>Total (USD)</th><th>Total (TRY)</th></tr>
+                        <tr><td>FOB (Free On Board)</td><td>$ ${(d.fob/1000).toFixed(2)}</td><td>$ ${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
+                        <tr><td>CIF (Cost, Ins, Freight)</td><td>$ ${(d.cif/1000).toFixed(2)}</td><td>$ ${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
+                        <tr style="background:#fafafa;"><td><b>DDP (Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
+                    </table>
+                </div>`;
             });
 
             html += `
-                <div style="font-size:10.5px; padding:15px; border:1px solid #000; line-height:1.6; position:relative; z-index:2; margin-top:20px; background:#fff;">
-                    <b style="border-bottom:1px solid #000; text-transform:uppercase;">International Trade Terms & Legal Clauses:</b><br>
-                    • <b>Incoterms:</b> All prices are based on ICC Incoterms® 2020 standards.<br>
-                    • <b>FOB:</b> Loading & local customs by seller. Freight & insurance by buyer.<br>
-                    • <b>CIF:</b> Freight and basic marine insurance included to destination port.<br>
-                    • <b>DDP:</b> All import duties, taxes, and final delivery included to buyer's warehouse.<br>
-                    • <b>Validity:</b> Due to market volatility, this official quote is valid for <b>48 hours</b>.
+                <div style="display: flex; gap: 20px; margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <div style="flex: 1; font-size: 8.5px; line-height: 1.6; text-align: justify;">
+                        <b style="font-size:10px; border-bottom:1px solid #000; display:block; margin-bottom:6px;">TERMS & CONDITIONS (EN)</b>
+                        • <b>Pricing:</b> Strictly based on live ICE market. Valid 48 hours.<br>
+                        • <b>Incoterms:</b> Subject to ICC Incoterms® 2020 definitions.<br>
+                        • <b>Quality:</b> Export standards guaranteed. SGS/Phyto provided.<br>
+                        • <b>Payment:</b> SWIFT Wire Transfer prior to title release.<br>
+                        • <b>Ownership:</b> Retained by ASC until 100% payment clearance.<br>
+                        • <b>Force Majeure:</b> Standard international clauses apply.<br>
+                        • <b>Jurisdiction:</b> Disputes settled under ICC Arbitration.
+                    </div>
+                    <div style="flex: 1; font-size: 8.5px; line-height: 1.6; text-align: justify; border-left: 1px solid #ddd; padding-left: 20px;">
+                        <b style="font-size:10px; border-bottom:1px solid #000; display:block; margin-bottom:6px;">TİCARİ ŞARTLAR (TR)</b>
+                        • <b>Fiyatlandırma:</b> Canlı borsa verilerine dayalıdır. 48s geçerlidir.<br>
+                        • <b>Incoterms:</b> ICC Incoterms® 2020 standartları uygulanır.<br>
+                        • <b>Kalite:</b> İhracat kalitesi garantili olup SGS sertifikalıdır.<br>
+                        • <b>Ödeme:</b> Mülkiyet devri öncesi SWIFT havale gereklidir.<br>
+                        • <b>Mülkiyet:</b> Ödeme tamamlanana kadar mülkiyet ASC'ye aittir.<br>
+                        • <b>Mücbir Sebep:</b> Uluslararası standart maddeler geçerlidir.<br>
+                        • <b>Yetki:</b> Uyuşmazlıklarda ICC Tahkim kuralları esastır.
+                    </div>
                 </div>
-                
-                <div style="margin-top:50px; display:flex; justify-content:space-between; font-size:11px; font-weight:bold; position:relative; z-index:2;">
-                    <div>TURKEY HQ: +90 544 590 60 14</div>
-                    <div>BRASILIA DF: +55 19 981 55 29 42</div>
-                    <div style="text-align:center; border-top:1px solid #000; min-width:160px; padding-top:5px;">ASC OFFICIAL EXECUTION</div>
-                </div>
-            `;
+                <div style="margin-top:40px; display:flex; justify-content:space-between; font-size:10px; font-weight:bold; color:#111; border-top:2px solid #000; padding-top:15px;">
+                    <div>TÜRKİYE OFİSİ / TURKEY:<br><span style="color:#555;">+90 544 590 60 14</span></div>
+                    <div style="text-align:center;">BRASILIA DF OFİSİ / BRAZIL:<br><span style="color:#555;">+55 19 981 55 29 42</span></div>
+                    <div style="text-align:right;">ASC CAFÉ GLOBAL<br>TRADING TERMINAL</div>
+                </div>`;
+            
             document.getElementById('pdfInner').innerHTML = html;
             document.getElementById('modal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
 
         function hidePdf() { document.getElementById('modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
-        function downloadPdf() {
-            const el = document.getElementById('pdfPage');
-            html2pdf().set({ margin:0, filename:'ASC_Official_Offer.pdf', html2canvas:{scale:3}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} }).from(el).save();
+        function downloadPdf() { 
+            const opt = { margin: 0, filename: 'ASC_Global_Offer.pdf', html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            html2pdf().set(opt).from(document.getElementById('pdfPage')).save(); 
         }
-        function shareWhatsapp() { window.open(`https://wa.me/?text=${encodeURIComponent("ASC CAFÉ: Your official export offer has been generated with Ref No.")}`, '_blank'); }
-        
-        window.onload = () => {
-            build();
-            updateLiveRates();
-        };
+        function shareWa() { window.open("https://wa.me/?text=ASC%20CAFÉ%20Premium%20Offer", "_blank"); }
+
+        window.onload = () => { build(); fetchLiveCurrency(); };
     </script>
 </body>
 </html>

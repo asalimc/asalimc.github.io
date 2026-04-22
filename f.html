@@ -59,11 +59,12 @@
         .modal-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px 0; position: sticky; top: 0; background: #000; z-index: 1001; }
         .btn { padding: 12px; border-radius: 6px; border: none; font-weight: 800; font-size: 10px; text-transform: uppercase; cursor: pointer; }
 
-        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 50px; color: #000; position: relative; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; }
-        .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 30px; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .pdf-table th { background: #f8f8f8; border: 1px solid #000; padding: 10px; font-size: 10px; text-align: left; font-weight: 900; text-transform: uppercase; }
-        .pdf-table td { border: 1px solid #000; padding: 12px; font-size: 12px; font-weight: 700; }
+        /* PDF Styling - Full Page Use */
+        #pdfPage { background: white; width: 794px; min-height: 1123px; padding: 50px 60px; color: #000; position: relative; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; justify-content: space-between; }
+        .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin: 25px 0; }
+        .pdf-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; font-size: 11px; text-align: left; font-weight: 900; text-transform: uppercase; }
+        .pdf-table td { border: 1px solid #000; padding: 15px 12px; font-size: 13px; font-weight: 700; }
 
         @media (min-width: 768px) { .container { display: grid; grid-template-columns: 1fr 1fr; } .modal-btns { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 820px) { .pdf-wrap { transform: scale(calc(100vw / 850)); transform-origin: top center; margin-bottom: -550px; } }
@@ -92,7 +93,7 @@
                 <button class="btn" style="background:#fff; border:1px solid #000;" onclick="window.print()">PRINT / YAZDIR</button>
             </div>
             <div class="pdf-wrap">
-                <div id="pdfPage"><div id="pdfInner"></div></div>
+                <div id="pdfPage"><div id="pdfInner" style="height:100%; display:flex; flex-direction:column;"></div></div>
             </div>
         </div>
     </div>
@@ -167,75 +168,65 @@
 
         function showPdf() {
             const client = prompt("Client / Company Name:") || "VALUED PARTNER";
-            const ref = "ASC-QUOTE-" + Math.random().toString(36).substring(7).toUpperCase();
+            const ref = "ASC-" + Math.random().toString(36).substring(7).toUpperCase();
             let html = `
                 <div class="pdf-header">
-                    <div><h1 style="margin:0; font-size:35px; letter-spacing:-1px;">ASC CAFÉ</h1><p style="font-size:10px; font-weight:bold; letter-spacing:3px; color:#444;">GLOBAL COFFEE TRADING & LOGISTICS</p></div>
+                    <div><h1 style="margin:0; font-size:42px; letter-spacing:-1px;">ASC CAFÉ</h1><p style="font-size:11px; font-weight:bold; letter-spacing:4px; color:#444;">GLOBAL COFFEE TRADING & LOGISTICS</p></div>
                     <div style="text-align:right">
-                        <div style="background:#000; color:#fff; padding:8px 15px; font-weight:900; font-size:12px; margin-bottom:5px;">OFFER REF: ${ref}</div>
-                        <p style="font-size:11px; font-weight:bold;">DATE: ${new Date().toLocaleDateString('tr-TR')}</p>
+                        <div style="background:#000; color:#fff; padding:8px 18px; font-weight:900; font-size:13px; margin-bottom:8px;">OFFER REF: ${ref}</div>
+                        <p style="font-size:12px; font-weight:bold;">DATE: ${new Date().toLocaleDateString('tr-TR')}</p>
                     </div>
                 </div>
 
-                <div style="margin-bottom:30px; border-left:5px solid #000; padding-left:20px;">
-                    <p style="font-size:12px; color:#666; margin:0; font-weight:bold; text-transform:uppercase;">To the attention of:</p>
-                    <p style="font-size:20px; font-weight:bold; margin:5px 0; color:#000;">${client.toUpperCase()}</p>
-                </div>`;
+                <div style="margin-bottom:30px; border-left:6px solid #000; padding-left:20px;">
+                    <p style="font-size:12px; color:#666; margin:0; font-weight:bold; text-transform:uppercase;">OFFER PREPARED FOR:</p>
+                    <p style="font-size:24px; font-weight:bold; margin:5px 0; color:#000;">${client.toUpperCase()}</p>
+                </div>
+
+                <div style="flex-grow: 1;">`;
 
             PRODS.forEach(p => {
                 const d = getVals(p.id, p.type);
                 html += `
-                <div style="margin-bottom:35px;">
-                    <div style="background:#f9f9f9; border:1px solid #000; padding:12px 20px; font-size:12px; font-weight:bold; display:flex; justify-content:space-between;">
+                <div style="margin-bottom:40px;">
+                    <div style="background:#f4f4f4; border:1px solid #000; padding:12px 20px; font-size:13px; font-weight:bold; display:flex; justify-content:space-between;">
                         <span>COMMODITY: ${p.name}</span>
                         <span>QUANTITY: ${d.ton} MT</span>
                     </div>
                     <table class="pdf-table">
-                        <tr><th>Incoterm 2020</th><th>Unit Price (USD/KG)</th><th>Total Amount (USD)</th><th>Total Amount (TRY)</th></tr>
+                        <tr><th style="width:30%">Incoterm 2020</th><th style="width:20%">Unit (USD/KG)</th><th style="width:25%">Total (USD)</th><th style="width:25%">Total (TRY)</th></tr>
                         <tr><td>FOB (Free On Board)</td><td>$ ${(d.fob/1000).toFixed(2)}</td><td>$ ${Math.round(d.fob*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.fob*d.ton*d.kur).toLocaleString()}</td></tr>
                         <tr><td>CIF (Cost, Ins, Freight)</td><td>$ ${(d.cif/1000).toFixed(2)}</td><td>$ ${Math.round(d.cif*d.ton).toLocaleString()}</td><td>₺ ${Math.round(d.cif*d.ton*d.kur).toLocaleString()}</td></tr>
-                        <tr style="background:#fafafa;"><td><b>DDP (Delivered Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
+                        <tr style="background:#fafafa;"><td><b>DDP (Duty Paid)</b></td><td><b>$ ${(d.ddp/1000).toFixed(2)}</b></td><td><b>$ ${Math.round(d.ddp*d.ton).toLocaleString()}</b></td><td><b>₺ ${Math.round(d.ddp*d.ton*d.kur).toLocaleString()}</b></td></tr>
                     </table>
                 </div>`;
             });
 
             html += `
-                <div style="display: flex; gap: 30px; margin-top: auto;">
-                    <div style="flex: 1; font-size: 9px; line-height: 1.6; text-align: justify;">
-                        <div style="margin-bottom:12px; font-size:10px; border-bottom:2px solid #000; padding-bottom:4px;"><b>INTERNATIONAL TRADE DEFINITIONS</b></div>
-                        • <b>FOB:</b> Price includes goods loaded on vessel at origin.<br>
-                        • <b>CIF:</b> Price includes goods, insurance, and freight to port.<br>
-                        • <b>DDP:</b> Price includes all duties, taxes, and delivery to door.<br>
-                        
-                        <div style="margin:15px 0 8px 0; font-size:10px; border-bottom:2px solid #000; padding-bottom:4px;"><b>TERMS & CONDITIONS (EN)</b></div>
-                        • <b>Pricing:</b> Strictly based on live ICE market. Valid 48 hours.<br>
-                        • <b>Incoterms:</b> Subject to ICC Incoterms® 2020 definitions.<br>
-                        • <b>Quality:</b> Export standards guaranteed. SGS/Phyto provided.<br>
-                        • <b>Payment:</b> SWIFT Wire Transfer prior to title release.<br>
-                        • <b>Ownership:</b> Retained by ASC until 100% payment clearance.<br>
-                        • <b>Force Majeure:</b> Standard international clauses apply.<br>
-                        • <b>Jurisdiction:</b> Disputes settled under ICC Arbitration.
+                </div> <div style="display: flex; gap: 30px; padding-bottom: 40px; border-top: 1px solid #eee; padding-top: 30px;">
+                    <div style="flex: 1; font-size: 10px; line-height: 1.7; text-align: justify;">
+                        <b style="font-size:12px; border-bottom:2px solid #000; display:block; margin-bottom:10px;">TERMS & CONDITIONS (EN)</b>
+                        • <b>FOB:</b> Goods loaded on vessel at origin.<br>
+                        • <b>CIF:</b> Goods, insurance, and freight included.<br>
+                        • <b>DDP:</b> Duties and delivery to door included.<br>
+                        • <b>Pricing:</b> Based on live ICE market. Valid 48h.<br>
+                        • <b>Payment:</b> SWIFT Transfer prior to release.<br>
+                        • <b>Quality:</b> Export grade, SGS/Phyto provided.
                     </div>
-                    <div style="flex: 1; font-size: 9px; line-height: 1.6; text-align: justify; border-left: 1px solid #eee; padding-left: 30px;">
-                        <div style="margin-bottom:12px; font-size:10px; border-bottom:2px solid #000; padding-bottom:4px;"><b>ULUSLARARASI TİCARİ TANIMLAR</b></div>
-                        • <b>FOB:</b> Ürünün limanda gemiye yüklenmiş haldeki fiyatıdır.<br>
-                        • <b>CIF:</b> Ürün, sigorta ve varış limanına kadar navlun dahil fiyattır.<br>
-                        • <b>DDP:</b> Gümrük vergileri ve adrese teslim dahil tüm masraflar dahildir.<br>
-
-                        <div style="margin:15px 0 8px 0; font-size:10px; border-bottom:2px solid #000; padding-bottom:4px;"><b>TİCARİ ŞARTLAR (TR)</b></div>
-                        • <b>Fiyatlandırma:</b> Canlı borsa verilerine dayalıdır. 48s geçerlidir.<br>
-                        • <b>Incoterms:</b> ICC Incoterms® 2020 standartları uygulanır.<br>
-                        • <b>Kalite:</b> İhracat kalitesi garantili olup SGS sertifikalıdır.<br>
-                        • <b>Ödeme:</b> Mülkiyet devri öncesi SWIFT havale gereklidir.<br>
-                        • <b>Mülkiyet:</b> Ödeme tamamlanana kadar mülkiyet ASC'ye aittir.<br>
-                        • <b>Mücbir Sebep:</b> Uluslararası standart maddeler geçerlidir.<br>
-                        • <b>Yetki:</b> Uyuşmazlıklarda ICC Tahkim kuralları esastır.
+                    <div style="flex: 1; font-size: 10px; line-height: 1.7; text-align: justify; border-left: 1px solid #eee; padding-left: 30px;">
+                        <b style="font-size:12px; border-bottom:2px solid #000; display:block; margin-bottom:10px;">TİCARİ ŞARTLAR (TR)</b>
+                        • <b>FOB:</b> Ürün gemiye yüklenmiş fiyattır.<br>
+                        • <b>CIF:</b> Sigorta ve navlun dahil fiyattır.<br>
+                        • <b>DDP:</b> Gümrük ve adrese teslim dahil fiyattır.<br>
+                        • <b>Fiyat:</b> Canlı borsa odaklıdır. 48s geçerlidir.<br>
+                        • <b>Ödeme:</b> Teslimat öncesi SWIFT havale.<br>
+                        • <b>Kalite:</b> İhracat standartı, SGS onaylı.
                     </div>
                 </div>
 
-                <div style="margin-top:50px; display:flex; justify-content:space-between; font-size:11px; font-weight:bold; color:#111; border-top:2.5px solid #000; padding-top:20px;">
-                    <div>TURKEY OFFICE / TÜRKİYE:<br><span style="color:#555; font-weight:400;">+90 544 590 60 14</span></div>
-                    <div style="text-align:center;">BRAZIL OFFICE / BRASILIA DF:<br><span style="color:#555; font-weight:400;">+55 19 981 55 29 42</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; color:#111; border-top:3px solid #000; padding-top:25px;">
+                    <div>TURKEY OFFICE:<br><span style="color:#555; font-weight:400;">+90 544 590 60 14</span></div>
+                    <div style="text-align:center;">BRAZIL OFFICE:<br><span style="color:#555; font-weight:400;">+55 19 981 55 29 42</span></div>
                     <div style="text-align:right;">ASC CAFÉ GLOBAL<br>TRADING DIVISION</div>
                 </div>`;
             
@@ -246,10 +237,10 @@
 
         function hidePdf() { document.getElementById('modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
         function downloadPdf() { 
-            const opt = { margin: 0, filename: 'ASC_Global_Quotation.pdf', html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            const opt = { margin: 0, filename: 'ASC_Premium_Offer.pdf', html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
             html2pdf().set(opt).from(document.getElementById('pdfPage')).save(); 
         }
-        function shareWa() { window.open("https://wa.me/?text=ASC%20CAFÉ%20Global%20Offer%20Ready", "_blank"); }
+        function shareWa() { window.open("https://wa.me/?text=ASC%20CAFÉ%20Premium%20Offer%20is%20Ready", "_blank"); }
 
         window.onload = () => { build(); fetchLiveCurrency(); };
     </script>

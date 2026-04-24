@@ -102,6 +102,12 @@
         <div id="view-finance" class="hidden space-y-6">
             <div class="space-y-4">
                 <h2 class="text-xl font-black">Lista de Vendas</h2>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="renderFinance('all')" class="filter-btn active" id="f-all">Todas</button>
+                    <button onclick="renderFinance('Cartão')" class="filter-btn" id="f-card">Cartão</button>
+                    <button onclick="renderFinance('Dinheiro')" class="filter-btn" id="f-cash">Dinheiro</button>
+                    <button onclick="renderFinance('Pix')" class="filter-btn" id="f-pix">Pix</button>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-green-500">
@@ -138,7 +144,7 @@
                 <button onclick="saveSettings()" class="btn-yellow w-full py-4 rounded-2xl uppercase shadow-md">Salvar Configurações</button>
                 
                 <div class="pt-4 border-t border-dashed space-y-3">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase text-center">Google Drive Backup</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase text-center">Backup Google Drive</p>
                     <button onclick="backupSystem()" class="w-full py-3 bg-navy text-white rounded-2xl text-xs font-bold uppercase"><i class="fas fa-cloud-download-alt mr-2"></i>Sistemi Yedekle (Json)</button>
                     <button onclick="document.getElementById('restore-file').click()" class="w-full py-3 bg-slate-100 text-navy rounded-2xl text-xs font-bold uppercase"><i class="fas fa-cloud-upload-alt mr-2"></i>Yedekten Geri Yükle</button>
                     <input type="file" id="restore-file" class="hidden" accept=".json" onchange="restoreSystem(event)">
@@ -205,7 +211,7 @@
     </div>
 
     <script>
-        const db = new Dexie("PRO_SBO_DATABASE");
+        const db = new Dexie("PRO_SBO_V16_2_DRIVE_SYNC");
         db.version(1).stores({
             products: "++id, sku, name, price, cost, stock, category",
             contacts: "++id, name, phone, type",
@@ -214,7 +220,7 @@
         });
 
         let cart = [];
-        let config = { company: 'SBO GESTÃO', profitRate: 30 };
+        let config = { company: 'SBO GESTÃO', currency: 'R$', lowStock: 5, profitRate: 30, cardFee: 3.09 };
 
         async function init() {
             await loadConfig();
@@ -225,6 +231,7 @@
         async function loadConfig() {
             const res = await db.config.toArray();
             res.forEach(c => config[c.id] = c.val);
+            config.cardFee = 3.09;
             document.getElementById('brand-name').innerText = config.company || 'SBO GESTÃO';
             document.getElementById('set-company').value = config.company || '';
             document.getElementById('set-profit-rate').value = config.profitRate || 30;
@@ -242,53 +249,29 @@
             if(tab === 'stock') renderStock();
             if(tab === 'customers') renderContactList('customer');
             if(tab === 'suppliers') renderContactList('supplier');
-            if(tab === 'finance') renderFinance();
+            if(tab === 'finance') renderFinance('all');
         }
 
-        async function renderPos() {
-            const query = document.getElementById('pos-search').value.toLowerCase();
-            const prods = await db.products.toArray();
-            document.getElementById('pos-products').innerHTML = prods.filter(p => p.name.toLowerCase().includes(query)).map(p => `
-                <div onclick="addToCart(${p.id})" class="pos-card shadow-sm"><span class="text-[8px] font-bold text-slate-400">${p.category}</span><h4 class="text-[10px] font-black truncate text-navy uppercase">${p.name}</h4><p class="text-[10px] font-black text-amber-500">R$ ${p.price.toFixed(2)}</p></div>
-            `).join('');
-        }
-
-        function addToCart(id) {
-            db.products.get(id).then(p => {
-                if(p.stock <= 0) return alert('Sem Estoque!');
-                const item = cart.find(x => x.id === id);
-                if(item) item.cQty++; else cart.push({...p, cQty: 1});
-                renderCart();
-            });
-        }
-
-        function renderCart() {
-            document.getElementById('cart-items').innerHTML = cart.map((it, i) => `<div class="flex items-center justify-between bg-white/5 p-2 rounded-xl"><div><h5 class="text-[10px] font-bold uppercase">${it.name}</h5><p class="text-[9px] text-amber-400">${it.cQty}x R$ ${it.price.toFixed(2)}</p></div><button onclick="cart.splice(${i},1);renderCart()" class="text-red-400 text-xs font-bold">X</button></div>`).join('');
-            document.getElementById('cart-total').innerText = "R$ " + cart.reduce((s, x) => s + (x.price * x.cQty), 0).toFixed(2);
-        }
-
-        function openPaymentModal() { if(cart.length) openModal('modal-payment'); }
-
-        async function finishSale(method) {
-            const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0);
-            const myRate = (parseFloat(config.profitRate) / 100);
-            let myPart = total * myRate;
-            let profit = (method === 'Cartão') ? (myPart - (total * 0.0309)) : myPart;
-            const sale = { date: new Date().toISOString(), method, total, profit, items: JSON.parse(JSON.stringify(cart)) };
-            for(let it of cart) await db.products.update(it.id, { stock: it.stock - it.cQty });
-            await db.sales.add(sale); cart = []; renderCart(); closeModal('modal-payment'); alert('Venda Realizada!');
-        }
-
-        async function renderFinance() {
-            let sales = await db.sales.toArray();
-            document.getElementById('fin-income').innerText = "R$ " + sales.reduce((s, x) => s + x.total, 0).toFixed(2);
-            document.getElementById('fin-profit').innerText = "R$ " + sales.reduce((s, x) => s + x.profit, 0).toFixed(2);
-            document.getElementById('sales-list-body').innerHTML = sales.reverse().map(s => `<tr><td class="font-bold">${s.items[0].name}..</td><td>${s.total.toFixed(2)}</td><td>${s.method}</td><td>${new Date(s.date).toLocaleDateString()}</td><td>${s.total.toFixed(2)}</td><td class="text-green-600">${s.profit.toFixed(2)}</td></tr>`).join('');
+        async function pickFromContacts() {
+            try {
+                if (!('contacts' in navigator)) return alert('Dispositivo não suporta.');
+                const props = ['name', 'tel'];
+                const contacts = await navigator.contacts.select(props, { multiple: false });
+                if (contacts.length) {
+                    if (contacts[0].name) document.getElementById('c-name').value = contacts[0].name[0];
+                    if (contacts[0].tel) document.getElementById('c-phone').value = contacts[0].tel[0];
+                }
+            } catch (e) { console.error(e); }
         }
 
         async function renderStock() {
             const prods = await db.products.toArray();
-            document.getElementById('stock-list').innerHTML = prods.map(p => `<div onclick="openProductModal(${p.id})" class="bg-white p-4 rounded-3xl border flex justify-between"><div><span class="text-[8px] font-black uppercase text-amber-500">${p.category}</span><h4 class="font-bold text-xs uppercase">${p.name}</h4></div><div class="font-black">${p.stock} Un.</div></div>`).join('');
+            document.getElementById('stock-list').innerHTML = prods.map(p => `
+                <div onclick="openProductModal(${p.id})" class="bg-white p-4 rounded-3xl border flex items-center justify-between active:scale-95 transition-all">
+                    <div class="flex flex-col"><span class="text-[8px] font-black text-amber-500 uppercase">${p.category}</span><h4 class="font-bold text-xs uppercase text-navy">${p.name}</h4><p class="text-[10px] text-slate-400 font-bold">Preço: ${p.price.toFixed(2)}</p></div>
+                    <div class="text-right px-4 font-black ${p.stock <= config.lowStock ? 'text-red-500' : 'text-navy'}">${p.stock} Un.</div>
+                </div>
+            `).join('');
         }
 
         function openProductModal(id = null) {
@@ -322,28 +305,104 @@
 
         async function deleteProduct() {
             const id = document.getElementById('p-id').value;
-            if(id && confirm('Apagar?')) { await db.products.delete(parseInt(id)); closeModal('modal-product'); renderStock(); }
+            if(id && confirm('Apagar este produto?')) { await db.products.delete(parseInt(id)); closeModal('modal-product'); renderStock(); }
+        }
+
+        async function renderPos() {
+            const query = document.getElementById('pos-search').value.toLowerCase();
+            const prods = await db.products.toArray();
+            document.getElementById('pos-products').innerHTML = prods.filter(p => p.name.toLowerCase().includes(query)).map(p => `
+                <div onclick="addToCart(${p.id})" class="pos-card shadow-sm"><span class="text-[8px] font-bold text-slate-400">${p.category}</span><h4 class="text-[10px] font-black truncate text-navy uppercase">${p.name}</h4><p class="text-[10px] font-black text-amber-500">R$ ${p.price.toFixed(2)}</p></div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            db.products.get(id).then(p => {
+                if(p.stock <= 0) return alert('Sem Estoque!');
+                const item = cart.find(x => x.id === id);
+                if(item) item.cQty++; else cart.push({...p, cQty: 1});
+                renderCart();
+            });
+        }
+
+        function renderCart() {
+            document.getElementById('cart-items').innerHTML = cart.map((it, i) => `<div class="flex items-center justify-between bg-white/5 p-2 rounded-xl"><div><h5 class="text-[10px] font-bold uppercase">${it.name}</h5><p class="text-[9px] text-amber-400">${it.cQty}x R$ ${it.price.toFixed(2)}</p></div><button onclick="cart.splice(${i},1);renderCart()" class="text-red-400 text-xs font-bold">X</button></div>`).join('');
+            const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0);
+            document.getElementById('cart-total').innerText = "R$ " + total.toFixed(2);
+        }
+
+        function openPaymentModal() { if(cart.length) openModal('modal-payment'); }
+
+        async function finishSale(method) {
+            const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0);
+            const myRate = (parseFloat(config.profitRate) / 100);
+            const bankRate = (3.09 / 100);
+            
+            let myPart = total * myRate;
+            let profit = (method === 'Cartão') ? (myPart - (total * bankRate)) : myPart;
+
+            const sale = { 
+                date: new Date().toISOString(), method: method, total: total, profit: profit, 
+                items: JSON.parse(JSON.stringify(cart)) 
+            };
+            
+            for(let it of cart) await db.products.update(it.id, { stock: it.stock - it.cQty });
+            await db.sales.add(sale);
+            cart = []; renderCart(); closeModal('modal-payment'); alert('Venda Realizada!');
+        }
+
+        async function renderFinance(filter = 'all') {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            const btnId = filter === 'all' ? 'f-all' : (filter === 'Cartão' ? 'f-card' : (filter === 'Dinheiro' ? 'f-cash' : 'f-pix'));
+            document.getElementById(btnId).classList.add('active');
+
+            let sales = await db.sales.toArray();
+            if(filter !== 'all') sales = sales.filter(s => s.method === filter);
+
+            document.getElementById('fin-income').innerText = "R$ " + sales.reduce((s, x) => s + x.total, 0).toFixed(2);
+            document.getElementById('fin-profit').innerText = "R$ " + sales.reduce((s, x) => s + x.profit, 0).toFixed(2);
+
+            document.getElementById('sales-list-body').innerHTML = sales.reverse().map(s => {
+                return s.items.map(it => `
+                    <tr>
+                        <td class="font-bold uppercase">${it.name}</td>
+                        <td>${it.price.toFixed(2)}</td>
+                        <td class="text-[9px] font-black">${s.method}</td>
+                        <td>${new Date(s.date).toLocaleDateString('pt-BR')}</td>
+                        <td class="font-bold">${s.total.toFixed(2)}</td>
+                        <td class="text-green-600 font-bold">${s.profit.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            }).join('');
         }
 
         async function renderContactList(type) {
             const list = await db.contacts.where('type').equals(type).toArray();
             const target = type === 'customer' ? 'customer-list' : 'supplier-list';
-            document.getElementById(target).innerHTML = list.map(c => `<div class="bg-white p-4 rounded-3xl border flex justify-between items-center"><div><h4 class="font-bold text-xs uppercase">${c.name}</h4><p class="text-[9px] text-slate-400">${c.phone}</p></div><button onclick="deleteContact(${c.id}, '${type}')" class="text-red-300"><i class="fas fa-trash-alt"></i></button></div>`).join('');
+            document.getElementById(target).innerHTML = list.map(c => `
+                <div class="bg-white p-4 rounded-3xl border flex justify-between items-center">
+                    <div><h4 class="font-bold text-xs uppercase">${c.name}</h4><p class="text-[9px] text-slate-400">${c.phone}</p></div>
+                    <button onclick="deleteContact(${c.id}, '${type}')" class="text-red-300"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `).join('');
         }
 
         function openContactModal(type) { document.getElementById('c-type').value = type; document.getElementById('c-name').value = ""; document.getElementById('c-phone').value = ""; openModal('modal-contact'); }
         async function saveContact() {
             const data = { name: document.getElementById('c-name').value, phone: document.getElementById('c-phone').value, type: document.getElementById('c-type').value };
-            if(data.name) await db.contacts.add(data); closeModal('modal-contact'); loadConfig(); renderContactList(data.type);
+            if(!data.name) return; await db.contacts.add(data); closeModal('modal-contact'); loadConfig(); renderContactList(data.type);
         }
         async function deleteContact(id, type) { if(confirm('Excluir?')) { await db.contacts.delete(id); renderContactList(type); } }
+        function openModal(id) { document.getElementById(id).classList.add('modal-active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
+        function clearCart() { cart = []; renderCart(); }
         async function saveSettings() {
             await db.config.put({id: 'company', val: document.getElementById('set-company').value});
             await db.config.put({id: 'profitRate', val: parseFloat(document.getElementById('set-profit-rate').value)});
             alert('Salvo!'); location.reload();
         }
 
-        // --- GITHUB SUNUCUSU İÇİN OTOMATİK YEDEKLEME FONKSİYONLARI ---
+        // --- BACKUP & RESTORE FONKSİYONLARI ---
         async function backupSystem() {
             const backupData = {
                 products: await db.products.toArray(),
@@ -358,8 +417,7 @@
             a.href = url;
             a.download = `SBO_GESTAO_YEDEK_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
             a.click();
-            URL.revokeObjectURL(url);
-            alert('Yedek Başarıyla İndirildi! Şimdi Drive\'a Yükleyebilirsiniz.');
+            alert('Dosya İndirildi! Şimdi bu dosyayı Google Drive klasörüne yükleyebilirsiniz.');
         }
 
         function restoreSystem(event) {
@@ -369,22 +427,20 @@
             reader.onload = async function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if(confirm('Mevcut veriler silinsin mi?')) {
+                    if(confirm('Dikkat! Mevcut tüm veriler silinecek ve yedekteki veriler yüklenecek. Emin misiniz?')) {
                         await db.products.clear(); await db.contacts.clear(); await db.sales.clear(); await db.config.clear();
                         if(data.products) await db.products.bulkAdd(data.products);
                         if(data.contacts) await db.contacts.bulkAdd(data.contacts);
                         if(data.sales) await db.sales.bulkAdd(data.sales);
                         if(data.config) await db.config.bulkPut(data.config);
-                        alert('Yedek Yüklendi!'); location.reload();
+                        alert('Yedek Başarıyla Yüklendi!');
+                        location.reload();
                     }
-                } catch(err) { alert('Hata: Geçersiz dosya!'); }
+                } catch(err) { alert('Hata: Geçersiz yedek dosyası!'); }
             };
             reader.readAsText(file);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('modal-active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
-        function clearCart() { cart = []; renderCart(); }
         init();
     </script>
 </body>

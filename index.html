@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PRO SISTEMA DE GESTÃO V16.2</title>
+    <title>PRO SISTEMA V16.2</title>
     
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0a192f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -41,7 +40,7 @@
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             try { await signInWithEmailAndPassword(auth, email, pass); } 
-            catch (err) { alert("Erro: " + err.message); }
+            catch (err) { console.error(err.message); }
         };
 
         window.handleLogout = () => signOut(auth);
@@ -60,257 +59,219 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        :root { --navy: #0f172a; --yellow: #fbbf24; --white: #ffffff; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; height: 100vh; overflow: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-        * { font-style: normal !important; -webkit-tap-highlight-color: transparent; }
-        
-        .main-view { height: calc(100vh - 145px); overflow-y: auto; padding: 1rem; padding-bottom: 6rem; }
-        nav { position: fixed !important; bottom: 0 !important; left: 0; right: 0; display: flex !important; z-index: 9999; height: 85px; background: white; border-top: 1px solid #eee; }
-
+        :root { 
+            --navy-dark: #0a192f; 
+            --amber-gold: #fbbf24; 
+            --slate-bg: #f8fafc;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--slate-bg); color: #1e293b; height: 100vh; overflow: hidden; margin: 0; }
+        .main-view { height: calc(100vh - 145px); overflow-y: auto; padding: 1rem; padding-bottom: 5rem; }
+        nav { position: fixed !important; bottom: 0 !important; left: 0; right: 0; display: flex !important; z-index: 9999; background: white; border-top: 1px solid #e2e8f0; height: 80px; padding-bottom: env(safe-area-inset-bottom); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .pos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 5px; }
-        .pos-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 8px; transition: 0.2s; cursor: pointer; text-align: center; }
         
-        .btn-yellow { background-color: var(--yellow); color: var(--navy); font-weight: 800; }
-        .bg-navy { background-color: var(--navy); }
-        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
-        .nav-active { color: var(--yellow) !important; border-top: 3px solid var(--yellow); }
+        /* 4 SÜTUNLU MİLİMETRİK POS KARTI */
+        .pos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .pos-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 8px; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; min-height: 85px; transition: all 0.2s; }
+        .pos-card:active { transform: scale(0.95); background: #f1f5f9; }
 
-        .excel-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-        .excel-table th { background: #f1f5f9; padding: 8px; text-align: left; border: 1px solid #e2e8f0; color: #64748b; }
-        .excel-table td { padding: 8px; border: 1px solid #e2e8f0; vertical-align: middle; }
-        
-        .filter-btn { padding: 6px 12px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid #e2e8f0; background: white; }
-        .filter-btn.active { background: var(--navy); color: white; }
+        .btn-gold { background-color: var(--amber-gold); color: var(--navy-dark); font-weight: 800; }
+        .modal-bg { position: fixed; inset: 0; background: rgba(10, 25, 47, 0.9); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 30px; max-height: 85vh; overflow-y: auto; }
+        .nav-active { color: var(--amber-gold) !important; border-top: 3px solid var(--amber-gold); }
+        .excel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .excel-table th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 800; text-transform: uppercase; }
+        .excel-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: var(--navy-dark); font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="fixed inset-0 bg-navy flex items-center justify-center p-6 z-[20000] hidden">
-        <div class="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-amber-400 rounded-2xl flex items-center justify-center text-navy font-black text-2xl mx-auto mb-4">PRO</div>
-                <h2 class="text-2xl font-black text-navy uppercase">Login</h2>
-            </div>
+    <div id="login-screen" class="fixed inset-0 bg-[#0a192f] flex items-center justify-center p-6 z-[10000] hidden">
+        <div class="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-amber-400 rounded-3xl flex items-center justify-center text-navy font-black text-3xl mx-auto mb-6">PRO</div>
+            <h2 class="text-2xl font-black text-slate-900 uppercase mb-8 tracking-tighter">Acesso Restrito</h2>
             <form onsubmit="handleLogin(event)" class="space-y-4">
-                <input type="email" id="login-email" placeholder="Email" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-200" required>
-                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-200" required>
-                <button type="submit" class="w-full py-4 bg-amber-400 text-navy font-black rounded-2xl shadow-lg uppercase">Entrar</button>
+                <input type="email" id="login-email" placeholder="E-mail" class="w-full p-5 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-200 focus:ring-amber-400 font-bold" required>
+                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-5 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-200 focus:ring-amber-400 font-bold" required>
+                <button type="submit" class="w-full py-5 bg-amber-400 text-[#0a192f] font-black rounded-2xl shadow-lg uppercase tracking-widest">Entrar</button>
             </form>
         </div>
     </div>
 
     <div id="main-app-container" class="hidden">
-        <header class="h-16 bg-navy text-white px-6 flex items-center justify-between shadow-xl">
+        <header class="h-16 bg-[#0a192f] text-white px-6 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-navy font-black">PRO</div>
+                <div class="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-[#0a192f] font-black">PRO</div>
                 <div>
-                    <h1 id="brand-name" class="font-bold text-sm uppercase">GESTÃO</h1>
-                    <span class="text-[9px] text-amber-400 uppercase font-black">SBO v16.2</span>
+                    <h1 id="brand-name" class="font-extrabold text-sm uppercase tracking-tight">SISTEMA</h1>
+                    <span class="text-[9px] text-amber-400 uppercase font-black tracking-widest">Gestão Pro</span>
                 </div>
             </div>
-            <button onclick="handleLogout()" class="text-[8px] bg-white/10 px-2 py-1 rounded font-bold uppercase">Sair</button>
+            <button onclick="handleLogout()" class="text-[9px] bg-white/10 px-4 py-2 rounded-lg font-black uppercase border border-white/20">Sair</button>
         </header>
 
         <main class="main-view no-scrollbar" id="app-content">
             <div id="view-pos" class="h-full flex flex-col gap-4">
-                <div class="bg-navy rounded-[35px] p-5 text-white shadow-2xl flex flex-col shrink-0">
-                    <div class="flex justify-between items-center mb-2">
-                        <select id="cart-customer-select" class="bg-transparent text-xs font-bold text-amber-400 outline-none"></select>
-                        <button onclick="clearCart()" class="text-[10px] text-red-400 font-bold uppercase">Limpar</button>
+                <div class="bg-[#0a192f] rounded-[35px] p-6 text-white shadow-2xl flex flex-col shrink-0 min-h-[250px]">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                        <select id="cart-customer-select" class="bg-transparent text-[10px] font-black border-none outline-none text-amber-400 uppercase"></select>
+                        <button onclick="clearCart()" class="text-[9px] text-red-400 font-black uppercase bg-red-400/10 px-2 py-1 rounded-full">Limpar</button>
                     </div>
-                    <div id="cart-items" class="max-height-[100px] overflow-y-auto space-y-2 no-scrollbar mb-2"></div>
-                    <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-                        <h3 id="cart-total" class="text-2xl font-black text-amber-400">R$ 0,00</h3>
-                        <button onclick="openPaymentModal()" class="btn-yellow px-6 py-3 rounded-xl text-xs uppercase">Vender</button>
+                    <div id="cart-items" class="flex-1 overflow-y-auto space-y-2 no-scrollbar mb-4"></div>
+                    <div class="pt-4 border-t border-white/10 flex justify-between items-end">
+                        <div><p class="text-[9px] text-slate-400 font-bold uppercase">Total</p><h3 id="cart-total" class="text-3xl font-black text-amber-400">R$ 0,00</h3></div>
+                        <button onclick="openPaymentModal()" class="btn-gold px-8 py-4 rounded-xl text-[11px] uppercase shadow-xl font-black">Finalizar</button>
                     </div>
                 </div>
                 <div class="flex-1">
-                    <input type="text" id="pos-search" oninput="renderPos()" placeholder="Buscar produto..." class="w-full p-3 rounded-xl ring-2 ring-slate-100 outline-none focus:ring-amber-400 mb-3 text-sm">
-                    <div id="pos-products" class="pos-grid no-scrollbar"></div>
+                    <input type="text" id="pos-search" oninput="renderPos()" placeholder="Pesquisar..." class="w-full p-4 rounded-xl ring-2 ring-slate-200 outline-none mb-4 focus:ring-amber-400 font-bold text-sm">
+                    <div id="pos-products" class="pos-grid"></div>
                 </div>
             </div>
 
             <div id="view-stock" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-black">Estoque</h2>
-                    <button onclick="openProductModal()" class="btn-yellow px-4 py-2 rounded-xl text-xs uppercase">+ Novo</button>
+                <div class="flex justify-between items-center px-2">
+                    <h2 class="text-xl font-black uppercase text-[#0a192f]">Estoque</h2>
+                    <button onclick="openProductModal()" class="btn-gold px-6 py-3 rounded-xl text-[10px] uppercase shadow-lg font-black">+ Novo</button>
+                </div>
+                <div class="grid grid-cols-1 gap-2">
+                    <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase">Qtd Total</p><b id="stk-total-qty" class="text-lg text-[#0a192f] font-black">0</b></div>
+                    <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase">Investimento</p><b id="stk-total-cost" class="text-lg text-red-500 font-black">R$ 0,00</b></div>
+                    <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase">Venda Total</p><b id="stk-total-sale" class="text-lg text-green-600 font-black">R$ 0,00</b></div>
+                    <div class="bg-[#0a192f] p-4 rounded-2xl flex justify-between items-center shadow-lg"><p class="text-[10px] font-black text-amber-400 uppercase">Lucro Est. (30%)</p><b id="stk-total-profit" class="text-lg text-white font-black">R$ 0,00</b></div>
                 </div>
                 <div id="stock-list" class="grid grid-cols-1 gap-2 pb-10"></div>
             </div>
 
             <div id="view-customers" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-black">Clientes</h2>
-                    <button onclick="openContactModal('customer')" class="btn-yellow px-4 py-2 rounded-xl text-xs uppercase">+ Novo</button>
-                </div>
+                <div class="flex justify-between items-center px-2"><h2 class="text-xl font-black uppercase text-[#0a192f]">Clientes</h2><button onclick="openContactModal('customer')" class="btn-gold px-6 py-3 rounded-xl text-[10px] uppercase shadow-lg font-black">+ Novo</button></div>
                 <div id="customer-list" class="grid grid-cols-1 gap-2 pb-10"></div>
             </div>
 
             <div id="view-suppliers" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-black">Toptancı</h2>
-                    <button onclick="openContactModal('supplier')" class="btn-yellow px-4 py-2 rounded-xl text-xs uppercase">+ Novo</button>
-                </div>
+                <div class="flex justify-between items-center px-2"><h2 class="text-xl font-black uppercase text-[#0a192f]">Fornecedores</h2><button onclick="openContactModal('supplier')" class="btn-gold px-6 py-3 rounded-xl text-[10px] uppercase shadow-lg font-black">+ Novo</button></div>
                 <div id="supplier-list" class="grid grid-cols-1 gap-2 pb-10"></div>
             </div>
 
+            <div id="view-expenses" class="hidden space-y-4">
+                <h2 class="text-xl font-black uppercase text-[#0a192f] px-2">Despesas</h2>
+                <div class="bg-white p-6 rounded-[35px] border shadow-sm space-y-4">
+                    <input type="number" id="exp-val" placeholder="Valor R$" class="w-full p-5 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none focus:ring-amber-400 font-black text-lg">
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="addExpense('Transporte')" class="p-4 bg-slate-50 rounded-2xl border flex flex-col items-center gap-2"><i class="fas fa-car text-navy-dark"></i><span class="text-[8px] font-black uppercase">Viagem</span></button>
+                        <button onclick="addExpense('Alimentação')" class="p-4 bg-slate-50 rounded-2xl border flex flex-col items-center gap-2"><i class="fas fa-utensils text-navy-dark"></i><span class="text-[8px] font-black uppercase">Refeição</span></button>
+                        <button onclick="addExpense('Outros')" class="p-4 bg-slate-50 rounded-2xl border flex flex-col items-center gap-2"><i class="fas fa-tag text-navy-dark"></i><span class="text-[8px] font-black uppercase">Gerais</span></button>
+                    </div>
+                </div>
+                <div id="expense-list" class="space-y-2 pb-10"></div>
+            </div>
+
             <div id="view-finance" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-black uppercase">Finanças</h2>
-                    <button onclick="generatePDF()" class="bg-navy text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-file-pdf mr-1"></i> EXPORTAR PDF</button>
+                <div class="flex justify-between items-center px-2"><h2 class="text-xl font-black uppercase text-[#0a192f]">Finanças</h2><button onclick="generatePDF()" class="bg-[#0a192f] text-white px-5 py-3 rounded-xl text-[9px] font-black uppercase">PDF Recibo</button></div>
+                <div class="bg-[#0a192f] p-8 rounded-[40px] text-white text-center shadow-2xl">
+                    <p class="text-[11px] font-black text-amber-400 uppercase tracking-widest mb-2">Saldo Líquido</p>
+                    <h2 id="fin-final-balance" class="text-4xl font-black text-white">R$ 0,00</h2>
                 </div>
-                <div class="flex gap-2 overflow-x-auto no-scrollbar">
-                    <button onclick="renderFinance('all')" class="filter-btn active" id="f-all">Todas</button>
-                    <button onclick="renderFinance('Cartão')" class="filter-btn" id="f-card">Cartão</button>
-                    <button onclick="renderFinance('Dinheiro')" class="filter-btn" id="f-cash">Dinheiro</button>
-                    <button onclick="renderFinance('Pix')" class="filter-btn" id="f-pix">Pix</button>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-2xl border-l-4 border-green-500 shadow-sm">
-                        <p class="text-[8px] font-black text-slate-400 uppercase">Faturamento</p>
-                        <h3 id="fin-income" class="text-lg font-black text-navy">R$ 0,00</h3>
-                    </div>
-                    <div class="bg-navy p-4 rounded-2xl border-l-4 border-amber-400 shadow-sm text-white">
-                        <p class="text-[8px] font-black text-slate-400 uppercase">Lucro Líquido</p>
-                        <h3 id="fin-profit" class="text-lg font-black text-amber-400">R$ 0,00</h3>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl border overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="excel-table">
-                            <thead>
-                                <tr>
-                                    <th>NOME</th><th>VALOR</th><th>TIPO</th><th>DATA</th><th>TOTAL</th><th>LUCRO</th><th>AÇÃO</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sales-list-body"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="bg-white rounded-[35px] border overflow-hidden shadow-sm"><table class="excel-table"><thead><tr><th>DESC</th><th>DATA</th><th>VALOR</th><th>PAG</th><th>-</th></tr></thead><tbody id="sales-list-body"></tbody></table></div>
             </div>
 
             <div id="view-settings" class="hidden space-y-6">
-                <h2 class="text-xl font-black uppercase">Ajuste Fiscal</h2>
-                <div class="bg-white p-6 rounded-[35px] border space-y-4 shadow-sm">
-                    <input type="text" id="set-company" placeholder="Razão Social / Nome Fantasia" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="set-cnpj" placeholder="CNPJ" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                        <input type="text" id="set-ie" placeholder="IE (Inscrição Estadual)" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                    </div>
-                    <input type="text" id="set-address" placeholder="Endereço Completo" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                    <input type="text" id="set-phone" placeholder="Telefone de Contato" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="number" id="set-profit-rate" placeholder="Comissão %" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 outline-none">
-                        <input type="text" value="3.09" readonly class="w-full p-4 bg-slate-200 rounded-2xl font-bold text-slate-500">
-                    </div>
-                    <button onclick="saveSettings()" class="btn-yellow w-full py-4 rounded-2xl uppercase shadow-lg">Salvar Dados da Empresa</button>
+                <h2 class="text-xl font-black uppercase text-[#0a192f] px-2">Ajustes</h2>
+                <div class="bg-white p-8 rounded-[40px] border space-y-4 shadow-sm pb-10">
+                    <input type="text" id="set-company" placeholder="Empresa" class="w-full p-4 bg-slate-50 rounded-xl outline-none ring-1 ring-slate-100 font-bold">
+                    <input type="text" id="set-manager" placeholder="Responsável" class="w-full p-4 bg-slate-50 rounded-xl outline-none ring-1 ring-slate-100 font-bold">
+                    <input type="text" id="set-cnpj" placeholder="CNPJ" class="w-full p-4 bg-slate-50 rounded-xl outline-none ring-1 ring-slate-100 font-bold">
+                    <input type="text" id="set-address" placeholder="Endereço" class="w-full p-4 bg-slate-50 rounded-xl outline-none ring-1 ring-slate-100 font-bold">
+                    <input type="text" id="set-phone" placeholder="Telefone" class="w-full p-4 bg-slate-50 rounded-xl outline-none ring-1 ring-slate-100 font-bold">
+                    <button onclick="saveSettings()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black shadow-lg">Salvar</button>
                 </div>
             </div>
         </main>
 
-        <nav class="bg-white border-t items-center justify-around px-2 pb-safe shadow-2xl h-20">
-            <button onclick="switchTab('pos')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-pos"><i class="fas fa-cash-register text-xl"></i><span class="text-[8px] font-black uppercase">Venda</span></button>
-            <button onclick="switchTab('stock')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-stock"><i class="fas fa-boxes text-xl"></i><span class="text-[8px] font-black uppercase">Estoque</span></button>
-            <button onclick="switchTab('customers')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-customers"><i class="fas fa-users text-xl"></i><span class="text-[8px] font-black uppercase">Clientes</span></button>
-            <button onclick="switchTab('suppliers')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-suppliers"><i class="fas fa-truck-loading text-xl"></i><span class="text-[8px] font-black uppercase">Toptancı</span></button>
-            <button onclick="switchTab('finance')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-finance"><i class="fas fa-chart-line text-xl"></i><span class="text-[8px] font-black uppercase">Finança</span></button>
-            <button onclick="switchTab('settings')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-settings"><i class="fas fa-cog text-xl"></i><span class="text-[8px] font-black uppercase">Ajuste</span></button>
+        <nav class="items-center justify-around px-2">
+            <button onclick="switchTab('pos')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-pos"><i class="fas fa-shopping-cart text-xl"></i><span class="text-[8px] font-black uppercase">Venda</span></button>
+            <button onclick="switchTab('stock')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-stock"><i class="fas fa-box text-xl"></i><span class="text-[8px] font-black uppercase">Estoque</span></button>
+            <button onclick="switchTab('customers')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-customers"><i class="fas fa-user-friends text-xl"></i><span class="text-[8px] font-black uppercase">Clientes</span></button>
+            <button onclick="switchTab('suppliers')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-suppliers"><i class="fas fa-truck-loading text-xl"></i><span class="text-[8px] font-black uppercase">Fornec.</span></button>
+            <button onclick="switchTab('expenses')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-expenses"><i class="fas fa-receipt text-xl"></i><span class="text-[8px] font-black uppercase">Despesa</span></button>
+            <button onclick="switchTab('finance')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-finance"><i class="fas fa-wallet text-xl"></i><span class="text-[8px] font-black uppercase">Finança</span></button>
+            <button onclick="switchTab('settings')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="n-settings"><i class="fas fa-user-shield text-xl"></i><span class="text-[8px] font-black uppercase">Ajuste</span></button>
         </nav>
     </div>
 
     <div id="modal-product" class="modal-bg">
-        <div class="modal-content p-6">
-            <h3 class="text-xl font-black mb-4 uppercase text-navy">Produto</h3>
+        <div class="modal-content p-8">
+            <h3 class="text-xl font-black mb-6 uppercase text-[#0a192f]">Produto</h3>
             <div class="space-y-4">
                 <input type="hidden" id="p-id">
-                <select id="p-cat" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 font-bold uppercase">
-                    <option value="Colar">Colar</option><option value="Brinco">Brinco</option><option value="Pulseira">Pulseira</option><option value="Anel">Anel</option><option value="Outros">Outros</option>
-                </select>
-                <input type="text" id="p-sku" placeholder="Referência" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                <input type="text" id="p-name" placeholder="Nome do Produto" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="number" id="p-cost" placeholder="Custo" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                    <input type="number" id="p-price" placeholder="Venda" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100 border-l-4 border-green-500">
+                <input type="text" id="p-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="p-cost" placeholder="Custo" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
+                    <input type="number" id="p-price" placeholder="Venda" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
                 </div>
-                <input type="number" id="p-stock" placeholder="Estoque Inicial" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                <button onclick="saveProduct()" class="btn-yellow w-full py-4 rounded-2xl uppercase">Gravar</button>
-                <button id="btn-delete-product" onclick="deleteProduct()" class="w-full py-2 text-red-500 font-bold text-[10px] uppercase">EXCLUIR PRODUTO</button>
-                <button onclick="closeModal('modal-product')" class="w-full text-[10px] font-bold text-slate-400 uppercase">FECHAR</button>
+                <input type="number" id="p-stock" placeholder="Estoque" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
+                <button onclick="saveProduct()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black">Salvar</button>
+                <button onclick="closeModal('modal-product')" class="w-full text-[10px] font-black text-slate-400 mt-4 uppercase">Voltar</button>
             </div>
         </div>
     </div>
 
     <div id="modal-payment" class="modal-bg">
-        <div class="modal-content p-8 text-center">
-            <h3 class="text-2xl font-black mb-6 uppercase text-navy">Pagamento</h3>
-            <div class="grid grid-cols-3 gap-3">
-                <button onclick="finishSale('Dinheiro')" class="p-4 rounded-2xl border-2 flex flex-col items-center gap-2 font-bold text-[10px]"><i class="fas fa-money-bill-wave text-green-500 text-xl"></i>DINHEIRO</button>
-                <button onclick="finishSale('Cartão')" class="p-4 rounded-2xl border-2 flex flex-col items-center gap-2 font-bold text-[10px]"><i class="fas fa-credit-card text-blue-500 text-xl"></i>CARTÃO</button>
-                <button onclick="finishSale('Pix')" class="p-4 rounded-2xl border-2 flex flex-col items-center gap-2 font-bold text-[10px]"><i class="fas fa-bolt text-purple-500 text-xl"></i>PIX</button>
+        <div class="modal-content p-10 text-center">
+            <h3 class="text-2xl font-black mb-2 uppercase text-[#0a192f]">Pagamento</h3>
+            <div class="grid grid-cols-3 gap-3 mt-6">
+                <button onclick="finishSale('Dinheiro')" class="p-4 rounded-2xl border-2 border-slate-50 font-black text-[9px] uppercase"><i class="fas fa-money-bill-wave text-green-500 text-xl block mb-1"></i>Dinheiro</button>
+                <button onclick="finishSale('Cartão')" class="p-4 rounded-2xl border-2 border-slate-50 font-black text-[9px] uppercase"><i class="fas fa-credit-card text-blue-500 text-xl block mb-1"></i>Cartão</button>
+                <button onclick="finishSale('Pix')" class="p-4 rounded-2xl border-2 border-slate-50 font-black text-[9px] uppercase"><i class="fas fa-bolt text-purple-500 text-xl block mb-1"></i>PIX</button>
             </div>
-            <button onclick="closeModal('modal-payment')" class="mt-6 text-slate-400 font-bold uppercase text-[10px]">Cancelar</button>
+            <button onclick="closeModal('modal-payment')" class="mt-8 text-slate-400 font-black uppercase text-[10px]">Fechar</button>
         </div>
     </div>
 
     <div id="modal-contact" class="modal-bg">
-        <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="c-modal-title" class="text-xl font-black uppercase text-navy">Cadastro</h3>
-                <button onclick="pickFromContacts()" class="bg-amber-100 text-amber-600 px-3 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-address-book mr-1"></i> REHBER</button>
-            </div>
+        <div class="modal-content p-8">
+            <h3 class="text-xl font-black mb-6 uppercase text-[#0a192f]">Registro</h3>
             <div class="space-y-4">
                 <input type="hidden" id="c-id"><input type="hidden" id="c-type">
-                <input type="text" id="c-name" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                <input type="text" id="c-phone" placeholder="Telefone" class="w-full p-4 bg-slate-50 rounded-2xl ring-1 ring-slate-100">
-                <button onclick="saveContact()" class="btn-yellow w-full py-4 rounded-2xl uppercase">Gravar</button>
-                <button onclick="closeModal('modal-contact')" class="w-full text-[10px] font-bold text-slate-400 uppercase">VOLTAR</button>
+                <button onclick="pickFromContacts()" class="w-full py-4 bg-[#0a192f] text-white rounded-2xl font-black text-xs uppercase flex items-center justify-center gap-3"><i class="fas fa-address-book"></i> Importar Agenda</button>
+                <input type="text" id="c-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
+                <input type="text" id="c-phone" placeholder="WhatsApp" class="w-full p-4 bg-slate-50 rounded-2xl outline-none ring-1 ring-slate-100 font-bold">
+                <button onclick="saveContact()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black">Salvar</button>
+                <button onclick="closeModal('modal-contact')" class="w-full text-[10px] font-black text-slate-400 mt-4 uppercase">Voltar</button>
             </div>
         </div>
     </div>
 
     <script>
-        let products = [];
-        let contacts = [];
-        let sales = [];
-        let cart = [];
-        let config = { company: 'SBO GESTÃO', profitRate: 30, cnpj: '', ie: '', address: '', phone: '' };
+        let products = [], contacts = [], sales = [], expenses = [], cart = [];
+        let config = {};
 
-        async function init() {
-            setupCloudSync();
-            switchTab('pos');
-        }
+        async function init() { setupCloudSync(); switchTab('pos'); }
 
         function setupCloudSync() {
-            window.fs_snap(window.fs_coll(window.fs, "products"), (snap) => {
+            window.fs_snap(window.fs_coll(window.fs, "products"), snap => {
                 products = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                renderPos();
-                renderStock();
+                renderPos(); renderStock();
             });
-
-            window.fs_snap(window.fs_coll(window.fs, "contacts"), (snap) => {
+            window.fs_snap(window.fs_coll(window.fs, "contacts"), snap => {
                 contacts = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                renderContactList('customer');
-                renderContactList('supplier');
-                updateCustomerSelect();
+                renderContactList('customer'); renderContactList('supplier'); updateCustomerSelect();
             });
-
-            window.fs_snap(window.fs_coll(window.fs, "sales"), (snap) => {
+            window.fs_snap(window.fs_coll(window.fs, "sales"), snap => {
                 sales = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                renderFinance(window.currentFinanceFilter || 'all');
+                renderFinance();
             });
-
-            window.fs_snap(window.fs_coll(window.fs, "config"), (snap) => {
-                snap.docs.forEach(doc => { config[doc.id] = doc.data().val; });
-                document.getElementById('brand-name').innerText = config.company || 'SBO GESTÃO';
-                document.getElementById('set-company').value = config.company || '';
-                document.getElementById('set-cnpj').value = config.cnpj || '';
-                document.getElementById('set-ie').value = config.ie || '';
-                document.getElementById('set-address').value = config.address || '';
-                document.getElementById('set-phone').value = config.phone || '';
-                document.getElementById('set-profit-rate').value = config.profitRate || 30;
+            window.fs_snap(window.fs_coll(window.fs, "expenses"), snap => {
+                expenses = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                renderExpenses(); renderFinance();
+            });
+            window.fs_snap(window.fs_coll(window.fs, "config"), snap => {
+                snap.docs.forEach(doc => {
+                    config[doc.id] = doc.data().val;
+                    const el = document.getElementById('set-' + doc.id);
+                    if(el) el.value = doc.data().val;
+                });
+                document.getElementById('brand-name').innerText = config.company || 'SISTEMA';
             });
         }
 
@@ -322,261 +283,159 @@
         }
 
         function renderPos() {
-            const query = document.getElementById('pos-search').value.toLowerCase();
-            document.getElementById('pos-products').innerHTML = products
-                .filter(p => p.name.toLowerCase().includes(query))
-                .map(p => `
-                    <div onclick="addToCart('${p.id}')" class="pos-card shadow-sm active:scale-95">
-                        <div class="text-[7px] font-black text-slate-400 uppercase truncate">${p.category}</div>
-                        <h4 class="text-[9px] font-black truncate text-navy uppercase my-1">${p.name}</h4>
-                        <p class="text-[9px] font-black text-amber-500">R$ ${p.price.toFixed(2)}</p>
-                    </div>
-                `).join('');
+            const q = document.getElementById('pos-search').value.toLowerCase();
+            document.getElementById('pos-products').innerHTML = products.filter(p => p.name.toLowerCase().includes(q)).map(p => `
+                <div onclick="addToCart('${p.id}')" class="pos-card ${p.stock <= 0 ? 'opacity-30 grayscale pointer-events-none' : ''}">
+                    <h4 class="text-[8px] font-extrabold truncate text-[#0a192f] uppercase mb-1">${p.name}</h4>
+                    <p class="text-[10px] font-black text-amber-500">R$ ${p.price.toFixed(2)}</p>
+                    <span class="text-[7px] font-bold text-slate-400 mt-1 uppercase">EST: ${p.stock}</span>
+                </div>
+            `).join('');
         }
 
         function addToCart(id) {
             const p = products.find(x => x.id === id);
-            if(p.stock <= 0) return alert('Sem Estoque!');
+            if(p.stock <= 0) return;
             const item = cart.find(x => x.id === id);
-            if(item) item.cQty++; else cart.push({...p, cQty: 1});
+            if(item) { if(item.cQty + 1 > p.stock) return; item.cQty++; } else cart.push({...p, cQty: 1});
             renderCart();
         }
 
         function renderCart() {
             document.getElementById('cart-items').innerHTML = cart.map((it, i) => `
-                <div class="flex items-center justify-between bg-white/10 p-2 rounded-lg">
-                    <div class="text-[9px]"><b class="uppercase">${it.name}</b><br>${it.cQty}x R$ ${it.price.toFixed(2)}</div>
-                    <button onclick="cart.splice(${i},1);renderCart()" class="text-red-400 text-xs font-bold">X</button>
+                <div class="flex items-center justify-between bg-white/10 p-3 rounded-xl">
+                    <div class="text-[10px] uppercase font-black text-white">${it.name} <span class="text-amber-400 ml-2">x${it.cQty}</span></div>
+                    <button onclick="cart.splice(${i},1);renderCart()" class="text-red-400 text-[8px] font-black uppercase">Remover</button>
                 </div>
             `).join('');
-            const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0);
-            document.getElementById('cart-total').innerText = "R$ " + total.toFixed(2);
+            document.getElementById('cart-total').innerText = "R$ " + cart.reduce((s, x) => s + (x.price * x.cQty), 0).toFixed(2);
         }
 
         async function finishSale(method) {
             const total = cart.reduce((s, x) => s + (x.price * x.cQty), 0);
-            const myRate = (parseFloat(config.profitRate) / 100);
-            const bankRate = (3.09 / 100);
-            let myPart = total * myRate;
-            let profit = (method === 'Cartão') ? (myPart - (total * bankRate)) : myPart;
-
-            const saleData = {
-                date: new Date().toISOString(),
-                method: method,
-                total: total,
-                profit: profit,
-                customer: document.getElementById('cart-customer-select').value,
-                items: cart.map(it => ({ name: it.name, price: it.price, qty: it.cQty }))
-            };
-
-            for(let it of cart) {
-                const newStock = it.stock - it.cQty;
-                await window.fs_upd(window.fs_doc(window.fs, "products", it.id), { stock: newStock });
-            }
-
-            await window.fs_add(window.fs_coll(window.fs, "sales"), saleData);
-            cart = []; renderCart(); closeModal('modal-payment'); alert('Venda Realizada!');
-        }
-
-        async function voidSale(id) {
-            if(confirm('⚠️ CANCELAR VENDA? Esta ação é irreversível e o estoque não voltará automaticamente.')) {
-                await window.fs_del(window.fs_doc(window.fs, "sales", id));
-            }
+            const customerId = document.getElementById('cart-customer-select').value;
+            const customer = contacts.find(c => c.id === customerId);
+            let profit = total * 0.30;
+            if(method === 'Cartão') profit -= (total * 0.0309);
+            for(let it of cart) { await window.fs_upd(window.fs_doc(window.fs, "products", it.id), { stock: it.stock - it.cQty }); }
+            await window.fs_add(window.fs_coll(window.fs, "sales"), { date: new Date().toISOString(), method, total, profit, customer: customer ? customer.name : 'Venda Balcão', items: cart.map(it => `${it.name} (${it.cQty}x)`) });
+            cart = []; renderCart(); closeModal('modal-payment');
         }
 
         function renderStock() {
-            document.getElementById('stock-list').innerHTML = products.map(p => `
-                <div onclick="openProductModal('${p.id}')" class="bg-white p-4 rounded-2xl border flex items-center justify-between active:scale-95 transition-all">
-                    <div><span class="text-[7px] font-black text-amber-500 uppercase">${p.category}</span><h4 class="font-bold text-xs uppercase text-navy">${p.name}</h4></div>
-                    <div class="text-right"><p class="text-[9px] font-bold">R$ ${p.price.toFixed(2)}</p><b class="text-xs ${p.stock <= 5 ? 'text-red-500' : 'text-navy'}">${p.stock} Un.</b></div>
+            let tq = 0, tc = 0, ts = 0;
+            document.getElementById('stock-list').innerHTML = products.map(p => {
+                tq += p.stock; tc += (p.cost * p.stock); ts += (p.price * p.stock);
+                return `<div onclick="openProductModal('${p.id}')" class="bg-white p-5 rounded-3xl border flex justify-between items-center shadow-sm">
+                    <div><h4 class="font-extrabold text-[12px] uppercase text-[#0a192f]">${p.name}</h4><p class="text-[10px] text-slate-400 font-bold uppercase">Preço: R$ ${p.price.toFixed(2)}</p></div>
+                    <div class="text-right font-black text-[#0a192f] bg-slate-100 px-4 py-2 rounded-xl text-xs">${p.stock} UN</div>
+                </div>`;
+            }).join('');
+            document.getElementById('stk-total-qty').innerText = tq;
+            document.getElementById('stk-total-cost').innerText = "R$ " + tc.toFixed(2);
+            document.getElementById('stk-total-sale').innerText = "R$ " + ts.toFixed(2);
+            document.getElementById('stk-total-profit').innerText = "R$ " + (ts * 0.30).toFixed(2);
+        }
+
+        async function addExpense(cat) {
+            const val = parseFloat(document.getElementById('exp-val').value);
+            if(!val) return;
+            await window.fs_add(window.fs_coll(window.fs, "expenses"), { date: new Date().toISOString(), cat, val });
+            document.getElementById('exp-val').value = "";
+        }
+
+        function renderExpenses() {
+            document.getElementById('expense-list').innerHTML = expenses.sort((a,b) => new Date(b.date)-new Date(a.date)).map(e => `
+                <div class="bg-white p-5 rounded-3xl border flex justify-between items-center shadow-sm">
+                    <div><b class="text-[11px] uppercase font-black text-[#0a192f]">${e.cat}</b><p class="text-[9px] text-slate-400 font-bold uppercase">${new Date(e.date).toLocaleDateString()}</p></div>
+                    <div class="flex items-center gap-4"><span class="text-red-500 font-black text-sm">R$ ${e.val.toFixed(2)}</span>
+                    <button onclick="window.fs_del(window.fs_doc(window.fs,'expenses','${e.id}'))" class="text-red-200"><i class="fas fa-trash"></i></button></div>
                 </div>
             `).join('');
         }
 
+        function renderFinance() {
+            const totalProfit = sales.reduce((s, x) => s + x.profit, 0);
+            const totalExp = expenses.reduce((s, x) => s + x.val, 0);
+            document.getElementById('fin-final-balance').innerText = "R$ " + (totalProfit - totalExp).toFixed(2);
+            document.getElementById('sales-list-body').innerHTML = sales.sort((a,b) => new Date(b.date)-new Date(a.date)).map(s => `
+                <tr><td class="uppercase truncate w-24 text-[9px]">${s.items[0]}</td><td class="text-[9px]">${new Date(s.date).toLocaleDateString()}</td>
+                <td class="font-black text-green-600 text-[10px]">R$ ${s.total.toFixed(2)}</td><td class="uppercase font-black text-[8px]">${s.method}</td>
+                <td><button onclick="window.fs_del(window.fs_doc(window.fs,'sales','${s.id}'))" class="text-red-300"><i class="fas fa-times-circle"></i></button></td></tr>
+            `).join('');
+        }
+
+        function generatePDF() {
+            const customerId = document.getElementById('cart-customer-select').value;
+            const customer = contacts.find(c => c.id === customerId);
+            const win = window.open('', '_blank');
+            const itemsHtml = sales.map(s => `
+                <tr>
+                    <td style="padding:12px; border-bottom:1px solid #eee; font-size:11px;">${s.items.join(', ')}</td>
+                    <td style="padding:12px; border-bottom:1px solid #eee; font-size:11px; font-weight:800; text-align:right;">R$ ${s.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            win.document.write(`<html><head><style>
+                body{font-family:sans-serif;padding:30px;color:#0a192f}
+                .header{display:flex;justify-content:space-between;border-bottom:3px solid #fbbf24;padding-bottom:15px;margin-bottom:20px}
+                .client-box{background:#f8fafc;padding:15px;border-radius:10px;margin-bottom:20px;border:1px solid #e2e8f0}
+                table{width:100%;border-collapse:collapse}
+                th{background:#0a192f;color:#fff;text-align:left;padding:12px;font-size:11px}
+                .total-div{margin-top:30px;text-align:right;font-size:20px;font-weight:900;border-top:2px solid #0a192f;padding-top:15px}
+            </style></head><body>
+                <div class="header">
+                    <div><h1 style="margin:0">${config.company || 'RECIBO PRO'}</h1><p style="margin:5px 0;font-size:12px;">${config.address || ''}</p></div>
+                    <div style="text-align:right"><p>RECIBO DE VENDA</p><p style="font-size:11px">${new Date().toLocaleString()}</p></div>
+                </div>
+                <div class="client-box"><h4 style="margin:0;font-size:10px;color:#fbbf24;text-transform:uppercase;">Cliente</h4><p style="margin:5px 0 0 0;font-weight:800;">${customer ? customer.name : 'VENDA BALCÃO'}</p></div>
+                <table><thead><tr><th>DESCRIÇÃO</th><th style="text-align:right">VALOR</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+                <div class="total-div">TOTAL: R$ ${sales.reduce((a,b)=>a+b.total,0).toFixed(2)}</div>
+                <script>window.onload=function(){window.print();}</` + `script></body></html>`);
+            win.document.close();
+        }
+
+        async function pickFromContacts() {
+            try { const props = ['name', 'tel']; const list = await navigator.contacts.select(props, { multiple: false }); if (list.length) { if (list[0].name) document.getElementById('c-name').value = list[0].name[0]; if (list[0].tel) document.getElementById('c-phone').value = list[0].tel[0]; } } catch (e) { alert('Disponível em mobile.'); }
+        }
+
+        async function saveSettings() {
+            const fields = ['company', 'manager', 'cnpj', 'address', 'phone'];
+            for(let f of fields) await window.fs_set(window.fs_doc(window.fs, "config", f), { val: document.getElementById('set-' + f).value });
+            alert('Salvo!');
+        }
+
         function openProductModal(id = null) {
-            if(id) {
-                const p = products.find(x => x.id === id);
-                document.getElementById('p-id').value = p.id;
-                document.getElementById('p-sku').value = p.sku;
-                document.getElementById('p-name').value = p.name;
-                document.getElementById('p-price').value = p.price;
-                document.getElementById('p-cost').value = p.cost;
-                document.getElementById('p-stock').value = p.stock;
-                document.getElementById('p-cat').value = p.category;
-                document.getElementById('btn-delete-product').classList.remove('hidden');
-            } else {
-                document.getElementById('p-id').value = "";
-                document.getElementById('p-sku').value = "REF-" + Date.now().toString().slice(-4);
-                document.getElementById('p-name').value = "";
-                document.getElementById('p-price').value = "";
-                document.getElementById('p-cost').value = "";
-                document.getElementById('p-stock').value = "0";
-                document.getElementById('btn-delete-product').classList.add('hidden');
-            }
+            if(id) { const p = products.find(x => x.id === id); document.getElementById('p-id').value = p.id; document.getElementById('p-name').value = p.name; document.getElementById('p-price').value = p.price; document.getElementById('p-cost').value = p.cost; document.getElementById('p-stock').value = p.stock; }
+            else { document.getElementById('p-id').value = ""; document.getElementById('p-name').value = ""; document.getElementById('p-price').value = ""; document.getElementById('p-cost').value = ""; document.getElementById('p-stock').value = "0"; }
             openModal('modal-product');
         }
 
         async function saveProduct() {
             const id = document.getElementById('p-id').value;
-            const data = {
-                sku: document.getElementById('p-sku').value,
-                name: document.getElementById('p-name').value,
-                price: parseFloat(document.getElementById('p-price').value) || 0,
-                cost: parseFloat(document.getElementById('p-cost').value) || 0,
-                stock: parseInt(document.getElementById('p-stock').value) || 0,
-                category: document.getElementById('p-cat').value
-            };
-            if(id) await window.fs_upd(window.fs_doc(window.fs, "products", id), data);
-            else await window.fs_add(window.fs_coll(window.fs, "products"), data);
+            const data = { name: document.getElementById('p-name').value, price: parseFloat(document.getElementById('p-price').value) || 0, cost: parseFloat(document.getElementById('p-cost').value) || 0, stock: parseInt(document.getElementById('p-stock').value) || 0 };
+            id ? await window.fs_upd(window.fs_doc(window.fs, "products", id), data) : await window.fs_add(window.fs_coll(window.fs, "products"), data);
             closeModal('modal-product');
-        }
-
-        async function deleteProduct() {
-            if(confirm('⚠️ EXCLUIR PRODUTO DEFINITIVAMENTE?')) {
-                await window.fs_del(window.fs_doc(window.fs, "products", document.getElementById('p-id').value));
-                closeModal('modal-product');
-            }
-        }
-
-        function renderContactList(type) {
-            const list = contacts.filter(c => c.type === type);
-            const target = type === 'customer' ? 'customer-list' : 'supplier-list';
-            document.getElementById(target).innerHTML = list.map(c => `
-                <div class="bg-white p-4 rounded-2xl border flex justify-between items-center">
-                    <div><h4 class="font-bold text-xs uppercase">${c.name}</h4><p class="text-[9px] text-slate-400">${c.phone}</p></div>
-                    <button onclick="deleteContact('${c.id}')" class="text-red-400 p-2"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            `).join('');
-        }
-
-        async function deleteContact(id) {
-            if(confirm('⚠️ EXCLUIR CONTATO?')) await window.fs_del(window.fs_doc(window.fs, "contacts", id));
-        }
-
-        function updateCustomerSelect() {
-            const custs = contacts.filter(c => c.type === 'customer');
-            document.getElementById('cart-customer-select').innerHTML = '<option value="0">Venda Rápida</option>' + custs.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        }
-
-        async function saveContact() {
-            const data = { name: document.getElementById('c-name').value, phone: document.getElementById('c-phone').value, type: document.getElementById('c-type').value };
-            if(!data.name) return;
-            await window.fs_add(window.fs_coll(window.fs, "contacts"), data);
-            closeModal('modal-contact');
-        }
-
-        async function pickFromContacts() {
-            try {
-                if (!('contacts' in navigator)) return alert('Dispositivo não suporta acesso aos contatos.');
-                const props = ['name', 'tel'];
-                const contactsList = await navigator.contacts.select(props, { multiple: false });
-                if (contactsList.length) {
-                    if (contactsList[0].name) document.getElementById('c-name').value = contactsList[0].name[0];
-                    if (contactsList[0].tel) document.getElementById('c-phone').value = contactsList[0].tel[0];
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function renderFinance(filter = 'all') {
-            window.currentFinanceFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const btnMap = { 'all': 'f-all', 'Cartão': 'f-card', 'Dinheiro': 'f-cash', 'Pix': 'f-pix' };
-            document.getElementById(btnMap[filter]).classList.add('active');
-
-            let filteredSales = (filter === 'all') ? sales : sales.filter(s => s.method === filter);
-            document.getElementById('fin-income').innerText = "R$ " + filteredSales.reduce((s, x) => s + x.total, 0).toFixed(2);
-            document.getElementById('fin-profit').innerText = "R$ " + filteredSales.reduce((s, x) => s + x.profit, 0).toFixed(2);
-
-            document.getElementById('sales-list-body').innerHTML = filteredSales.sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => {
-                return (s.items || []).map(it => `
-                    <tr>
-                        <td class="font-bold uppercase">${it.name}</td>
-                        <td>${it.price.toFixed(2)}</td>
-                        <td class="text-[8px] font-black">${s.method}</td>
-                        <td>${new Date(s.date).toLocaleDateString('pt-BR')}</td>
-                        <td class="font-bold">${s.total.toFixed(2)}</td>
-                        <td class="text-green-600 font-bold">${s.profit.toFixed(2)}</td>
-                        <td class="text-center"><button onclick="voidSale('${s.id}')" class="text-red-500 font-black">X</button></td>
-                    </tr>
-                `).join('');
-            }).join('');
-        }
-
-        async function saveSettings() {
-            const updates = [
-                { id: "company", val: document.getElementById('set-company').value },
-                { id: "cnpj", val: document.getElementById('set-cnpj').value },
-                { id: "ie", val: document.getElementById('set-ie').value },
-                { id: "address", val: document.getElementById('set-address').value },
-                { id: "phone", val: document.getElementById('set-phone').value },
-                { id: "profitRate", val: parseFloat(document.getElementById('set-profit-rate').value) }
-            ];
-            for(let item of updates) {
-                await window.fs_set(window.fs_doc(window.fs, "config", item.id), { val: item.val });
-            }
-            alert('Dados Fiscal Sincronizados!');
-        }
-
-        function generatePDF() {
-            const printWindow = window.open('', '_blank');
-            const rows = document.getElementById('sales-list-body').innerHTML;
-            
-            // Kar kolonunu ve işlem kolonunu PDF'den kaldırmak için temizlik
-            const cleanRows = rows.replace(/<td class="text-green-600 font-bold">.*?<\/td>/g, '')
-                                 .replace(/<td class="text-center">.*?<\/td>/g, '');
-
-            printWindow.document.write(`
-                <html><head><title>Relatório Gerencial</title>
-                <style>
-                    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 0; margin: 0; color: #0f172a; }
-                    .letterhead { background: #0f172a; color: white; padding: 40px; border-bottom: 8px solid #fbbf24; }
-                    .letterhead h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
-                    .letterhead p { margin: 5px 0; font-size: 11px; opacity: 0.8; }
-                    .content { padding: 40px; }
-                    .doc-info { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-                    .doc-info div { font-size: 12px; font-weight: bold; text-transform: uppercase; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th { background: #f8fafc; color: #64748b; font-size: 10px; padding: 12px; text-align: left; border-bottom: 2px solid #edf2f7; text-transform: uppercase; }
-                    td { padding: 12px; border-bottom: 1px solid #edf2f7; font-size: 11px; }
-                    .total-box { margin-top: 30px; background: #f8fafc; padding: 20px; border-radius: 15px; text-align: right; }
-                    .total-box h2 { margin: 0; color: #0f172a; font-size: 20px; }
-                    .footer { position: fixed; bottom: 30px; width: 100%; text-align: center; font-size: 9px; color: #94a3b8; }
-                </style></head>
-                <body>
-                    <div class="letterhead">
-                        <h1>${config.company}</h1>
-                        <p>CNPJ: ${config.cnpj} | Inscrição Estadual: ${config.ie}</p>
-                        <p>${config.address}</p>
-                        <p>Contato: ${config.phone}</p>
-                    </div>
-                    <div class="content">
-                        <div class="doc-info">
-                            <div>RELATÓRIO DE VENDAS</div>
-                            <div>DATA: ${new Date().toLocaleDateString('pt-BR')}</div>
-                        </div>
-                        <table>
-                            <thead><tr><th>NOME</th><th>PREÇO UNIT.</th><th>PAGAMENTO</th><th>DATA</th><th>TOTAL</th></tr></thead>
-                            <tbody>${cleanRows}</tbody>
-                        </table>
-                        <div class="total-box">
-                            <p style="font-size: 10px; margin: 0; font-weight: bold; color: #64748b;">VALOR TOTAL ACUMULADO</p>
-                            <h2>${document.getElementById('fin-income').innerText}</h2>
-                        </div>
-                    </div>
-                    <div class="footer">Este documento é um registro gerencial interno da empresa ${config.company}.</div>
-                </body></html>
-            `);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 500);
         }
 
         function openModal(id) { document.getElementById(id).classList.add('modal-active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
         function clearCart() { cart = []; renderCart(); }
         function openPaymentModal() { if(cart.length) openModal('modal-payment'); }
-        function openContactModal(type) { 
-            document.getElementById('c-type').value = type; document.getElementById('c-name').value = ""; document.getElementById('c-phone').value = ""; 
-            openModal('modal-contact'); 
+        function openContactModal(type) { document.getElementById('c-type').value = type; openModal('modal-contact'); }
+        async function saveContact() { await window.fs_add(window.fs_coll(window.fs, "contacts"), { name: document.getElementById('c-name').value, phone: document.getElementById('c-phone').value, type: document.getElementById('c-type').value }); closeModal('modal-contact'); }
+
+        function renderContactList(type) {
+            const list = contacts.filter(c => c.type === type);
+            document.getElementById(type === 'customer' ? 'customer-list' : 'supplier-list').innerHTML = list.map(c => `
+                <div class="bg-white p-5 rounded-3xl border flex justify-between items-center shadow-sm">
+                    <div><h4 class="font-extrabold text-[12px] uppercase text-[#0a192f]">${c.name}</h4><p class="text-[10px] font-bold text-slate-400">${c.phone}</p></div>
+                    <button onclick="window.fs_del(window.fs_doc(window.fs,'contacts','${c.id}'))" class="text-red-200"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        function updateCustomerSelect() {
+            document.getElementById('cart-customer-select').innerHTML = '<option value="0">BALCÃO</option>' + contacts.filter(c => c.type === 'customer').map(c => `<option value="${c.id}">${c.name.toUpperCase()}</option>`).join('');
         }
     </script>
 </body>

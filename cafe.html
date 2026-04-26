@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASCAFÉ | Mobile Source 25.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #f8fafc; --primary: #0f172a; --gold: #92400e; --blue: #1d4ed8; --border: #e2e8f0; --success: #10b981; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--primary); font-family: 'Inter', sans-serif; padding-bottom: 100px; }
+
+        /* Mobile Header */
+        header { background: var(--primary); color: white; padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .live-bar { display: flex; justify-content: space-between; align-items: center; }
+        .live-item { text-align: center; }
+        .live-item label { display: block; font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+        .live-item b { font-family: 'JetBrains Mono'; font-size: 14px; color: #fff; }
+
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+
+        /* Cards */
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        h2 { font-size: 11px; margin-bottom: 15px; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800; border-left: 3px solid var(--gold); padding-left: 10px; }
+
+        /* Input Styles */
+        .field { margin-bottom: 15px; }
+        .field label { display: block; font-size: 10px; font-weight: 700; color: #64748b; margin-bottom: 6px; }
+        .field input { width: 100%; padding: 14px; border-radius: 12px; border: 2.2px solid #f1f5f9; font-family: 'JetBrains Mono'; font-size: 16px; font-weight: 700; outline: none; background: #f8fafc; }
+        .field input:focus { border-color: var(--blue); background: #fff; }
+
+        /* Selector Grid */
+        .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .sel-btn { padding: 12px 5px; border-radius: 10px; border: 2px solid #f1f5f9; background: #fff; font-weight: 700; font-size: 10px; cursor: pointer; transition: 0.2s; }
+        .sel-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Price Comparison Cards */
+        .price-card { border: 2px solid #f1f5f9; border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; cursor: pointer; transition: 0.2s; }
+        .price-card.active { border-color: var(--blue); background: #f0f7ff; }
+        .price-card.active::after { content: '✓'; position: absolute; top: 10px; right: 15px; color: var(--blue); font-weight: 900; }
+        .price-card .type { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .price-card .main-val { display: block; font-size: 22px; font-weight: 900; color: var(--primary); font-family: 'JetBrains Mono'; margin: 5px 0; }
+        .price-card .sub-vals { display: flex; gap: 10px; font-size: 11px; color: #475569; }
+
+        /* Floating Action Button */
+        .fab-container { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; border-top: 1px solid var(--border); box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 100; }
+        .btn-pdf { width: 100%; padding: 18px; border-radius: 14px; border: none; background: var(--blue); color: white; font-size: 16px; font-weight: 800; cursor: pointer; }
+
+        @media (min-width: 600px) {
+            .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="live-bar">
+        <div class="live-item"><label>USD/TRY</label><b id="v-usd">45.015</b></div>
+        <div class="live-item"><label>ICE NY</label><b>294.90</b></div>
+        <div class="live-item"><label>SYNC</label><b style="color:var(--success)">LIVE</b></div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>I. Contract Parameters</h2>
+        <div class="input-grid">
+            <div class="field"><label>Müşteri</label><input type="text" id="inp-client" value="OSMAN ECE MERSİN"></div>
+            <div class="field"><label>Toptancı ($/TON)</label><input type="number" id="inp-whol-ton" value="4800" oninput="hesapla()"></div>
+            <div class="field"><label>Kâr Marjı (%)</label><input type="number" id="inp-kar-perc" value="10" oninput="hesapla()"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>II. Logistics Selection</h2>
+        <div class="selector-grid">
+            <button class="sel-btn active" onclick="setL(19200, 3500, 550, this, '20DC')"><b>20' DC</b>19.2T</button>
+            <button class="sel-btn" onclick="setL(38400, 6200, 980, this, '40HC')"><b>40' HC</b>38.4T</button>
+            <button class="sel-btn" onclick="setL(1000, 250, 100, this, 'LCL')"><b>LCL</b>1T</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>III. Select Price Mode</h2>
+        <div id="row-whol" class="price-card active" onclick="selectMode('wholesale')">
+            <span class="type">Wholesale Based (DDP)</span>
+            <span class="main-val" id="w-ddp-v">$0.000</span>
+            <div class="sub-vals">
+                <span>FOB: <b id="w-fob-v">0</b></span>
+                <span>CIF: <b id="w-cif-v">0</b></span>
+            </div>
+        </div>
+
+        <div id="row-exch" class="price-card" onclick="selectMode('exchange')">
+            <span class="type">ICE Index Based (DDP)</span>
+            <span class="main-val" id="b-ddp-v">$0.000</span>
+            <div class="sub-vals">
+                <span>FOB: <b id="b-fob-v">0</b></span>
+                <span>CIF: <b id="b-cif-v">0</b></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fab-container">
+    <button class="btn-pdf" onclick="generatePDF()">GENERATE PROFORMA INVOICE</button>
+</div>
+
+<script>
+    let state = { mode: 'wholesale', qty: 19200, nav: 3500, port: 550, unit: '20DC', tax: 0.16, ins: 0.004, cur: 45.015, b3: 294.90 };
+
+    function selectMode(m) {
+        state.mode = m;
+        document.getElementById('row-whol').className = m === 'wholesale' ? 'price-card active' : 'price-card';
+        document.getElementById('row-exch').className = m === 'exchange' ? 'price-card active' : 'price-card';
+        hesapla();
+    }
+
+    function setL(q, n, p, btn, u) {
+        state.qty = q; state.nav = n; state.port = p; state.unit = u;
+        document.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        hesapla();
+    }
+
+    function hesapla() {
+        const kar = (parseFloat(document.getElementById('inp-kar-perc').value) || 0) / 100;
+        const wholTon = parseFloat(document.getElementById('inp-whol-ton').value) || 0;
+        
+        const calc = (raw) => {
+            const navKg = state.nav / state.qty;
+            const portKg = state.port / state.qty;
+            const fob = raw * (1 + kar);
+            const cif = fob + navKg + (raw * state.ins);
+            const ddp = ((raw + navKg + portKg) * (1 + state.tax)) + (raw * kar);
+            return { fob, cif, ddp };
+        };
+
+        const w = calc(wholTon / 1000);
+        const b = calc((state.b3 + 15) / 60);
+
+        const ui = (pre, d) => {
+            document.getElementById(`${pre}-ddp-v`).innerText = "$" + d.ddp.toFixed(3);
+            document.getElementById(`${pre}-fob-v`).innerText = "$" + d.fob.toFixed(2);
+            document.getElementById(`${pre}-cif-v`).innerText = "$" + d.cif.toFixed(2);
+        };
+
+        ui('w', w); ui('b', b);
+        return state.mode === 'wholesale' ? w : b;
+    }
+
+    function generatePDF() {
+        const d = hesapla();
+        const client = document.getElementById('inp-client').value || "CLIENT";
+        const win = window.open("", "_blank");
+        win.document.write(`
+            <html><head><style>
+                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+                body { font-family: 'Montserrat', sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.4; }
+                .header { border-bottom: 8px solid #1a1a1a; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+                .brand h1 { margin:0; font-size: 38px; font-weight:900; letter-spacing:-1px; }
+                .section { margin-top: 35px; }
+                .label { font-size: 10px; font-weight:900; color: #92400e; text-transform:uppercase; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+                table { width: 100%; border-collapse: collapse; }
+                th { background: #1a1a1a; color: #fff; padding: 12px; font-size: 11px; text-align: left; }
+                td { padding: 15px; border-bottom: 1px solid #eee; font-weight:700; font-size: 14px; }
+                .ddp-box { background: #f8fafc; border: 3px solid #1a1a1a; padding: 40px; text-align: center; margin-top: 35px; }
+                .stamp { width: 150px; height: 150px; border: 5px double #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: rotate(-15deg); margin-left: auto; color: #1d4ed8; font-weight: 900; font-size: 12px; text-align: center; }
+            </style></head>
+            <body>
+                <div class="header">
+                    <div class="brand"><h1>ASCAFÉ BRAZIL</h1><p>Santos Port Logistics | Global Division</p></div>
+                    <div style="text-align:right"><h2>PROFORMA</h2><p>${new Date().toLocaleDateString()}</p></div>
+                </div>
+                <div class="section"><div class="label">Consignee</div><div style="font-size: 22px; font-weight:900;">${client.toUpperCase()}</div></div>
+                <div class="section">
+                    <div class="label">Product Details</div>
+                    <table>
+                        <thead><tr><th>Commodity</th><th>Weight</th><th>Load</th><th>Origin</th></tr></thead>
+                        <tbody><tr><td>Green Arabica Beans</td><td>${(state.qty/1000).toLocaleString()}T</td><td>${state.unit}</td><td>BRAZIL</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="section">
+                    <div class="label">Unit Prices (USD)</div>
+                    <table>
+                        <thead><tr><th>Term</th><th>Price/KG</th><th>Sub-Total</th></tr></thead>
+                        <tbody>
+                            <tr><td>FOB SANTOS</td><td>$ ${d.fob.toFixed(3)}</td><td>$ ${(d.fob * state.qty).toLocaleString()}</td></tr>
+                            <tr><td>CIF MERSIN</td><td>$ ${d.cif.toFixed(3)}</td><td>$ ${(d.cif * state.qty).toLocaleString()}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ddp-box">
+                    <div style="font-size: 11px; font-weight:900; color:#92400e;">DOOR DELIVERY ALL-IN (DDP)</div>
+                    <div style="font-size: 55px; font-weight: 900; color: #1d4ed8;">$ ${d.ddp.toFixed(3)} / KG</div>
+                    <div style="font-size: 20px; font-weight: 700;">TOTAL: $ ${(d.ddp * state.qty).toLocaleString()}</div>
+                    <p style="font-size: 9px; margin-top: 10px;">Ref Rate: ${state.cur} TRY | Mode: ${state.mode.toUpperCase()}</p>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:40px;">
+                    <p style="font-size: 9px; color:#888; max-width:400px;">Validity: 24h. Official Santos Port Export Document.</p>
+                    <div class="stamp">DIRECT<br>SOURCE<br>BRAZIL</div>
+                </div>
+                <script>window.onload = function(){ window.print(); };<\/script>
+            </body></html>
+        `);
+        win.document.close();
+    }
+    window.onload = hesapla;
+</script>
+</body>
+</html>

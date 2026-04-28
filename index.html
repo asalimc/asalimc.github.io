@@ -61,7 +61,15 @@
         * { box-sizing: border-box; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--haki-bg); color: #2c3520; height: 100vh; overflow: hidden; margin: 0; }
         .main-view { height: calc(100vh - 145px); overflow-y: auto; padding: 1rem; padding-bottom: 5rem; }
-        nav { position: fixed !important; bottom: 0 !important; left: 0; right: 0; display: flex !important; z-index: 9999; background: var(--haki-dark); border-top: 2px solid var(--haki-mid); height: 80px; padding-bottom: env(safe-area-inset-bottom); }
+        nav {
+            position: fixed !important; bottom: 0 !important; left: 0; right: 0;
+            display: flex !important; z-index: 9999;
+            background: white;
+            border-top: 2px solid var(--haki-pale);
+            height: 80px;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(61,74,46,0.10);
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .pos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         @media(max-width:400px){ .pos-grid { grid-template-columns: repeat(3,1fr); } }
@@ -72,8 +80,12 @@
         .modal-bg { position: fixed; inset: 0; background: rgba(30,40,20,0.92); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
         .modal-active { display: flex; }
         .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 30px; max-height: 90vh; overflow-y: auto; border: 2px solid var(--haki-pale); }
-        .nav-active { color: var(--haki-gold) !important; border-top: 3px solid var(--haki-gold); }
-        .nav-btn { color: var(--haki-light); background: none; border: none; cursor: pointer; padding: 8px 4px; }
+        .nav-active { color: var(--haki-gold) !important; }
+        .nav-active span { color: var(--haki-gold) !important; }
+        .nav-active i { color: var(--haki-gold) !important; }
+        .nav-btn { color: #64748b; background: none; border: none; cursor: pointer; padding: 8px 4px; }
+        .nav-btn span { color: #64748b; }
+        .nav-btn i { color: #64748b; }
         .excel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .excel-table th { background: var(--haki-dark); color: var(--haki-pale); padding: 10px 8px; text-align: left; border-bottom: 2px solid var(--haki-mid); font-weight: 800; text-transform: uppercase; font-size: 9px; }
         .excel-table td { padding: 10px 8px; border-bottom: 1px solid var(--haki-cream); color: var(--haki-dark); font-weight: 600; font-size: 10px; vertical-align: middle; }
@@ -86,8 +98,8 @@
         .pay-nakit { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
         .pay-kredi { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
         .pay-pix { border-color: #7c3aed; background: #f5f3ff; color: #6d28d9; }
-        .dash-grid-6 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .dash-card { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .dash-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .dash-card { border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; }
         .dash-card-dark { background: linear-gradient(135deg,var(--haki-dark),#2c3520); border: none; }
         .dash-card-light { background: white; border: 1px solid var(--haki-pale); box-shadow: 0 2px 8px rgba(61,74,46,0.06); }
     </style>
@@ -96,7 +108,7 @@
 
 <div id="login-screen" class="fixed inset-0 flex items-center justify-center p-6 z-[10000] hidden" style="background:linear-gradient(135deg,#2c3520,#3d4a2e,#5a6e42);">
     <div class="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl text-center" style="border:2px solid var(--haki-pale);">
-        <div class="w-20 h-20 rounded-3xl flex items-center justify-center font-black text-3xl mx-auto mb-6 text-white shadow-lg" style="background:linear-gradient(135deg,var(--haki-mid),var(--haki-dark))">PRO</div>
+        <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-20 h-20 mx-auto mb-6 rounded-3xl shadow-lg" onerror="this.style.display='none'">
         <h2 class="text-2xl font-black uppercase mb-2 tracking-tighter" style="color:var(--haki-dark)">Acesso Restrito</h2>
         <p class="text-xs mb-8 font-bold" style="color:var(--haki-light)">PRO SISTEMA V16.2</p>
         <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -110,7 +122,7 @@
 <div id="main-app-container" class="hidden">
     <header class="h-16 text-white px-6 flex items-center justify-between shadow-xl" style="background:var(--haki-dark);">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black shadow" style="background:linear-gradient(135deg,var(--haki-gold),#d4a843);color:var(--haki-dark);">PRO</div>
+            <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-10 h-10 rounded-xl shadow object-contain bg-white p-1" onerror="this.style.display='none'">
             <div>
                 <h1 id="brand-name" class="font-extrabold text-sm uppercase tracking-tight" style="color:var(--haki-pale)">SISTEMA</h1>
                 <span class="text-[9px] font-black tracking-widest uppercase" style="color:var(--haki-gold)">Gestão Pro</span>
@@ -128,11 +140,9 @@
                     <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Dashboard</h2>
                     <p class="text-[10px] font-bold" style="color:var(--haki-light)" id="dash-date"></p>
                 </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:var(--haki-cream);border:1px solid var(--haki-pale)">
-                    <i class="fas fa-chart-line" style="color:var(--haki-mid)"></i>
-                </div>
+                <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-10 h-10 rounded-xl object-contain bg-white p-1 shadow" style="border:1px solid var(--haki-pale)" onerror="this.style.display='none'">
             </div>
-            <div class="dash-grid-6">
+            <div class="dash-grid-4">
                 <div class="dash-card dash-card-dark col-span-2">
                     <p class="text-[9px] font-black uppercase" style="color:var(--haki-gold)">💰 Saldo Líquido</p>
                     <b id="db-balance" class="text-2xl font-black text-white">R$ 0,00</b>
@@ -154,20 +164,14 @@
                     <p class="text-[9px]" style="color:var(--haki-light)">Transações</p>
                 </div>
                 <div class="dash-card dash-card-light">
-                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">📦 Estoque</p>
-                    <b id="db-stock-qty" class="text-base font-black" style="color:var(--haki-dark)">0</b>
-                    <p class="text-[9px]" style="color:var(--haki-light)">Itens totais</p>
-                </div>
-                <div class="dash-card dash-card-light">
                     <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">👥 Clientes</p>
                     <b id="db-customers-count" class="text-base font-black" style="color:var(--haki-dark)">0</b>
                     <p class="text-[9px]" style="color:var(--haki-light)">Cadastrados</p>
                 </div>
             </div>
-            <!-- SON SATIŞLAR -->
             <div>
                 <p class="text-[11px] font-black uppercase mb-3 px-1" style="color:var(--haki-dark)">Últimas Vendas</p>
-                <div id="db-recent-sales" class="space-y-2"></div>
+                <div id="db-recent-sales" class="space-y-2 pb-4"></div>
             </div>
         </div>
 
@@ -246,7 +250,7 @@
             <div class="flex justify-between items-center px-2">
                 <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Finanças</h2>
             </div>
-            <div class="dash-grid-6">
+            <div class="dash-grid-4">
                 <div class="dash-card dash-card-dark col-span-2">
                     <p class="text-[9px] font-black uppercase" style="color:var(--haki-gold)">Saldo Líquido</p>
                     <b id="fin-final-balance" class="text-2xl font-black text-white">R$ 0,00</b>
@@ -407,6 +411,8 @@ let config = {};
 let activeCategory = 'Todos';
 let currentCustomerId = null;
 
+const LOGO_URL = 'https://asalimc.github.io/logo.svg';
+
 const BIOJOIA_CATEGORIES = [
     { name: 'Anéis',         emoji: '💍', bg: '#fdf2f8', text: '#831843', border: '#f9a8d4' },
     { name: 'Colares',       emoji: '📿', bg: '#fefce8', text: '#713f12', border: '#fcd34d' },
@@ -464,42 +470,43 @@ function switchTab(tab) {
     document.querySelectorAll('main > div').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('.nav-btn').forEach(b => {
         b.classList.remove('nav-active');
-        b.style.color = 'var(--haki-light)';
-        b.style.borderTop = '';
+        b.style.color = '#64748b';
+        b.querySelectorAll('i,span').forEach(el => el.style.color = '#64748b');
     });
     document.getElementById('view-' + tab).classList.remove('hidden');
     const btn = document.getElementById('n-' + tab);
     btn.classList.add('nav-active');
     btn.style.color = 'var(--haki-gold)';
+    btn.querySelectorAll('i,span').forEach(el => el.style.color = 'var(--haki-gold)');
 }
 
 function renderDashboard() {
     const now = new Date();
     const el = document.getElementById('dash-date');
     if (el) el.innerText = now.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-
-    const totalRevenue = sales.reduce((s, x) => s + x.total, 0);
-    const totalProfit  = sales.reduce((s, x) => s + x.profit, 0);
-    const totalExp     = expenses.reduce((s, x) => s + x.val, 0);
+    const totalRevenue = sales.reduce((s,x) => s+x.total, 0);
+    const totalProfit  = sales.reduce((s,x) => s+x.profit, 0);
+    const totalExp     = expenses.reduce((s,x) => s+x.val, 0);
     const balance      = totalProfit - totalExp;
-    const totalStock   = products.reduce((s, p) => s + (p.stock || 0), 0);
     const custCount    = contacts.filter(c => c.type === 'customer').length;
-
-    document.getElementById('db-balance').innerText = 'R$ ' + balance.toFixed(2);
-    document.getElementById('db-revenue').innerText = 'R$ ' + totalRevenue.toFixed(2);
-    document.getElementById('db-expenses').innerText = 'R$ ' + totalExp.toFixed(2);
-    document.getElementById('db-sales-count').innerText = sales.length;
-    document.getElementById('db-stock-qty').innerText = totalStock;
-    document.getElementById('db-customers-count').innerText = custCount;
-
-    const recent = [...sales].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5);
+    const dbBalance = document.getElementById('db-balance');
+    const dbRevenue = document.getElementById('db-revenue');
+    const dbExp     = document.getElementById('db-expenses');
+    const dbSalesC  = document.getElementById('db-sales-count');
+    const dbCustC   = document.getElementById('db-customers-count');
+    if (dbBalance)  dbBalance.innerText  = 'R$ ' + balance.toFixed(2);
+    if (dbRevenue)  dbRevenue.innerText  = 'R$ ' + totalRevenue.toFixed(2);
+    if (dbExp)      dbExp.innerText      = 'R$ ' + totalExp.toFixed(2);
+    if (dbSalesC)   dbSalesC.innerText   = sales.length;
+    if (dbCustC)    dbCustC.innerText    = custCount;
     const rc = document.getElementById('db-recent-sales');
     if (!rc) return;
-    if (recent.length === 0) { rc.innerHTML = `<p class="text-center text-[11px] font-bold py-4" style="color:var(--haki-light)">Nenhuma venda ainda.</p>`; return; }
+    const recent = [...sales].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5);
+    if (!recent.length) { rc.innerHTML = `<p class="text-center text-[11px] font-bold py-4" style="color:var(--haki-light)">Nenhuma venda ainda.</p>`; return; }
     rc.innerHTML = recent.map(s => {
         const items = Array.isArray(s.items) ? s.items : [];
         const label = items.length ? (typeof items[0]==='object' ? items[0].name : items[0]) : s.customer;
-        const methodColor = s.method==='Nakit'?'#16a34a': s.method==='Kredi'?'#2563eb':'#7c3aed';
+        const mc = s.method==='Nakit'?'#16a34a': s.method==='Kredi'?'#2563eb':'#7c3aed';
         return `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)">
             <div>
                 <p class="text-[11px] font-black" style="color:var(--haki-dark)">${label}</p>
@@ -507,7 +514,7 @@ function renderDashboard() {
             </div>
             <div class="text-right">
                 <p class="text-[12px] font-black text-green-700">R$ ${parseFloat(s.total).toFixed(2)}</p>
-                <span style="background:${methodColor}20;color:${methodColor};padding:2px 8px;border-radius:8px;font-size:8px;font-weight:900">${s.method}</span>
+                <span style="background:${mc}20;color:${mc};padding:2px 8px;border-radius:8px;font-size:8px;font-weight:900">${s.method}</span>
             </div>
         </div>`;
     }).join('');
@@ -649,11 +656,15 @@ function renderFinance() {
     const totalRevenue = sales.reduce((s,x)=>s+x.total,0);
     const totalProfit  = sales.reduce((s,x)=>s+x.profit,0);
     const totalExp     = expenses.reduce((s,x)=>s+x.val,0);
-    document.getElementById('fin-final-balance').innerText = "R$ "+(totalProfit-totalExp).toFixed(2);
-    document.getElementById('fin-total-revenue').innerText = "R$ "+totalRevenue.toFixed(2);
-    document.getElementById('fin-total-exp').innerText     = "R$ "+totalExp.toFixed(2);
-
-    document.getElementById('sales-list-body').innerHTML = sales.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(s => {
+    const finBal = document.getElementById('fin-final-balance');
+    const finRev = document.getElementById('fin-total-revenue');
+    const finExp = document.getElementById('fin-total-exp');
+    if (finBal) finBal.innerText = "R$ "+(totalProfit-totalExp).toFixed(2);
+    if (finRev) finRev.innerText = "R$ "+totalRevenue.toFixed(2);
+    if (finExp) finExp.innerText = "R$ "+totalExp.toFixed(2);
+    const tbody = document.getElementById('sales-list-body');
+    if (!tbody) return;
+    tbody.innerHTML = sales.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(s => {
         const items = Array.isArray(s.items) ? s.items : [];
         const firstName = items.length ? (typeof items[0]==='object'?items[0].name:items[0]) : s.customer;
         const totalQty  = items.reduce((sum,it)=>sum+(typeof it==='object'?(it.qty||1):1),0);
@@ -675,13 +686,13 @@ function generateSalePDF(saleId) {
     const s = sales.find(x => x.id === saleId);
     if (!s) return;
     const items = Array.isArray(s.items) ? s.items : [];
-    const cust = contacts.find(c => c.id === s.customerId);
+    const cust  = contacts.find(c => c.id === s.customerId);
     const phone = cust ? (cust.phone||'').replace(/\D/g,'') : '';
-    const win = window.open('','_blank');
+    const win   = window.open('','_blank');
     const itemsHtml = items.map(it => {
-        const name = typeof it==='object'?it.name:it;
-        const qty  = typeof it==='object'?(it.qty||1):1;
-        const price= typeof it==='object'?(it.price||0):0;
+        const name  = typeof it==='object'?it.name:it;
+        const qty   = typeof it==='object'?(it.qty||1):1;
+        const price = typeof it==='object'?(it.price||0):0;
         return `<tr>
             <td style="padding:10px 12px;border-bottom:1px solid #c8d5b2;font-size:12px;font-weight:700">${name}</td>
             <td style="padding:10px 12px;border-bottom:1px solid #c8d5b2;font-size:12px;text-align:center;font-weight:700">${qty}</td>
@@ -689,59 +700,68 @@ function generateSalePDF(saleId) {
             <td style="padding:10px 12px;border-bottom:1px solid #c8d5b2;font-size:12px;text-align:right;font-weight:800;color:#3d4a2e">R$ ${(price*qty).toFixed(2)}</td>
         </tr>`;
     }).join('');
-    const mc = s.method==='Nakit'?'#16a34a': s.method==='Kredi'?'#2563eb':'#7c3aed';
-    const waLink = phone ? `https://wa.me/${phone}?text=${encodeURIComponent('Olá '+s.customer+'! Segue seu recibo de compra em '+( config.company||'nossa loja')+'.')}` : '';
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Recibo</title>
+    const mc     = s.method==='Nakit'?'#16a34a': s.method==='Kredi'?'#2563eb':'#7c3aed';
+    const waText = encodeURIComponent(`Olá ${s.customer}! Segue seu recibo de compra em ${config.company||'nossa loja'}. Obrigado pela preferência! 💚`);
+    const waLink = phone ? `https://wa.me/${phone}?text=${waText}` : '';
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Recibo - ${s.customer}</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;padding:24px;color:#3d4a2e;background:#f4f6f0;max-width:480px;margin:0 auto}
+        body{font-family:sans-serif;color:#3d4a2e;background:#f4f6f0;max-width:480px;margin:0 auto}
+        .page{padding:24px;position:relative;min-height:100vh}
+        .bg-logo{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:280px;opacity:0.04;pointer-events:none;z-index:0}
+        .content{position:relative;z-index:1}
         .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #b8a84a;padding-bottom:14px;margin-bottom:18px}
-        .logo{width:44px;height:44px;background:linear-gradient(135deg,#5a6e42,#3d4a2e);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#b8a84a;font-weight:900;font-size:13px;flex-shrink:0}
+        .logo-img{width:48px;height:48px;border-radius:12px;object-fit:contain;background:white;padding:4px;border:1px solid #c8d5b2}
         .client-box{background:#eef1e8;padding:12px 14px;border-radius:12px;margin-bottom:16px;border:1px solid #c8d5b2}
-        table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;margin-bottom:18px}
+        table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;margin-bottom:18px;box-shadow:0 2px 8px rgba(61,74,46,0.08)}
         th{background:#3d4a2e;color:#c8d5b2;text-align:left;padding:10px 12px;font-size:10px;text-transform:uppercase}
         .total-box{background:#eef1e8;border:1px solid #c8d5b2;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
-        .wa-btn{display:block;background:#25D366;color:white;text-align:center;padding:14px;border-radius:12px;font-weight:900;font-size:14px;text-decoration:none;margin-bottom:14px}
-        .footer{text-align:center;font-size:10px;color:#8a9e6a;margin-top:14px;padding-top:10px;border-top:1px solid #c8d5b2}
+        .wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:white;text-align:center;padding:14px;border-radius:12px;font-weight:900;font-size:14px;text-decoration:none;margin-bottom:14px}
+        .print-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#3d4a2e;color:#b8a84a;border:none;padding:12px 32px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;width:100%;margin-bottom:12px}
+        .footer{text-align:center;font-size:10px;color:#8a9e6a;padding-top:10px;border-top:1px solid #c8d5b2}
         .method-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:900;color:white;background:${mc}}
-        @media print{.wa-btn{display:none!important}.no-print{display:none!important}}
+        @media print{.wa-btn,.print-btn{display:none!important}.bg-logo{position:fixed!important;opacity:0.05!important}}
     </style></head><body>
-        <div class="header">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div class="logo">PRO</div>
-                <div>
-                    <h2 style="font-size:16px;font-weight:900;color:#3d4a2e">${config.company||'BIOJOIA'}</h2>
-                    <p style="font-size:10px;color:#8a9e6a">${config.address||''}</p>
+    <div class="page">
+        <img src="${LOGO_URL}" class="bg-logo" alt="">
+        <div class="content">
+            <div class="header">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <img src="${LOGO_URL}" class="logo-img" alt="Logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 style="font-size:16px;font-weight:900;color:#3d4a2e">${config.company||'BIOJOIA'}</h2>
+                        <p style="font-size:10px;color:#8a9e6a">${config.address||''}</p>
+                        ${config.phone?`<p style="font-size:10px;color:#8a9e6a">${config.phone}</p>`:''}
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <p style="font-size:10px;font-weight:900;color:#3d4a2e">RECIBO DE VENDA</p>
+                    <p style="font-size:9px;color:#8a9e6a">${new Date(s.date).toLocaleString()}</p>
+                    <div style="margin-top:5px"><span class="method-badge">${s.method}</span></div>
                 </div>
             </div>
-            <div style="text-align:right">
-                <p style="font-size:10px;font-weight:900;color:#3d4a2e">RECIBO</p>
-                <p style="font-size:9px;color:#8a9e6a">${new Date(s.date).toLocaleString()}</p>
-                <div style="margin-top:5px"><span class="method-badge">${s.method}</span></div>
+            <div class="client-box">
+                <p style="font-size:9px;font-weight:900;text-transform:uppercase;color:#b8a84a;margin-bottom:3px">Cliente</p>
+                <p style="font-size:15px;font-weight:800;color:#3d4a2e">${s.customer||'VENDA BALCÃO'}</p>
+                ${phone?`<p style="font-size:11px;color:#8a9e6a;margin-top:2px">📱 ${cust.phone}</p>`:''}
+            </div>
+            <table>
+                <thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço Un.</th><th style="text-align:right">Subtotal</th></tr></thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+            <div class="total-box">
+                <span style="font-size:14px;font-weight:900;color:#3d4a2e">TOTAL DA COMPRA</span>
+                <span style="font-size:22px;font-weight:900;color:#b8a84a">R$ ${parseFloat(s.total).toFixed(2)}</span>
+            </div>
+            ${waLink?`<a href="${waLink}" target="_blank" class="wa-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Enviar pelo WhatsApp</a>`:''}
+            <button onclick="window.print()" class="print-btn">🖨️ Imprimir Recibo</button>
+            <div class="footer">
+                <p>${config.company||''} ${config.phone?'| '+config.phone:''}</p>
+                <p style="margin-top:3px">Obrigado pela preferência! 💚</p>
             </div>
         </div>
-        <div class="client-box">
-            <p style="font-size:9px;font-weight:900;text-transform:uppercase;color:#b8a84a;margin-bottom:3px">Cliente</p>
-            <p style="font-size:15px;font-weight:800;color:#3d4a2e">${s.customer||'VENDA BALCÃO'}</p>
-            ${phone ? `<p style="font-size:11px;color:#8a9e6a;margin-top:2px">📱 ${cust.phone}</p>` : ''}
-        </div>
-        <table>
-            <thead><tr><th>Produto</th><th style="text-align:center">Qtd</th><th style="text-align:right">Preço</th><th style="text-align:right">Total</th></tr></thead>
-            <tbody>${itemsHtml}</tbody>
-        </table>
-        <div class="total-box">
-            <span style="font-size:14px;font-weight:900;color:#3d4a2e">TOTAL</span>
-            <span style="font-size:20px;font-weight:900;color:#b8a84a">R$ ${parseFloat(s.total).toFixed(2)}</span>
-        </div>
-        ${waLink ? `<a href="${waLink}" target="_blank" class="wa-btn no-print">📲 Enviar pelo WhatsApp</a>` : ''}
-        <div class="footer">
-            <p>${config.company||''} ${config.phone?'| '+config.phone:''}</p>
-            <p style="margin-top:3px">Obrigado pela preferência! 💚</p>
-        </div>
-        <div class="no-print" style="text-align:center;margin-top:14px">
-            <button onclick="window.print()" style="background:#3d4a2e;color:#b8a84a;border:none;padding:12px 32px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer">🖨️ Imprimir</button>
-        </div>
+    </div>
     </body></html>`);
     win.document.close();
 }
@@ -771,7 +791,7 @@ function openCustomerDetail(customerId) {
                 <p class="text-[10px] font-bold mb-2" style="color:var(--haki-dark)">${label}</p>
                 <div class="flex justify-between items-center">
                     <span class="text-[11px] font-black text-green-700">R$ ${parseFloat(s.total).toFixed(2)}</span>
-                    <button onclick="generateSalePDF('${s.id}')" class="text-[9px] font-black uppercase px-3 py-1 rounded-full" style="background:var(--haki-dark);color:var(--haki-gold);border:none;cursor:pointer"><i class="fas fa-file-pdf mr-1"></i>PDF</button>
+                    <button onclick="generateSalePDF('${s.id}')" style="background:var(--haki-dark);color:var(--haki-gold);border:none;border-radius:8px;padding:4px 10px;font-size:9px;font-weight:900;cursor:pointer"><i class="fas fa-file-pdf mr-1"></i>PDF</button>
                 </div>
             </div>`;
         }).join('');
@@ -782,9 +802,9 @@ function openCustomerDetail(customerId) {
 function editCurrentCustomer() {
     const c = contacts.find(x => x.id === currentCustomerId);
     if (!c) return;
-    document.getElementById('edit-c-id').value = c.id;
-    document.getElementById('edit-c-type').value = c.type;
-    document.getElementById('edit-c-name').value = c.name;
+    document.getElementById('edit-c-id').value   = c.id;
+    document.getElementById('edit-c-type').value  = c.type;
+    document.getElementById('edit-c-name').value  = c.name;
     document.getElementById('edit-c-phone').value = c.phone||'';
     closeModal('modal-customer-detail');
     openModal('modal-edit-contact');
@@ -817,11 +837,11 @@ async function saveSettings() {
 function openProductModal(id=null) {
     if (id) {
         const p = products.find(x=>x.id===id);
-        document.getElementById('p-id').value = p.id;
-        document.getElementById('p-name').value = p.name;
-        document.getElementById('p-price').value = p.price;
-        document.getElementById('p-cost').value = p.cost||'';
-        document.getElementById('p-stock').value = p.stock;
+        document.getElementById('p-id').value       = p.id;
+        document.getElementById('p-name').value     = p.name;
+        document.getElementById('p-price').value    = p.price;
+        document.getElementById('p-cost').value     = p.cost||'';
+        document.getElementById('p-stock').value    = p.stock;
         document.getElementById('p-category').value = p.category||'';
     } else {
         ['p-id','p-name','p-price','p-cost'].forEach(id=>document.getElementById(id).value='');
@@ -872,7 +892,7 @@ function renderContactList(type) {
     const el = document.getElementById(type==='customer'?'customer-list':'supplier-list');
     if (!list.length) { el.innerHTML=`<p class="text-center text-[11px] font-bold py-8" style="color:var(--haki-light)">Nenhum registro.</p>`; return; }
     el.innerHTML = list.map(c => {
-        const custSales = sales.filter(s=>s.customerId===c.id);
+        const custSales  = sales.filter(s=>s.customerId===c.id);
         const totalSpent = custSales.reduce((sum,s)=>sum+s.total,0);
         return `<div onclick="openCustomerDetail('${c.id}')" class="bg-white p-5 rounded-3xl flex justify-between items-center shadow-sm cursor-pointer" style="border:1px solid var(--haki-pale)">
             <div>

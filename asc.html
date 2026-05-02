@@ -7,7 +7,6 @@
     <meta name="theme-color" content="#0a192f">
     <title>Ahmet Çınarbaş | Biografia Oficial</title>
 
-    <!-- Fontes de Prestígio -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
@@ -15,15 +14,16 @@
 
     <style>
         :root {
-            --navy-deep: #0a192f;
-            --navy-medium: #112240;
-            --navy-light: #233554;
+            --navy-deep: #060d1a;
+            --navy-medium: #0a192f;
+            --navy-light: #172a45;
             --accent-silver: #e6f1ff;
+            --accent-blue: #64ffda;
             --text-main: #ccd6f6;
             --text-dim: #8892b0;
             --white: #ffffff;
-            --border-glass: rgba(230, 241, 255, 0.1);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-glass: rgba(230, 241, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
@@ -35,257 +35,272 @@
         body {
             background-color: var(--navy-deep);
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(100, 255, 218, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(230, 241, 255, 0.05) 0%, transparent 40%);
+                radial-gradient(circle at 10% 20%, rgba(100, 255, 218, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(230, 241, 255, 0.03) 0%, transparent 50%);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            padding: clamp(10px, 3vw, 40px);
+            line-height: 1.7;
+            padding: clamp(10px, 4vw, 60px);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Container Principal */
+        /* Ana Konteyner - Cam Efekti Artırıldı */
         .main-wrapper {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: var(--navy-medium);
-            border-radius: 24px;
+            background: rgba(17, 34, 64, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
             border: 1px solid var(--border-glass);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
             overflow: hidden;
             position: relative;
+            animation: fadeIn 1s ease-out;
         }
 
-        /* Toolbar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Aksiyon Butonları - Daha Modern */
         .top-actions {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 30px;
+            right: 30px;
             z-index: 10;
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-action {
-            background: var(--navy-light);
-            color: var(--white);
-            border: 1px solid var(--accent-silver);
-            padding: 8px 16px;
-            border-radius: 50px;
+            background: rgba(23, 42, 69, 0.8);
+            color: var(--accent-silver);
+            border: 1px solid var(--border-glass);
+            padding: 10px 20px;
+            border-radius: 12px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            text-decoration: none;
+            backdrop-filter: blur(5px);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn-action:hover {
             background: var(--white);
             color: var(--navy-deep);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        /* Header */
+        /* Header Bölümü - Dramatik Derinlik */
         .hero-header {
-            padding: clamp(40px, 8vw, 80px) clamp(20px, 5vw, 60px);
-            background: linear-gradient(135deg, var(--navy-medium) 0%, var(--navy-deep) 100%);
+            padding: clamp(60px, 10vw, 100px) clamp(30px, 6vw, 80px);
+            background: linear-gradient(to bottom, rgba(10, 25, 47, 0.8), rgba(6, 13, 26, 1));
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 40px;
             border-bottom: 1px solid var(--border-glass);
         }
 
         .profile-box {
             position: relative;
-            flex-shrink: 0;
+            z-index: 1;
         }
 
         .avatar {
-            width: clamp(120px, 18vw, 180px);
-            height: clamp(120px, 18vw, 180px);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            border: 4px solid var(--white);
+            width: clamp(140px, 20vw, 200px);
+            height: clamp(140px, 20vw, 200px);
+            border-radius: 24% 76% 35% 65% / 49% 30% 70% 51%; /* Organik form */
+            border: 2px solid var(--border-glass);
+            padding: 8px;
             object-fit: cover;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            background: var(--navy-light);
+            transition: var(--transition);
+            filter: grayscale(20%);
+        }
+
+        .avatar:hover {
+            border-radius: 50%;
+            filter: grayscale(0%);
+            transform: scale(1.05) rotate(3deg);
         }
 
         .hero-text h1 {
             font-family: 'Cinzel', serif;
-            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            font-size: clamp(2rem, 6vw, 4rem);
             color: var(--white);
-            margin-bottom: 10px;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .badge-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 10px;
         }
 
         .badge {
-            background: rgba(230, 241, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: var(--accent-silver);
+            background: rgba(100, 255, 218, 0.1);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
-        /* Grid de Conteúdo */
+        /* Kart Yapısı - Soft Glow */
         .content-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 25px;
-            padding: clamp(20px, 5vw, 50px);
+            gap: 30px;
+            padding: clamp(30px, 6vw, 60px);
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.01);
             border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 24px;
+            padding: 35px;
             transition: var(--transition);
         }
 
         .card:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: var(--accent-silver);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(100, 255, 218, 0.3);
+            transform: translateY(-5px);
         }
 
         .col-8 { grid-column: span 8; }
         .col-4 { grid-column: span 4; }
         .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
 
         .section-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--white);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
-        .section-title i { color: var(--accent-silver); opacity: 0.8; }
+        .section-title i { color: var(--accent-blue); font-size: 1.1rem; }
 
-        /* Estilo das Obras */
+        /* İş Deneyimi / Eserler - Soluk Çizgi Tasarımı */
         .work-item {
-            margin-bottom: 25px;
-            padding-left: 20px;
-            border-left: 2px solid var(--accent-silver);
+            margin-bottom: 30px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .work-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 5px; bottom: 5px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-blue), transparent);
         }
 
         .work-item h4 {
             color: var(--white);
-            font-size: 1.2rem;
-            margin-bottom: 5px;
+            font-size: 1.25rem;
+            margin-bottom: 6px;
         }
 
         .work-item span {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            margin-bottom: 10px;
-            font-style: italic;
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 0.8rem;
+            opacity: 0.8;
         }
 
-        /* Quote */
+        /* Quote - Şık ve Minimal */
         .quote-block {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--accent-silver);
-            font-style: italic;
+            line-height: 1.5;
             position: relative;
-            padding: 20px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
+            padding: 30px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+            border-right: 4px solid var(--accent-blue);
         }
 
-        /* Info List */
+        /* Bilgi Listesi */
         .info-list div {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 15px 0;
             border-bottom: 1px solid var(--border-glass);
         }
 
-        .info-list strong { color: var(--accent-silver); }
+        .info-list strong { color: var(--text-dim); font-weight: 400; font-size: 0.9rem; }
+        .info-list span { color: var(--white); font-weight: 600; }
 
-        /* Tags */
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
+        /* Tag Pill - Etkileşimli */
         .tag-pill {
             background: var(--navy-light);
-            padding: 6px 15px;
-            border-radius: 50px;
+            padding: 8px 18px;
+            border-radius: 12px;
             font-size: 0.85rem;
             border: 1px solid var(--border-glass);
+            transition: var(--transition);
         }
 
-        /* Responsividade Extrema */
+        .tag-pill:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Responsive Ayarlar */
         @media (max-width: 1024px) {
-            .col-8, .col-4 { grid-column: span 12; }
+            .col-8, .col-4, .col-6 { grid-column: span 12; }
         }
 
         @media (max-width: 768px) {
             .hero-header {
                 flex-direction: column;
                 text-align: center;
-                padding-top: 80px;
+                padding-top: 100px;
             }
             .top-actions {
                 width: 100%;
                 justify-content: center;
                 right: 0;
+                top: 20px;
             }
             .badge-list { justify-content: center; }
         }
 
-        @media (max-width: 480px) {
-            body { padding: 0; }
-            .main-wrapper { border-radius: 0; border: none; }
-            .card { padding: 20px; }
-            .hero-text h1 { font-size: 1.8rem; }
-        }
-
-        /* Modal Preview */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--navy-deep);
-            z-index: 1000;
-            padding: 20px;
-        }
-        .modal-content {
-            width: 100%; height: 90%;
-            border: 1px solid var(--accent-silver);
-            border-radius: 10px;
-            background: white;
+        /* Print - Kağıt Üzerinde Temiz Görünüm */
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .main-wrapper { box-shadow: none; border: none; width: 100%; }
+            .top-actions, .badge { display: none; }
+            .card { border: 1px solid #eee; break-inside: avoid; }
+            .section-title, h1, h4 { color: black !important; }
         }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper" id="printableArea">
-        <!-- Botões de Ação -->
+        <!-- Üst Aksiyonlar -->
         <div class="top-actions">
-            <button class="btn-action" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
-            <button class="btn-action" onclick="downloadHTML()"><i class="fas fa-download"></i> Salvar</button>
+            <button class="btn-action" onclick="window.print()"><i class="fas fa-print"></i> PDF/Yazdır</button>
+            <button class="btn-action" onclick="downloadHTML()"><i class="fas fa-file-code"></i> Kaynak Kodu</button>
         </div>
 
-        <!-- Cabeçalho -->
+        <!-- Hero Header -->
         <header class="hero-header">
             <div class="profile-box">
                 <img src="https://pbs.twimg.com/profile_images/1559852899303317504/pjkJwYHb_400x400.jpg" alt="Ahmet Çınarbaş" class="avatar">
@@ -301,41 +316,43 @@
             </div>
         </header>
 
-        <!-- Grid de Conteúdo -->
         <div class="content-grid">
             
-            <!-- Biografia Longa -->
+            <!-- Profil Özeti -->
             <section class="card col-8">
                 <h2 class="section-title"><i class="fas fa-feather-pointed"></i> Perfil Profissional</h2>
-                <p>Ahmet Çınarbaş é um pesquisador e cronista dedicado à preservação do patrimônio cultural de Mardin, Turquia. Com uma trajetória que une a precisão da Tecnologia da Informação à sensibilidade do jornalismo cultural, Çınarbaş resgata a memória oral e as tradições musicais da sua terra natal. Sua atuação como consultor político e editor reflete um compromisso profundo com a comunicação estratégica e a identidade histórica regional.</p>
+                <p>Ahmet Çınarbaş é um pesquisador e cronista dedicado à preservação do patrimônio cultural de Mardin, Turquia. Com uma trajetória que une a precisão da Tecnologia da Informação à sensibilidade do jornalismo cultural, Çınarbaş resgata a memória oral e as tradições musicais da sua terra natal.</p>
+                <p style="margin-top: 15px; color: var(--text-dim);">Sua atuação como consultor político e editor reflete um compromisso profundo com a comunicação estratégica e a identidade histórica regional.</p>
             </section>
 
-            <!-- Dados Rápidos -->
+            <!-- Kişisel Veriler -->
             <section class="card col-4">
-                <h2 class="section-title"><i class="fas fa-info-circle"></i> Fatos</h2>
+                <h2 class="section-title"><i class="fas fa-fingerprint"></i> Dados</h2>
                 <div class="info-list">
-                    <div><strong>Nascimento:</strong> <span>1979, Mardin</span></div>
-                    <div><strong>Formação:</strong> <span>Lise (Ensino Médio)</span></div>
-                    <div><strong>Base:</strong> <span>Mardin, Turquia</span></div>
+                    <div><strong>Nascimento</strong> <span>1979, Mardin</span></div>
+                    <div><strong>Formação</strong> <span>Ensino Médio</span></div>
+                    <div><strong>Base</strong> <span>Mardin, TR</span></div>
                 </div>
             </section>
 
-            <!-- Obras -->
+            <!-- Başarılar ve Eserler -->
             <section class="card col-12">
-                <h2 class="section-title"><i class="fas fa-book-open"></i> Obras em Destaque</h2>
-                <div class="work-item">
-                    <h4>Músicos de Mardin: Do Passado ao Presente</h4>
-                    <span>5 anos de pesquisa sistemática</span>
-                    <p>O mais completo registro da história musical civil da região, catalogando 167 músicos desde 1860, unindo diferentes crenças e idiomas sob a harmonia da arte.</p>
-                </div>
-                <div class="work-item">
-                    <h4>Os que Ficaram no Passado (Mazide Kalanlar)</h4>
-                    <span>Memória e Nostalgia</span>
-                    <p>Uma cápsula do tempo literária que retrata o cotidiano, as tradições e a vida social da antiga Mardin.</p>
+                <h2 class="section-title"><i class="fas fa-award"></i> Obras em Destaque</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                    <div class="work-item">
+                        <h4>Músicos de Mardin</h4>
+                        <span>Pesquisa Sistemática (5 anos)</span>
+                        <p style="margin-top: 8px; font-size: 0.95rem;">Catalogação de 167 músicos desde 1860, unindo diferentes crenças e idiomas sob a harmonia da arte regional.</p>
+                    </div>
+                    <div class="work-item">
+                        <h4>Os que Ficaram no Passado</h4>
+                        <span>Memória e Nostalgia (Mazide Kalanlar)</span>
+                        <p style="margin-top: 8px; font-size: 0.95rem;">Uma cápsula do tempo literária que retrata o cotidiano, as tradições e a vida social da antiga Mardin.</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- Citação -->
+            <!-- Felsefe -->
             <section class="card col-6">
                 <h2 class="section-title"><i class="fas fa-quote-left"></i> Filosofia</h2>
                 <div class="quote-block">
@@ -343,15 +360,15 @@
                 </div>
             </section>
 
-            <!-- Plataformas -->
+            <!-- Ekosistem Tags -->
             <section class="card col-6">
-                <h2 class="section-title"><i class="fas fa-network-wired"></i> Ecossistema</h2>
+                <h2 class="section-title"><i class="fas fa-layer-group"></i> Ecossistema</h2>
                 <div class="tags-container">
-                    <span class="tag-pill">Associação Musical de Mardin</span>
+                    <span class="tag-pill">Associação Musical</span>
                     <span class="tag-pill">Mardin Life Yayınları</span>
                     <span class="tag-pill">Mardin Time</span>
                     <span class="tag-pill">Consultoria Estratégica</span>
-                    <span class="tag-pill">Especialista em TI</span>
+                    <span class="tag-pill">TI Specialist</span>
                 </div>
             </section>
 
@@ -365,7 +382,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Ahmet_Cinarbas_Bio_Navy.html';
+            a.download = 'Ahmet_Cinarbas_Elite_Bio.html';
             a.click();
         }
     </script>

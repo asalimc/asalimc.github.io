@@ -1,280 +1,194 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ahmet Çınarbaş | Digital Archive</title>
+    <title>AHMET CINARBAS | DOSSIER</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=JetBrains+Mono:wght@300;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #0d0d0d;
-            --text: #e0e0e0;
-            --accent: #b4975a;
-            --dim: #4a4a4a;
-            --transition: all 0.7s cubic-bezier(0.2, 1, 0.3, 1);
+            --neon-green: #ccff00;
+            --deep-black: #050505;
+            --raw-white: #f0f0f0;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Unbounded', sans-serif;
+            background-color: var(--deep-black);
+            color: var(--raw-white);
+            font-family: 'JetBrains+Mono', monospace;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            padding: 2vw;
         }
 
-        /* Arka Plan Gürültü Efekti (Texture) */
-        body::before {
-            content: "";
+        /* Arka plandaki dev yazı */
+        .bg-text {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 50;
-        }
-
-        /* Navigasyon / Marker */
-        .page-marker {
-            position: fixed;
-            left: 50px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            font-size: 10px;
-            letter-spacing: 10px;
-            color: var(--accent);
-            text-transform: uppercase;
-            z-index: 100;
-        }
-
-        /* Ana Konteyner */
-        .wrapper {
-            padding: 100px 10% 100px 150px;
-        }
-
-        /* Hero Bölümü */
-        .hero {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 80vh;
-            align-items: center;
-            gap: 100px;
-            margin-bottom: 200px;
-        }
-
-        .hero-image-box {
-            position: relative;
-        }
-
-        .hero-image {
-            width: 100%;
-            aspect-ratio: 4/5;
-            object-fit: cover;
-            filter: grayscale(1) contrast(1.1);
-            border: 1px solid var(--dim);
-            transition: var(--transition);
-        }
-
-        .hero-image-box::after {
-            content: "MARDIN '79";
-            position: absolute;
-            bottom: -20px; right: -20px;
-            font-size: 80px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.03);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Syne', sans-serif;
+            font-size: 40vw;
+            color: rgba(255,255,255,0.02);
             z-index: -1;
+            white-space: nowrap;
+            pointer-events: none;
         }
 
-        .hero-content h1 {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(4rem, 10vw, 8rem);
-            line-height: 0.9;
-            font-style: italic;
-            margin-bottom: 40px;
-        }
-
-        .hero-content p {
-            font-size: 14px;
-            line-height: 1.8;
-            max-width: 400px;
-            font-weight: 300;
-            color: #aaa;
-        }
-
-        /* Seksiyon Başlıkları */
-        .section-header {
-            margin-bottom: 80px;
-            display: flex;
-            align-items: baseline;
+        /* Grid Sistemi */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
             gap: 20px;
         }
 
-        .section-header span { font-size: 12px; color: var(--accent); }
-        .section-header h2 { font-size: 40px; text-transform: uppercase; }
-
-        /* Arşiv Kartları (Eserler) */
-        .archive-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-            background-color: var(--dim);
-            border: 1px solid var(--dim);
-        }
-
-        .archive-item {
-            background-color: var(--bg);
-            padding: 50px;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 400px;
-        }
-
-        .archive-item:hover {
-            background-color: var(--accent);
-            color: var(--bg);
-        }
-
-        .archive-item h3 { font-size: 24px; margin-bottom: 20px; font-family: 'Instrument Serif', serif; font-style: italic; }
-        .archive-item p { font-size: 12px; font-weight: 300; }
-        .archive-item .year { font-size: 10px; opacity: 0.6; }
-
-        /* Veri Tablosu */
-        .data-table {
-            margin-top: 150px;
-            width: 100%;
-        }
-
-        .data-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            padding: 30px 0;
-            border-bottom: 1px solid var(--dim);
-            font-size: 14px;
-        }
-
-        .data-row .label { color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
-
-        /* Footer Quote */
-        .conclusion {
-            margin-top: 200px;
-            text-align: center;
-        }
-
-        .conclusion blockquote {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(2rem, 5vw, 5rem);
-            line-height: 1.1;
+        /* Başlık Alanı */
+        header {
+            grid-column: span 12;
+            border-bottom: 5px solid var(--neon-green);
+            padding-bottom: 20px;
             margin-bottom: 50px;
         }
 
-        .conclusion .btn-print {
-            background: none;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 15px 40px;
-            cursor: pointer;
-            font-family: 'Unbounded';
-            font-size: 10px;
-            letter-spacing: 2px;
-            transition: var(--transition);
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 10vw, 15rem);
+            line-height: 0.8;
+            text-transform: uppercase;
+            color: var(--neon-green);
         }
 
-        .conclusion .btn-print:hover {
-            background: var(--accent);
-            color: var(--bg);
+        /* Biyografi Bloğu */
+        .bio-block {
+            grid-column: span 7;
+            font-size: 1.5rem;
+            line-height: 1.2;
+            padding: 40px;
+            background: #111;
+            border-left: 10px solid var(--raw-white);
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .hero { grid-template-columns: 1fr; gap: 50px; }
-            .archive-grid { grid-template-columns: 1fr; }
-            .wrapper { padding: 60px 20px 60px 40px; }
-            .page-marker { display: none; }
+        .bio-block span {
+            background: var(--neon-green);
+            color: var(--deep-black);
+            padding: 0 5px;
+        }
+
+        /* Fotoğraf Alanı */
+        .photo-block {
+            grid-column: span 5;
+            position: relative;
+        }
+
+        .photo-block img {
+            width: 100%;
+            filter: grayscale(1) contrast(1.5) brightness(0.8);
+            mix-blend-mode: screen;
+        }
+
+        /* İş Alanları - Liste */
+        .work-list {
+            grid-column: span 12;
+            margin-top: 100px;
+        }
+
+        .work-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #333;
+            transition: 0.3s;
+        }
+
+        .work-item:hover {
+            padding-left: 20px;
+            color: var(--neon-green);
+        }
+
+        .work-item h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+        }
+
+        /* Kartvizit Tarzı Bilgi */
+        .info-card {
+            grid-column: span 4;
+            border: 2px solid var(--neon-green);
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        .info-card h4 { color: var(--neon-green); margin-bottom: 10px; }
+
+        /* Footer */
+        footer {
+            grid-column: span 12;
+            margin-top: 150px;
+            text-align: right;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .bio-block, .photo-block, .info-card { grid-column: span 12; }
+            .work-item h2 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="page-marker">Ahmet Çınarbaş / Profile 01</div>
+    <div class="bg-text">BRAZIL</div>
 
-    <div class="wrapper">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-image-box">
-                <img src="https://pbs.twimg.com/profile_images/1559852899303317504/pjkJwYHb_400x400.jpg" alt="Ahmet Çınarbaş" class="hero-image">
-            </div>
-            <div class="hero-content">
-                <h1>The<br>Chronicler.</h1>
-                <p>Journalista, Escritor e Consultor Político. Um pesquisador dedicado a capturar as vozes que o tempo esqueceu nas terras de Mardin.</p>
-                <div style="margin-top: 30px; display: flex; gap: 20px;">
-                    <i class="fab fa-twitter"></i>
-                    <i class="fab fa-linkedin-in"></i>
-                    <i class="fas fa-envelope"></i>
-                </div>
-            </div>
-        </section>
+    <div class="container">
+        <header>
+            <p>// INTERNAL DOCUMENT / 2026</p>
+            <h1>AHMET<br>CINARBAS</h1>
+        </header>
 
-        <!-- Arşiv Bölümü -->
-        <section id="archive">
-            <div class="section-header">
-                <span>01</span>
-                <h2>Obras Selecionadas</h2>
-            </div>
-            <div class="archive-grid">
-                <div class="archive-item">
-                    <span class="year">2019-2024</span>
-                    <h3>Músicos de Mardin</h3>
-                    <p>Um catálogo histórico de 167 músicos, resgatando a harmonia civil de 1860 aos dias atuais.</p>
-                </div>
-                <div class="archive-item">
-                    <span class="year">Cronologia</span>
-                    <h3>Mazide Kalanlar</h3>
-                    <p>O registro literário da alma social de Mardin, focado em tradições e memórias orais.</p>
-                </div>
-                <div class="archive-item">
-                    <span class="year">Atuação</span>
-                    <h3>Estratégia & TI</h3>
-                    <p>A fusão entre consultoria política e a precisão da tecnologia da informação.</p>
-                </div>
-            </div>
-        </section>
+        <div class="bio-block">
+            Mardin’in <span>kadim hafızasından</span> Brezilya’nın <span>global ticaret</span> hatlarına uzanan bir köprü. Gazeteci, stratejist ve butik kahve toptancısı. Olay sadece ticaret değil; doğru <span>çekirdeği</span>, doğru <span>hikayeyi</span> ve doğru <span>stratejiyi</span> bulmak.
+        </div>
 
-        <!-- Veri Bölümü -->
-        <section class="data-table">
-            <div class="section-header">
-                <span>02</span>
-                <h2>Metadados</h2>
-            </div>
-            <div class="data-row">
-                <div class="label">Origem</div>
-                <div>Mardin, Turquia (1979)</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Foco de Pesquisa</div>
-                <div>Patrimônio Imaterial, História Musical Regional</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Instituições</div>
-                <div>Mardin Life, Mardin Time, Associação Musical de Mardin</div>
-            </div>
-            <div class="data-row">
-                <div class="label">Competências</div>
-                <div>Especialista em TI, Gestão Editorial, Consultoria Política</div>
-            </div>
-        </section>
+        <div class="photo-block">
+            <img src="https://pbs.twimg.com/profile_images/1559852899303317504/pjkJwYHb_400x400.jpg" alt="Profile">
+        </div>
 
-        <!-- Conclusion -->
-        <section class="conclusion">
-            <blockquote>"Nossa missão é identificar os donos das vozes que o tempo tentou silenciar."</blockquote>
-            <button class="btn-print" onclick="window.print()">Exportar Biografia</button>
-        </section>
+        <div class="work-list">
+            <div class="work-item">
+                <h2>Wholesale</h2>
+                <p>Coffee Export / Brasilia Hub</p>
+            </div>
+            <div class="work-item">
+                <h2>Strategy</h2>
+                <p>Political & IT Consulting</p>
+            </div>
+            <div class="work-item">
+                <h2>Archive</h2>
+                <p>Journalism / Mardin History</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h4>LOCATION</h4>
+            <p>Brasília, DF / Brazil</p>
+        </div>
+        <div class="info-card">
+            <h4>CONTACT</h4>
+            <p>ahmet@example.com</p>
+        </div>
+        <div class="info-card">
+            <h4>STATUS</h4>
+            <p>Active Engagement</p>
+        </div>
+
+        <footer>
+            PROCESSED BY GEMINI 3 FLASH // ALL RIGHTS RESERVED 2026
+        </footer>
     </div>
 
 </body>

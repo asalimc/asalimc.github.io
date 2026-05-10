@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CASA DE BONIFACIO</title>
+    <meta name="theme-color" content="#3d4a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, addDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjmP7vlzAhZOEEvwcS1VIYCLlIkhNh6Kw",
+            authDomain: "asctoptan.firebaseapp.com",
+            projectId: "asctoptan",
+            storageBucket: "asctoptan.firebasestorage.app",
+            messagingSenderId: "195642720892",
+            appId: "1:195642720892:web:70d1c1d71a338f2e9f7ff9"
+        };
+        const app = initializeApp(firebaseConfig);
+        const fs = getFirestore(app);
+        const auth = getAuth(app);
+        window.fs = fs; window.auth = auth;
+        window.fs_coll = collection; window.fs_doc = doc; window.fs_snap = onSnapshot;
+        window.fs_add = addDoc; window.fs_upd = updateDoc; window.fs_del = deleteDoc;
+        window.fs_set = setDoc; window.fs_q = query; window.fs_where = where;
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            try { await signInWithEmailAndPassword(auth, email, pass); }
+            catch (err) { console.error(err.message); }
+        };
+        window.handleLogout = () => signOut(auth);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app-container').classList.remove('hidden');
+                init();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('main-app-container').classList.add('hidden');
+            }
+        });
+    </script>
+<script>
+    // ========== OFFLINE SYNC MODÜLÜ (MEVCUT KODU DEĞİŞTİRMEZ) ==========
+    (function setupOfflineSync() {
+        const STORE_NAME = 'offlineSales';
+        let syncInProgress = false;
+
+        // 1. IndexedDB bağlantısı
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('CasaBonifacioOffline', 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { autoIncrement: true });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // 2. Satış verisini offline kaydet
+        async function saveSaleOffline(saleData) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.add({ ...saleData, createdAt: new Date().toISOString() });
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // 3. Tüm offline verileri al
+        async function getAllOfflineSales() {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // 4. Sunucuya gönder (Firestore)
+        async function syncToServer() {
+            if (syncInProgress) return;
+            syncInProgress = true;
+
+            const unsynced = await getAllOfflineSales();
+            if (unsynced.length === 0) {
+                syncInProgress = false;
+                return;
+            }
+
+            console.log(`🔄 Sincronização iniciada: ${unsynced.length} item(ns)`);
+
+            for (const item of unsynced) {
+                try {
+                    const salesRef = collection(window.db, 'sales');
+                    await addDoc(salesRef, {
+                        ...item,
+                        syncedAt: new Date().toISOString(),
+                        offlineId: item.createdAt
+                    });
+                    
+                    const dbIndexed = await openDB();
+                    const tx = dbIndexed.transaction([STORE_NAME], 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    store.delete(item.id || item.createdAt);
+                    await tx.done;
+
+                    console.log('✅ Sincronizado com sucesso:', item);
+                } catch (err) {
+                    console.warn('❌ Erro na sincronização:', err);
+                }
+            }
+
+            syncInProgress = false;
+            console.log('🎉 Todos os dados off-line foram enviados para o servidor!');
+        }
+
+        // 5. İnternet geldiğinde otomatik senkronizasyon
+        window.addEventListener('online', () => {
+            console.log('🌐 Conexão com a Internet detectada, iniciando sincronização...');
+            if (window.auth?.currentUser) {
+                syncToServer();
+            }
+        });
+
+        // 6. Giriş yapınca da senkronize et
+        const originalOnAuth = window.onAuthStateChanged;
+        if (originalOnAuth) {
+            window.onAuthStateChanged = (auth, callback) => {
+                originalOnAuth(auth, async (user) => {
+                    if (user) {
+                        setTimeout(() => syncToServer(), 2000);
+                    }
+                    if (callback) callback(user);
+                });
+            };
+        }
+
+        // 7. Satış fonksiyonunu ezmeden offline desteği ekle
+        window.safeSale = async (saleData) => {
+            if (!navigator.onLine) {
+                await saveSaleOffline(saleData);
+                alert('📡 Sem internet, venda salva off-line. Será sincronizada automaticamente quando a conexão for restabelecida.');
+                return { offline: true };
+            } else {
+                try {
+                    const salesRef = collection(window.db, 'sales');
+                    const docRef = await addDoc(salesRef, saleData);
+                    return { id: docRef.id, offline: false };
+                } catch (err) {
+                    await saveSaleOffline(saleData);
+                    alert('⚠️ Erro no servidor, venda salva off-line.');
+                    return { offline: true };
+                }
+            }
+        };
+    })();
+</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        :root {
+            --haki-dark: #3d4a2e;
+            --haki-mid: #5a6e42;
+            --haki-light: #8a9e6a;
+            --haki-pale: #c8d5b2;
+            --haki-bg: #f4f6f0;
+            --haki-gold: #b8a84a;
+            --haki-cream: #eef1e8;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--haki-bg); color: #2c3520; height: 100vh; overflow: hidden; margin: 0; }
+        .main-view { height: calc(100vh - 145px); overflow-y: auto; padding: 1rem; padding-bottom: 5rem; }
+        nav { position: fixed !important; bottom: 0 !important; left: 0; right: 0; display: flex !important; z-index: 9999; background: white; border-top: 2px solid var(--haki-pale); height: 80px; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 20px rgba(61,74,46,0.10); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .pos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        @media(max-width:400px){ .pos-grid { grid-template-columns: repeat(3,1fr); } }
+        .pos-card { background: white; border-radius: 12px; border: 1px solid var(--haki-pale); padding: 8px; cursor: pointer; text-align: center; box-shadow: 0 2px 8px rgba(61,74,46,0.08); display: flex; flex-direction: column; justify-content: center; min-height: 85px; transition: all 0.2s; }
+        .pos-card:active { transform: scale(0.95); background: var(--haki-cream); }
+        .cat-badge { font-size: 6px; font-weight: 900; text-transform: uppercase; padding: 2px 5px; border-radius: 6px; margin-bottom: 3px; display: inline-block; letter-spacing: 0.5px; }
+        .btn-gold { background: linear-gradient(135deg, var(--haki-gold), #d4a843); color: var(--haki-dark); font-weight: 800; }
+        .modal-bg { position: fixed; inset: 0; background: rgba(30,40,20,0.92); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 550px; border-radius: 30px; max-height: 90vh; overflow-y: auto; border: 2px solid var(--haki-pale); }
+        .nav-active { color: var(--haki-gold) !important; }
+        .nav-active span, .nav-active i { color: var(--haki-gold) !important; }
+        .nav-btn { color: #64748b; background: none; border: none; cursor: pointer; padding: 8px 4px; }
+        .nav-btn span, .nav-btn i { color: #64748b; }
+        .excel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .excel-table th { background: var(--haki-dark); color: var(--haki-pale); padding: 10px 8px; text-align: left; border-bottom: 2px solid var(--haki-mid); font-weight: 800; text-transform: uppercase; font-size: 9px; }
+        .excel-table td { padding: 10px 8px; border-bottom: 1px solid var(--haki-cream); color: var(--haki-dark); font-weight: 600; font-size: 10px; vertical-align: middle; }
+        .cat-filter-btn { padding: 6px 14px; border-radius: 20px; font-size: 9px; font-weight: 900; text-transform: uppercase; white-space: nowrap; border: 2px solid var(--haki-pale); background: white; color: var(--haki-mid); cursor: pointer; transition: all 0.2s; }
+        .cat-filter-btn.active { background: var(--haki-dark); color: var(--haki-gold); border-color: var(--haki-dark); }
+        .cat-filter-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px 0; }
+        .cat-filter-scroll::-webkit-scrollbar { display: none; }
+        .pay-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 18px 8px; border-radius: 20px; font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 2px solid; width: 100%; background: none; }
+        .pay-btn:active { transform: scale(0.95); }
+        .pay-nakit { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+        .pay-kredi { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
+        .pay-pix { border-color: #7c3aed; background: #f5f3ff; color: #6d28d9; }
+        .dash-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .dash-card { border-radius: 22px; padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; }
+        .dash-card-dark { background: linear-gradient(135deg,var(--haki-dark),#2c3520); border: none; }
+        .dash-card-light { background: white; border: 1px solid var(--haki-pale); box-shadow: 0 2px 8px rgba(61,74,46,0.06); }
+        .customer-search-wrap { position: relative; }
+        .customer-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 16px; border: 2px solid var(--haki-pale); max-height: 220px; overflow-y: auto; z-index: 200; box-shadow: 0 8px 24px rgba(61,74,46,0.18); display: none; margin-top: 4px; }
+        .customer-dropdown.open { display: block; }
+        .customer-dropdown-item { padding: 12px 16px; cursor: pointer; font-weight: 700; font-size: 13px; color: var(--haki-dark); border-bottom: 1px solid var(--haki-cream); display: flex; align-items: center; gap: 10px; }
+        .customer-dropdown-item:last-child { border-bottom: none; }
+        .customer-dropdown-item:active { background: var(--haki-cream); }
+        .cdi-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--haki-cream); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: var(--haki-dark); flex-shrink: 0; border: 1.5px solid var(--haki-pale); }
+        .share-btn-row { display: flex; flex-direction: column; gap: 10px; }
+        .share-app-btn { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 15px 20px; border-radius: 16px; font-weight: 900; font-size: 14px; text-decoration: none; cursor: pointer; border: none; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen" class="fixed inset-0 flex items-center justify-center p-6 z-[10000] hidden" style="background:linear-gradient(135deg,#2c3520,#3d4a2e,#5a6e42);">
+    <div class="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl text-center" style="border:2px solid var(--haki-pale);">
+        <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-20 h-20 mx-auto mb-6 rounded-3xl shadow-lg" onerror="this.style.display='none'">
+        <h2 class="text-2xl font-black uppercase mb-2 tracking-tighter" style="color:var(--haki-dark)">Acesso Restrito</h2>
+        <p class="text-xs mb-8 font-bold" style="color:var(--haki-light)">PRO SISTEMA V16.2</p>
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+            <input type="email" id="login-email" placeholder="E-mail" class="w-full p-5 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);" required>
+            <input type="password" id="login-pass" placeholder="Senha" class="w-full p-5 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);" required>
+            <button type="submit" class="w-full py-5 font-black rounded-2xl shadow-lg uppercase tracking-widest btn-gold">Entrar</button>
+        </form>
+    </div>
+</div>
+
+<div id="main-app-container" class="hidden">
+    <header class="h-16 text-white px-6 flex items-center justify-between shadow-xl" style="background:var(--haki-dark);">
+        <div class="flex items-center gap-3">
+            <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-10 h-10 rounded-xl shadow object-contain bg-white p-1" onerror="this.style.display='none'">
+            <div>
+                <h1 id="brand-name" class="font-extrabold text-sm uppercase tracking-tight" style="color:var(--haki-pale)">SISTEMA</h1>
+                <span class="text-[9px] font-black tracking-widest uppercase" style="color:var(--haki-gold)">Gestao Pro</span>
+            </div>
+        </div>
+        <button onclick="handleLogout()" class="text-[9px] px-4 py-2 rounded-lg font-black uppercase" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--haki-pale);">Sair</button>
+    </header>
+
+    <main class="main-view no-scrollbar" id="app-content">
+
+        <!-- DASHBOARD -->
+        <div id="view-dashboard" class="hidden space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <div>
+                    <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Dashboard</h2>
+                    <p class="text-[10px] font-bold" style="color:var(--haki-light)" id="dash-date"></p>
+                </div>
+                <img src="https://asalimc.github.io/logo.svg" alt="Logo" class="w-10 h-10 rounded-xl object-contain bg-white p-1 shadow" style="border:1px solid var(--haki-pale)" onerror="this.style.display='none'">
+            </div>
+            <div class="dash-grid-4">
+                <div class="dash-card dash-card-dark col-span-2">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-gold)">Saldo Liquido</p>
+                    <b id="db-balance" class="text-2xl font-black text-white">R$ 0,00</b>
+                    <p class="text-[9px]" style="color:var(--haki-pale)">Lucro - Despesas</p>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Receita</p>
+                    <b id="db-revenue" class="text-base font-black text-green-700">R$ 0,00</b>
+                    <p class="text-[9px]" style="color:var(--haki-light)">Total vendas</p>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Despesas</p>
+                    <b id="db-expenses" class="text-base font-black text-red-600">R$ 0,00</b>
+                    <p class="text-[9px]" style="color:var(--haki-light)">Total gastos</p>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Vendas</p>
+                    <b id="db-sales-count" class="text-base font-black" style="color:var(--haki-dark)">0</b>
+                    <p class="text-[9px]" style="color:var(--haki-light)">Transacoes</p>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Clientes</p>
+                    <b id="db-customers-count" class="text-base font-black" style="color:var(--haki-dark)">0</b>
+                    <p class="text-[9px]" style="color:var(--haki-light)">Cadastrados</p>
+                </div>
+            </div>
+            <div>
+                <p class="text-[11px] font-black uppercase mb-3 px-1" style="color:var(--haki-dark)">Ultimas Vendas</p>
+                <div id="db-recent-sales" class="space-y-2 pb-4"></div>
+            </div>
+        </div>
+
+        <!-- POS -->
+        <div id="view-pos" class="h-full flex flex-col gap-3">
+            <div class="rounded-[28px] p-5 text-white shadow-2xl flex flex-col shrink-0" style="background:linear-gradient(135deg,var(--haki-dark),#2c3520);">
+                <div class="customer-search-wrap mb-3">
+                    <input type="text" id="customer-search-input"
+                        placeholder="Buscar cliente pelo nome..."
+                        autocomplete="off"
+                        oninput="onCustomerSearch()"
+                        onfocus="onCustomerSearch()"
+                        class="w-full p-4 rounded-2xl outline-none font-bold text-sm"
+                        style="background:rgba(255,255,255,0.18);color:white;border:1.5px solid rgba(255,255,255,0.3);placeholder-color:rgba(255,255,255,0.6)">
+                    <div id="customer-dropdown" class="customer-dropdown"></div>
+                </div>
+                <div id="selected-customer-badge" class="hidden mb-3 flex items-center gap-2">
+                    <span class="text-[10px] font-black px-3 py-1 rounded-full" style="background:var(--haki-gold);color:var(--haki-dark)" id="selected-customer-name-badge">-</span>
+                    <button onclick="clearSelectedCustomer()" class="text-[9px] font-black" style="color:#f87171;background:none;border:none;cursor:pointer">&#x2715; Remover</button>
+                </div>
+                <input type="hidden" id="cart-customer-id" value="0">
+                <div class="flex justify-between items-center mb-2 pb-2" style="border-bottom:1px solid rgba(255,255,255,0.1)">
+                    <span class="text-[10px] font-black uppercase" style="color:var(--haki-gold)">Itens</span>
+                    <button onclick="clearCart()" class="text-[9px] font-black uppercase px-2 py-1 rounded-full" style="color:#f87171;background:rgba(248,113,113,0.1);">Limpar</button>
+                </div>
+                <div id="cart-items" class="overflow-y-auto space-y-2 no-scrollbar mb-3" style="max-height:110px"></div>
+                <div class="pt-3 flex justify-between items-end" style="border-top:1px solid rgba(255,255,255,0.1)">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase" style="color:var(--haki-pale)">Total</p>
+                        <h3 id="cart-total" class="text-3xl font-black" style="color:var(--haki-gold)">R$ 0,00</h3>
+                    </div>
+                    <button onclick="openPaymentModal()" class="btn-gold px-8 py-4 rounded-xl text-[11px] uppercase shadow-xl font-black">Finalizar</button>
+                </div>
+            </div>
+            <div class="flex-1">
+                <input type="text" id="pos-search" oninput="renderPos()" placeholder="Pesquisar produto..." class="w-full p-4 rounded-xl outline-none mb-3 font-bold text-sm" style="border:2px solid var(--haki-pale);background:white;">
+                <div class="cat-filter-scroll mb-3" id="pos-cat-filters"></div>
+                <div id="pos-products" class="pos-grid"></div>
+            </div>
+        </div>
+
+        <!-- ESTOQUE -->
+        <div id="view-stock" class="hidden space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Estoque</h2>
+                <button onclick="openProductModal()" class="btn-gold px-6 py-3 rounded-xl text-[10px] uppercase shadow-lg font-black">+ Novo</button>
+            </div>
+            <div class="grid grid-cols-1 gap-2">
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)"><p class="text-[10px] font-black uppercase" style="color:var(--haki-light)">Qtd Total</p><b id="stk-total-qty" class="text-lg font-black" style="color:var(--haki-dark)">0</b></div>
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)"><p class="text-[10px] font-black uppercase" style="color:var(--haki-light)">Investimento</p><b id="stk-total-cost" class="text-lg font-black text-red-600">R$ 0,00</b></div>
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)"><p class="text-[10px] font-black uppercase" style="color:var(--haki-light)">Valor de Venda</p><b id="stk-total-sale" class="text-lg font-black text-green-700">R$ 0,00</b></div>
+                <div class="p-4 rounded-2xl flex justify-between items-center shadow-lg" style="background:var(--haki-dark)"><p class="text-[10px] font-black uppercase" style="color:var(--haki-gold)">Lucro Estimado</p><b id="stk-total-profit" class="text-lg font-black text-white">R$ 0,00</b></div>
+            </div>
+            <div id="stock-list" class="grid grid-cols-1 gap-2 pb-10"></div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div id="view-customers" class="hidden space-y-4">
+            <div class="flex justify-between items-center px-2 flex-wrap gap-2">
+                <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Clientes</h2>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="importAllContacts()" class="px-4 py-3 rounded-xl text-[9px] uppercase shadow-lg font-black text-white flex items-center gap-1" style="background:var(--haki-mid)"><i class="fas fa-users"></i> Importar Toda Agenda</button>
+                    <button onclick="openContactModal('customer')" class="btn-gold px-4 py-3 rounded-xl text-[9px] uppercase shadow-lg font-black">+ Novo</button>
+                </div>
+            </div>
+            <div id="customer-list" class="grid grid-cols-1 gap-2 pb-10"></div>
+        </div>
+
+        <!-- FORNECEDORES -->
+        <div id="view-suppliers" class="hidden space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <h2 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Fornecedores</h2>
+                <button onclick="openContactModal('supplier')" class="btn-gold px-6 py-3 rounded-xl text-[10px] uppercase shadow-lg font-black">+ Novo</button>
+            </div>
+            <div id="supplier-list" class="grid grid-cols-1 gap-2 pb-10"></div>
+        </div>
+
+        <!-- DESPESAS -->
+        <div id="view-expenses" class="hidden space-y-4">
+            <h2 class="text-xl font-black uppercase px-2" style="color:var(--haki-dark)">Despesas</h2>
+            <div class="bg-white p-6 rounded-[35px] space-y-4 shadow-sm" style="border:1px solid var(--haki-pale)">
+                <input type="number" id="exp-val" placeholder="Valor R$" class="w-full p-5 rounded-2xl font-black text-lg outline-none" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="addExpense('Transporte')" class="p-4 rounded-2xl flex flex-col items-center gap-2 font-black text-[8px] uppercase" style="background:var(--haki-cream);border:1px solid var(--haki-pale);color:var(--haki-dark)"><i class="fas fa-car text-lg" style="color:var(--haki-mid)"></i>Viagem</button>
+                    <button onclick="addExpense('Alimentacao')" class="p-4 rounded-2xl flex flex-col items-center gap-2 font-black text-[8px] uppercase" style="background:var(--haki-cream);border:1px solid var(--haki-pale);color:var(--haki-dark)"><i class="fas fa-utensils text-lg" style="color:var(--haki-mid)"></i>Refeicao</button>
+                    <button onclick="addExpense('Outros')" class="p-4 rounded-2xl flex flex-col items-center gap-2 font-black text-[8px] uppercase" style="background:var(--haki-cream);border:1px solid var(--haki-pale);color:var(--haki-dark)"><i class="fas fa-tag text-lg" style="color:var(--haki-mid)"></i>Gerais</button>
+                </div>
+            </div>
+            <div id="expense-list" class="space-y-2 pb-10"></div>
+        </div>
+
+        <!-- FINANCAS -->
+        <div id="view-finance" class="hidden space-y-4">
+            <h2 class="text-xl font-black uppercase px-2" style="color:var(--haki-dark)">Financas</h2>
+            <div class="dash-grid-4">
+                <div class="dash-card dash-card-dark col-span-2">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-gold)">Saldo Liquido</p>
+                    <b id="fin-final-balance" class="text-2xl font-black text-white">R$ 0,00</b>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Receita Total</p>
+                    <b id="fin-total-revenue" class="text-base font-black text-green-700">R$ 0,00</b>
+                </div>
+                <div class="dash-card dash-card-light">
+                    <p class="text-[9px] font-black uppercase" style="color:var(--haki-light)">Despesas</p>
+                    <b id="fin-total-exp" class="text-base font-black text-red-600">R$ 0,00</b>
+                </div>
+            </div>
+            <div class="rounded-[25px] overflow-x-auto shadow-sm" style="border:1px solid var(--haki-pale)">
+                <table class="excel-table" style="min-width:600px">
+                    <thead><tr>
+                        <th>Produto</th><th>Data/Hora</th><th>Total</th>
+                        <th>Pagamento</th><th>Lucro Liq.</th><th>PDF</th><th>-</th>
+                    </tr></thead>
+                    <tbody id="sales-list-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AJUSTES -->
+        <div id="view-settings" class="hidden space-y-6">
+            <h2 class="text-xl font-black uppercase px-2" style="color:var(--haki-dark)">Ajustes</h2>
+            <div class="bg-white p-8 rounded-[40px] space-y-4 shadow-sm pb-10" style="border:1px solid var(--haki-pale)">
+                <input type="text" id="set-company" placeholder="Empresa" class="w-full p-4 rounded-xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <input type="text" id="set-manager" placeholder="Responsavel" class="w-full p-4 rounded-xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <input type="text" id="set-cnpj" placeholder="CNPJ" class="w-full p-4 rounded-xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <input type="text" id="set-address" placeholder="Endereco" class="w-full p-4 rounded-xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <input type="text" id="set-phone" placeholder="Telefone" class="w-full p-4 rounded-xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <button onclick="saveSettings()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black shadow-lg">Salvar</button>
+            </div>
+        </div>
+
+    </main>
+
+    <nav class="items-center justify-around px-1">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-1 nav-btn" id="n-dashboard"><i class="fas fa-home text-xl"></i><span class="text-[7px] font-black uppercase">Home</span></button>
+        <button onclick="switchTab('pos')" class="flex flex-col items-center gap-1 nav-btn" id="n-pos"><i class="fas fa-shopping-cart text-xl"></i><span class="text-[7px] font-black uppercase">Venda</span></button>
+        <button onclick="switchTab('stock')" class="flex flex-col items-center gap-1 nav-btn" id="n-stock"><i class="fas fa-box text-xl"></i><span class="text-[7px] font-black uppercase">Estoque</span></button>
+        <button onclick="switchTab('customers')" class="flex flex-col items-center gap-1 nav-btn" id="n-customers"><i class="fas fa-user-friends text-xl"></i><span class="text-[7px] font-black uppercase">Clientes</span></button>
+        <button onclick="switchTab('suppliers')" class="flex flex-col items-center gap-1 nav-btn" id="n-suppliers"><i class="fas fa-truck-loading text-xl"></i><span class="text-[7px] font-black uppercase">Fornec.</span></button>
+        <button onclick="switchTab('expenses')" class="flex flex-col items-center gap-1 nav-btn" id="n-expenses"><i class="fas fa-receipt text-xl"></i><span class="text-[7px] font-black uppercase">Despesa</span></button>
+        <button onclick="switchTab('finance')" class="flex flex-col items-center gap-1 nav-btn" id="n-finance"><i class="fas fa-wallet text-xl"></i><span class="text-[7px] font-black uppercase">Financa</span></button>
+        <button onclick="switchTab('settings')" class="flex flex-col items-center gap-1 nav-btn" id="n-settings"><i class="fas fa-cog text-xl"></i><span class="text-[7px] font-black uppercase">Ajuste</span></button>
+    </nav>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div id="modal-product" class="modal-bg">
+    <div class="modal-content p-8">
+        <h3 class="text-xl font-black mb-6 uppercase" style="color:var(--haki-dark)">Produto</h3>
+        <div class="space-y-4">
+            <input type="hidden" id="p-id">
+            <input type="text" id="p-name" placeholder="Nome do Produto" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <select id="p-category" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);color:var(--haki-dark);">
+                <option value="">-- Selecionar Categoria --</option>
+                <option value="Aneis">Aneis</option>
+                <option value="Colares">Colares</option>
+                <option value="Brincos">Brincos</option>
+                <option value="Pulseiras">Pulseiras</option>
+                <option value="Tornozeleiras">Tornozeleiras</option>
+                <option value="Pingentes">Pingentes</option>
+                <option value="Conjuntos">Conjuntos</option>
+                <option value="Chokers">Chokers</option>
+                <option value="Berloques">Berloques</option>
+                <option value="Acessorios">Acessorios</option>
+            </select>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="number" id="p-cost" placeholder="Custo (R$)" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+                <input type="number" id="p-price" placeholder="Venda (R$)" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            </div>
+            <input type="number" id="p-stock" placeholder="Quantidade em Estoque" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <button onclick="saveProduct()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black">Salvar</button>
+            <button onclick="closeModal('modal-product')" class="w-full text-[10px] font-black uppercase mt-4" style="color:var(--haki-light)">Voltar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PAGAMENTO -->
+<div id="modal-payment" class="modal-bg">
+    <div class="modal-content p-8">
+        <h3 class="text-2xl font-black mb-1 uppercase text-center" style="color:var(--haki-dark)">Forma de Pagamento</h3>
+        <p class="text-center text-xs font-bold mb-4" style="color:var(--haki-light)">Selecione como o cliente vai pagar</p>
+        <div class="text-center mb-6 p-4 rounded-2xl" style="background:var(--haki-cream)">
+            <span class="text-3xl font-black" id="modal-pay-total" style="color:var(--haki-gold)">R$ 0,00</span>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <button onclick="finishSale('Dinheiro')" class="pay-btn pay-nakit"><i class="fas fa-money-bill-wave text-2xl"></i><span>Dinheiro</span></button>
+            <button onclick="finishSale('Cartao')" class="pay-btn pay-kredi"><i class="fas fa-credit-card text-2xl"></i><span>Cartao</span></button>
+            <button onclick="finishSale('Pix')" class="pay-btn pay-pix"><i class="fas fa-bolt text-2xl"></i><span>Pix</span></button>
+        </div>
+        <button onclick="closeModal('modal-payment')" class="w-full text-[10px] font-black uppercase" style="color:var(--haki-light)">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL CONTATO -->
+<div id="modal-contact" class="modal-bg">
+    <div class="modal-content p-8">
+        <h3 class="text-xl font-black mb-6 uppercase" style="color:var(--haki-dark)" id="contact-modal-title">Novo Registro</h3>
+        <div class="space-y-4">
+            <input type="hidden" id="c-id">
+            <input type="hidden" id="c-type">
+            <button onclick="pickFromContacts()" class="w-full py-4 text-white rounded-2xl font-black text-xs uppercase flex items-center justify-center gap-3" style="background:var(--haki-dark)"><i class="fas fa-address-book"></i> Importar da Agenda</button>
+            <input type="text" id="c-name" placeholder="Nome Completo" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <input type="text" id="c-phone" placeholder="WhatsApp / Telefone" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <button onclick="saveContact()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black">Salvar</button>
+            <button onclick="closeModal('modal-contact')" class="w-full text-[10px] font-black uppercase mt-4" style="color:var(--haki-light)">Voltar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CLIENTE DETALHE -->
+<div id="modal-customer-detail" class="modal-bg">
+    <div class="modal-content p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-black uppercase" style="color:var(--haki-dark)" id="detail-customer-name">Cliente</h3>
+            <button onclick="closeModal('modal-customer-detail')" style="color:var(--haki-light);background:none;border:none;cursor:pointer;font-size:22px;line-height:1">&#x2715;</button>
+        </div>
+        <div id="detail-customer-info" class="mb-4 p-4 rounded-2xl" style="background:var(--haki-cream);border:1px solid var(--haki-pale)"></div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="editCurrentCustomer()" class="py-3 rounded-2xl font-black text-xs uppercase text-white" style="background:var(--haki-mid)"><i class="fas fa-edit mr-1"></i>Editar</button>
+            <button onclick="deleteCurrentCustomer()" class="py-3 rounded-2xl font-black text-xs uppercase text-white" style="background:#dc2626"><i class="fas fa-trash mr-1"></i>Excluir</button>
+        </div>
+        <h4 class="text-[11px] font-black uppercase mb-3" style="color:var(--haki-dark)">Historico de Compras</h4>
+        <div id="detail-customer-sales" class="space-y-3 pb-4"></div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR CLIENTE -->
+<div id="modal-edit-contact" class="modal-bg">
+    <div class="modal-content p-8">
+        <h3 class="text-xl font-black mb-6 uppercase" style="color:var(--haki-dark)">Editar Cliente</h3>
+        <div class="space-y-4">
+            <input type="hidden" id="edit-c-id">
+            <input type="hidden" id="edit-c-type">
+            <input type="text" id="edit-c-name" placeholder="Nome" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <input type="text" id="edit-c-phone" placeholder="WhatsApp" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);">
+            <button onclick="saveEditContact()" class="btn-gold w-full py-5 rounded-2xl uppercase font-black">Salvar Alteracoes</button>
+            <button onclick="closeModal('modal-edit-contact')" class="w-full text-[10px] font-black uppercase mt-4" style="color:var(--haki-light)">Voltar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TROCA/DEVOLUCAO -->
+<div id="modal-return" class="modal-bg">
+    <div class="modal-content p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-black uppercase" style="color:var(--haki-dark)">Troca / Devolucao</h3>
+            <button onclick="closeModal('modal-return')" style="color:var(--haki-light);background:none;border:none;cursor:pointer;font-size:22px;line-height:1">&#x2715;</button>
+        </div>
+        <div id="return-sale-info" class="mb-4 p-4 rounded-2xl" style="background:var(--haki-cream);border:1px solid var(--haki-pale)"></div>
+        <div class="space-y-4">
+            <p class="text-[10px] font-black uppercase" style="color:var(--haki-dark)">Tipo de Solicitacao</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="setReturnType('refund')" id="btn-refund" class="py-3 rounded-2xl font-black text-xs uppercase" style="background:#fef2f2;border:2px solid #fca5a5;color:#dc2626"><i class="fas fa-undo mr-1"></i>Reembolso</button>
+                <button onclick="setReturnType('exchange')" id="btn-exchange" class="py-3 rounded-2xl font-black text-xs uppercase" style="background:#eff6ff;border:2px solid #93c5fd;color:#2563eb"><i class="fas fa-exchange-alt mr-1"></i>Troca</button>
+            </div>
+            <div id="exchange-section" class="hidden space-y-3">
+                <p class="text-[10px] font-black uppercase" style="color:var(--haki-dark)">Novo Produto para Troca</p>
+                <select id="exchange-product-select" class="w-full p-4 rounded-2xl outline-none font-bold" style="background:var(--haki-cream);border:1.5px solid var(--haki-pale);color:var(--haki-dark);"></select>
+                <div id="exchange-diff-info" class="p-3 rounded-xl text-[11px] font-bold hidden" style="background:var(--haki-cream)"></div>
+            </div>
+            <div class="p-3 rounded-xl text-[10px] font-bold" style="background:#fff7ed;border:1px solid #fdba74;color:#92400e">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Troca ou devolucao aceita somente em ate 7 dias. Apenas 1 troca por venda e permitida.
+            </div>
+            <button onclick="processReturn()" class="btn-gold w-full py-4 rounded-2xl uppercase font-black">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL COMPARTILHAR PDF -->
+<div id="modal-share" class="modal-bg">
+    <div class="modal-content p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-black uppercase" style="color:var(--haki-dark)">Compartilhar Comprovante</h3>
+            <button onclick="closeModal('modal-share')" style="color:var(--haki-light);background:none;border:none;cursor:pointer;font-size:22px;line-height:1">&#x2715;</button>
+        </div>
+        <div id="share-preview-wrap" class="mb-4 rounded-2xl overflow-hidden" style="border:1px solid var(--haki-pale);max-height:280px;overflow-y:auto;"></div>
+        <p class="text-[10px] font-black uppercase mb-3 text-center" style="color:var(--haki-light)">Escolha como compartilhar</p>
+        <div class="share-btn-row">
+            <button onclick="shareVia('whatsapp')" class="share-app-btn text-white" style="background:#25D366">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                Enviar pelo WhatsApp
+            </button>
+            <button onclick="shareVia('telegram')" class="share-app-btn text-white" style="background:#229ED9">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                Enviar pelo Telegram
+            </button>
+            <button onclick="shareVia('instagram')" class="share-app-btn text-white" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                Enviar pelo Instagram
+            </button>
+            <button onclick="printCurrentReceipt()" class="share-app-btn" style="background:var(--haki-dark);color:var(--haki-gold)">
+                <i class="fas fa-print text-xl"></i> Imprimir Comprovante
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let products=[], contacts=[], sales=[], expenses=[], cart=[];
+let config={};
+let activeCategory='Todos';
+let currentCustomerId=null;
+let currentReturnSaleId=null;
+let currentReturnType=null;
+let currentShareSaleId=null;
+let currentShareBlob=null;
+let selectedCustomer=null;
+
+const LOGO_URL='https://asalimc.github.io/logo.svg';
+const BANK_FEE=0.0309;
+const PROFIT_RATE=0.30;
+const RETURN_DAYS=7;
+
+const BIOJOIA_CATEGORIES=[
+    {name:'Aneis',emoji:'💍',bg:'#fdf2f8',text:'#831843',border:'#f9a8d4'},
+    {name:'Colares',emoji:'📿',bg:'#fefce8',text:'#713f12',border:'#fcd34d'},
+    {name:'Brincos',emoji:'✨',bg:'#f0fdf4',text:'#14532d',border:'#86efac'},
+    {name:'Pulseiras',emoji:'🪬',bg:'#eff6ff',text:'#1e3a8a',border:'#93c5fd'},
+    {name:'Tornozeleiras',emoji:'🦶',bg:'#fff7ed',text:'#7c2d12',border:'#fdba74'},
+    {name:'Pingentes',emoji:'🔮',bg:'#f5f3ff',text:'#4c1d95',border:'#c4b5fd'},
+    {name:'Conjuntos',emoji:'🎁',bg:'#fef2f2',text:'#7f1d1d',border:'#fca5a5'},
+    {name:'Chokers',emoji:'🪢',bg:'#ecfdf5',text:'#064e3b',border:'#6ee7b7'},
+    {name:'Berloques',emoji:'🌟',bg:'#fffbeb',text:'#78350f',border:'#fbbf24'},
+    {name:'Acessorios',emoji:'🌿',bg:'#f0fdf4',text:'#166534',border:'#4ade80'},
+];
+
+function getCatStyle(n){return BIOJOIA_CATEGORIES.find(c=>c.name===n)||{bg:'#eef1e8',text:'#3d4a2e',border:'#8a9e6a',emoji:'📦'};}
+
+function fmtMoney(val){return 'R$ '+parseFloat(val||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtNum(val){return parseInt(val||0).toLocaleString('pt-BR');}
+function fmtDate(iso){if(!iso)return '-';const d=new Date(iso);return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function calcNetProfit(total,method){return(total*PROFIT_RATE)-((method==='Cartao')?(total*BANK_FEE):0);}
+function calcBankFee(total,method){return(method==='Cartao')?(total*BANK_FEE):0;}
+
+async function init(){setupCloudSync();switchTab('dashboard');}
+
+function setupCloudSync(){
+    window.fs_snap(window.fs_coll(window.fs,"products"),snap=>{
+        products=snap.docs.map(d=>({id:d.id,...d.data()}));
+        renderPos();renderStock();renderCatFilters();renderDashboard();
+    });
+    window.fs_snap(window.fs_coll(window.fs,"contacts"),snap=>{
+        contacts=snap.docs.map(d=>({id:d.id,...d.data()}));
+        renderContactList('customer');renderContactList('supplier');renderDashboard();
+    });
+    window.fs_snap(window.fs_coll(window.fs,"sales"),snap=>{
+        sales=snap.docs.map(d=>({id:d.id,...d.data()}));
+        renderFinance();renderDashboard();
+    });
+    window.fs_snap(window.fs_coll(window.fs,"expenses"),snap=>{
+        expenses=snap.docs.map(d=>({id:d.id,...d.data()}));
+        renderExpenses();renderFinance();renderDashboard();
+    });
+    window.fs_snap(window.fs_coll(window.fs,"config"),snap=>{
+        snap.docs.forEach(d=>{
+            config[d.id]=d.data().val;
+            const el=document.getElementById('set-'+d.id);
+            if(el)el.value=d.data().val;
+        });
+        document.getElementById('brand-name').innerText=config.company||'SISTEMA';
+    });
+}
+
+function switchTab(tab){
+    document.querySelectorAll('main > div').forEach(v=>v.classList.add('hidden'));
+    document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('nav-active');b.style.color='#64748b';b.querySelectorAll('i,span').forEach(el=>el.style.color='#64748b');});
+    document.getElementById('view-'+tab).classList.remove('hidden');
+    const btn=document.getElementById('n-'+tab);
+    btn.classList.add('nav-active');btn.style.color='var(--haki-gold)';
+    btn.querySelectorAll('i,span').forEach(el=>el.style.color='var(--haki-gold)');
+    const dd=document.getElementById('customer-dropdown');
+    if(dd)dd.classList.remove('open');
+}
+
+// --- CUSTOMER SEARCH ---
+function onCustomerSearch(){
+    const q=document.getElementById('customer-search-input').value.trim().toLowerCase();
+    const dd=document.getElementById('customer-dropdown');
+    const customers=contacts.filter(c=>c.type==='customer');
+    const filtered=q?customers.filter(c=>c.name.toLowerCase().includes(q)):customers;
+    if(!filtered.length){dd.classList.remove('open');return;}
+    dd.innerHTML=filtered.slice(0,20).map(c=>`
+        <div class="customer-dropdown-item" onclick="selectCustomer('${c.id}')">
+            <div class="cdi-avatar">${c.name.charAt(0).toUpperCase()}</div>
+            <div>
+                <div style="font-weight:800;font-size:13px;color:var(--haki-dark)">${c.name}</div>
+                <div style="font-size:10px;color:var(--haki-light)">${c.phone||''}</div>
+            </div>
+        </div>`).join('');
+    dd.classList.add('open');
+}
+
+function selectCustomer(id){
+    const c=contacts.find(x=>x.id===id);if(!c)return;
+    selectedCustomer=c;
+    document.getElementById('cart-customer-id').value=id;
+    document.getElementById('customer-search-input').value='';
+    document.getElementById('selected-customer-name-badge').innerText=c.name.toUpperCase();
+    document.getElementById('selected-customer-badge').classList.remove('hidden');
+    document.getElementById('customer-dropdown').classList.remove('open');
+}
+
+function clearSelectedCustomer(){
+    selectedCustomer=null;
+    document.getElementById('cart-customer-id').value='0';
+    document.getElementById('customer-search-input').value='';
+    document.getElementById('selected-customer-badge').classList.add('hidden');
+}
+
+document.addEventListener('click',(e)=>{
+    const dd=document.getElementById('customer-dropdown');
+    const wrap=document.querySelector('.customer-search-wrap');
+    if(dd&&wrap&&!wrap.contains(e.target))dd.classList.remove('open');
+});
+
+// --- DASHBOARD ---
+function renderDashboard(){
+    const now=new Date();
+    const el=document.getElementById('dash-date');
+    if(el)el.innerText=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    const totalRevenue=sales.reduce((s,x)=>s+(x.total||0),0);
+    const totalProfit=sales.reduce((s,x)=>s+(x.netProfit||x.profit||0),0);
+    const totalExp=expenses.reduce((s,x)=>s+(x.val||0),0);
+    const balance=totalProfit-totalExp;
+    const custCount=contacts.filter(c=>c.type==='customer').length;
+    const set=(id,val)=>{const e=document.getElementById(id);if(e)e.innerText=val;};
+    set('db-balance',fmtMoney(balance));set('db-revenue',fmtMoney(totalRevenue));
+    set('db-expenses',fmtMoney(totalExp));set('db-sales-count',sales.length);
+    set('db-customers-count',custCount);
+    const rc=document.getElementById('db-recent-sales');if(!rc)return;
+    const recent=[...sales].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    if(!recent.length){rc.innerHTML=`<p class="text-center text-[11px] font-bold py-4" style="color:var(--haki-light)">Nenhuma venda ainda.</p>`;return;}
+    rc.innerHTML=recent.map(s=>{
+        const items=Array.isArray(s.items)?s.items:[];
+        const label=items.length?(typeof items[0]==='object'?items[0].name:items[0]):s.customer;
+        const mc=s.method==='Dinheiro'?'#16a34a':s.method==='Cartao'?'#2563eb':'#7c3aed';
+        return `<div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)">
+            <div><p class="text-[11px] font-black" style="color:var(--haki-dark)">${label}</p>
+            <p class="text-[9px] font-bold" style="color:var(--haki-light)">${s.customer} · ${fmtDate(s.date)}</p></div>
+            <div class="text-right"><p class="text-[12px] font-black text-green-700">${fmtMoney(s.total)}</p>
+            <span style="background:${mc}20;color:${mc};padding:2px 8px;border-radius:8px;font-size:8px;font-weight:900">${s.method}</span></div>
+        </div>`;
+    }).join('');
+}
+
+function renderCatFilters(){
+    const usedCats=[...new Set(products.map(p=>p.category).filter(Boolean))];
+    document.getElementById('pos-cat-filters').innerHTML=['Todos',...usedCats].map(cat=>{
+        const isActive=cat===activeCategory;
+        if(cat==='Todos')return`<button onclick="setCategory('Todos')" class="cat-filter-btn ${isActive?'active':''}">Todos</button>`;
+        const s=getCatStyle(cat);
+        return`<button onclick="setCategory('${cat}')" class="cat-filter-btn" style="${isActive?`background:${s.bg};color:${s.text};border-color:${s.border};`:''}">${s.emoji} ${cat}</button>`;
+    }).join('');
+}
+
+function setCategory(cat){activeCategory=cat;renderCatFilters();renderPos();}
+
+function renderPos(){
+    const q=(document.getElementById('pos-search')||{value:''}).value.toLowerCase();
+    let filtered=products.filter(p=>p.name.toLowerCase().includes(q));
+    if(activeCategory!=='Todos')filtered=filtered.filter(p=>(p.category||'Acessorios')===activeCategory);
+    document.getElementById('pos-products').innerHTML=filtered.map(p=>{
+        const cat=p.category||'Acessorios';const s=getCatStyle(cat);
+        return`<div onclick="addToCart('${p.id}')" class="pos-card ${p.stock<=0?'opacity-30 grayscale pointer-events-none':''}">
+            <span class="cat-badge" style="background:${s.bg};color:${s.text};border:1px solid ${s.border}">${s.emoji} ${cat}</span>
+            <h4 class="text-[8px] font-extrabold truncate uppercase mb-1" style="color:var(--haki-dark)">${p.name}</h4>
+            <p class="text-[10px] font-black" style="color:var(--haki-gold)">${fmtMoney(p.price)}</p>
+            <span class="text-[7px] font-bold uppercase mt-1" style="color:var(--haki-light)">Est: ${fmtNum(p.stock)}</span>
+        </div>`;
+    }).join('');
+}
+
+function addToCart(id){
+    const p=products.find(x=>x.id===id);if(!p||p.stock<=0)return;
+    const item=cart.find(x=>x.id===id);
+    if(item){if(item.cQty+1>p.stock)return;item.cQty++;}else cart.push({...p,cQty:1});
+    renderCart();
+}
+
+function renderCart(){
+    document.getElementById('cart-items').innerHTML=cart.map((it,i)=>`
+        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.1)">
+            <div class="text-[10px] uppercase font-black text-white">${it.name} <span class="ml-2" style="color:var(--haki-gold)">x${it.cQty}</span></div>
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-black text-white">${fmtMoney(it.price*it.cQty)}</span>
+                <button onclick="cart.splice(${i},1);renderCart()" style="color:#f87171;background:none;border:none;cursor:pointer;font-size:14px">&#x2715;</button>
+            </div>
+        </div>`).join('');
+    document.getElementById('cart-total').innerText=fmtMoney(cart.reduce((s,x)=>s+(x.price*x.cQty),0));
+}
+
+function openPaymentModal(){
+    if(!cart.length)return;
+    const total=cart.reduce((s,x)=>s+(x.price*x.cQty),0);
+    document.getElementById('modal-pay-total').innerText=fmtMoney(total);
+    openModal('modal-payment');
+}
+
+async function finishSale(method){
+    const total=cart.reduce((s,x)=>s+(x.price*x.cQty),0);
+    const customerId=document.getElementById('cart-customer-id').value;
+    const customer=contacts.find(c=>c.id===customerId);
+    const grossProfit=total*PROFIT_RATE;
+    const bankFee=calcBankFee(total,method);
+    const netProfit=grossProfit-bankFee;
+    for(let it of cart){const ns=(it.stock||0)-it.cQty;await window.fs_upd(window.fs_doc(window.fs,"products",it.id),{stock:ns<0?0:ns});}
+    await window.fs_add(window.fs_coll(window.fs,"sales"),{
+        date:new Date().toISOString(),method,total,grossProfit,bankFee,netProfit,profit:netProfit,
+        customerId:customerId||'',customer:customer?customer.name:'Balcao',
+        items:cart.map(it=>({name:it.name,qty:it.cQty,price:it.price,productId:it.id})),
+        exchanged:false
+    });
+    cart=[];renderCart();clearSelectedCustomer();closeModal('modal-payment');
+}
+
+async function cancelSale(saleId){
+    if(!confirm('Cancelar esta venda e devolver itens ao estoque?'))return;
+    const s=sales.find(x=>x.id===saleId);if(!s)return;
+    const items=Array.isArray(s.items)?s.items:[];
+    for(let it of items){
+        if(typeof it==='object'&&it.productId){
+            const prod=products.find(p=>p.id===it.productId);
+            if(prod)await window.fs_upd(window.fs_doc(window.fs,"products",it.productId),{stock:(prod.stock||0)+(it.qty||1)});
+        }
+    }
+    await window.fs_del(window.fs_doc(window.fs,"sales",saleId));
+}
+
+// --- RECEIPT HTML ---
+function buildReceiptHTML(saleId){
+    const s=sales.find(x=>x.id===saleId);if(!s)return'';
+    const items=Array.isArray(s.items)?s.items:[];
+    const cust=contacts.find(c=>c.id===s.customerId);
+    const phone=cust?(cust.phone||'').replace(/\D/g,''):'';
+    const mc=s.method==='Dinheiro'?'#16a34a':s.method==='Cartao'?'#2563eb':'#7c3aed';
+    const itemsHtml=items.map(it=>{
+        const name=typeof it==='object'?it.name:it;
+        const qty=typeof it==='object'?(it.qty||1):1;
+        const price=typeof it==='object'?(it.price||0):0;
+        return`<tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #e8f0d4;font-size:12px;font-weight:700;color:#2c3520">${name}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e8f0d4;font-size:12px;text-align:center;font-weight:700;color:#2c3520">${qty}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e8f0d4;font-size:12px;text-align:right;font-weight:700;color:#2c3520">${fmtMoney(price)}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e8f0d4;font-size:12px;text-align:right;font-weight:900;color:#3d4a2e">${fmtMoney(price*qty)}</td>
+        </tr>`;
+    }).join('');
+    const exchNote=s.exchangeNote?`<div style="background:#fffbeb;border:1px solid #fbbf24;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:#78350f"><b>Historico de Troca:</b><br>${s.exchangeNote}</div>`:'';
+    return`<div id="receipt-html" style="font-family:Arial,sans-serif;color:#2c3520;background:#f4f6f0;max-width:500px;margin:0 auto;padding:28px;position:relative">
+        <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;opacity:0.12;pointer-events:none;z-index:0;max-width:380px">
+            <img src="${LOGO_URL}" style="width:100%;height:auto" crossorigin="anonymous">
+        </div>
+        <div style="position:relative;z-index:1">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid #b8a84a;padding-bottom:18px;margin-bottom:20px">
+                <div style="display:flex;align-items:center;gap:14px">
+                    <img src="${LOGO_URL}" crossorigin="anonymous" style="width:68px;height:68px;border-radius:14px;object-fit:contain;background:white;padding:6px;border:2.5px solid #c8d5b2;box-shadow:0 4px 18px rgba(61,74,46,0.28)">
+                    <div>
+                        <div style="font-size:19px;font-weight:900;color:#3d4a2e">${config.company||'BIOJOIA'}</div>
+                        <div style="font-size:10px;color:#8a9e6a;margin-top:3px">${config.address||''}</div>
+                        ${config.phone?`<div style="font-size:10px;color:#8a9e6a">${config.phone}</div>`:''}
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <div style="background:#3d4a2e;color:#b8a84a;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px">Comprovante</div>
+                    <div style="font-size:9px;color:#8a9e6a;margin-top:6px">${fmtDate(s.date)}</div>
+                    <div style="display:inline-block;margin-top:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:900;color:white;background:${mc}">${s.method}</div>
+                </div>
+            </div>
+            <div style="background:white;padding:14px 18px;border-radius:14px;margin-bottom:16px;border:1.5px solid #c8d5b2;box-shadow:0 2px 8px rgba(61,74,46,0.08)">
+                <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:#b8a84a;margin-bottom:5px">Cliente</div>
+                <div style="font-size:15px;font-weight:800;color:#3d4a2e">${s.customer||'Balcao'}</div>
+                ${phone?`<div style="font-size:11px;color:#8a9e6a;margin-top:3px">Tel: ${cust.phone}</div>`:''}
+                <div style="font-size:10px;color:#8a9e6a;margin-top:2px">Data: ${fmtDate(s.date)}</div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 3px 12px rgba(61,74,46,0.10)">
+                <thead><tr>
+                    <th style="background:#3d4a2e;color:#c8d5b2;text-align:left;padding:11px 14px;font-size:10px;text-transform:uppercase">Produto</th>
+                    <th style="background:#3d4a2e;color:#c8d5b2;text-align:center;padding:11px 14px;font-size:10px;text-transform:uppercase">Qtd</th>
+                    <th style="background:#3d4a2e;color:#c8d5b2;text-align:right;padding:11px 14px;font-size:10px;text-transform:uppercase">Preco Un.</th>
+                    <th style="background:#3d4a2e;color:#c8d5b2;text-align:right;padding:11px 14px;font-size:10px;text-transform:uppercase">Subtotal</th>
+                </tr></thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+            <div style="background:#3d4a2e;border-radius:16px;padding:18px 22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:11px;color:#8a9e6a;text-transform:uppercase;letter-spacing:1px;font-weight:700">Total Pago</div>
+                <div style="font-size:26px;font-weight:900;color:#b8a84a">${fmtMoney(s.total)}</div></div>
+                <div style="text-align:right"><div style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:900;color:white;background:${mc}">${s.method}</div></div>
+            </div>
+            ${exchNote}
+            <div style="background:white;border:1.5px solid #fdba74;border-radius:14px;padding:16px 18px;margin-bottom:16px">
+                <div style="font-size:11px;font-weight:900;color:#92400e;margin-bottom:8px;text-transform:uppercase">Politica de Troca e Devolucao</div>
+                <div style="font-size:11px;color:#78350f;line-height:1.6">
+                    A troca ou devolucao de produtos e aceita em ate <b>${RETURN_DAYS} (sete) dias</b> a partir da data da compra, desde que o produto esteja em perfeitas condicoes e acompanhado deste comprovante.<br><br>
+                    <b>Apenas 1 (uma) troca por venda e permitida.</b><br><br>
+                    <b style="color:#dc2626">Apos ${RETURN_DAYS} dias, nenhuma troca ou reembolso sera aceito em hipotese alguma.</b><br><br>
+                    Em caso de troca: se o novo produto for mais caro, o cliente devera pagar a diferenca. Se for mais barato, a diferenca sera reembolsada.
+                </div>
+            </div>
+            <div style="text-align:center;font-size:10px;color:#8a9e6a;padding-top:12px;border-top:1.5px solid #c8d5b2">
+                <div style="font-weight:800;font-size:12px">${config.company||''} ${config.phone?'| '+config.phone:''}</div>
+                <div style="margin-top:4px">Obrigado pela preferencia! Volte sempre!</div>
+            </div>
+        </div>
+    </div>`;
+}
+
+function buildShareText(saleId){
+    const s=sales.find(x=>x.id===saleId);if(!s)return'';
+    const items=Array.isArray(s.items)?s.items:[];
+    const itemsText=items.map(it=>typeof it==='object'?`• ${it.name} (${it.qty||1}x) - ${fmtMoney(it.price*(it.qty||1))}`:it).join('\n');
+    let txt=`*Comprovante - ${config.company||'BIOJOIA'}*\n\n`;
+    txt+=`*Cliente:* ${s.customer||'Balcao'}\n`;
+    txt+=`*Data:* ${fmtDate(s.date)}\n`;
+    txt+=`*Pagamento:* ${s.method}\n\n`;
+    txt+=`*Produtos:*\n${itemsText}\n\n`;
+    txt+=`*Total: ${fmtMoney(s.total)}*\n\n`;
+    if(s.exchangeNote)txt+=`*Troca:* ${s.exchangeNote}\n\n`;
+    txt+=`Politica: troca aceita em ate ${RETURN_DAYS} dias (1 troca por venda).\nObrigado! 💚`;
+    return txt;
+}
+
+async function captureBlob(saleId){
+    return new Promise(async(resolve)=>{
+        const html=buildReceiptHTML(saleId);
+        const wrap=document.createElement('div');
+        wrap.style.cssText='position:fixed;left:-9999px;top:0;width:500px;z-index:-99;background:#f4f6f0;';
+        wrap.innerHTML=html;
+        document.body.appendChild(wrap);
+        await Promise.all([...wrap.querySelectorAll('img')].map(img=>new Promise(r=>{if(img.complete)r();else{img.onload=r;img.onerror=r;}})));
+        await new Promise(r=>setTimeout(r,400));
+        html2canvas(wrap,{useCORS:true,allowTaint:false,scale:2,logging:false,backgroundColor:'#f4f6f0'}).then(canvas=>{
+            document.body.removeChild(wrap);
+            canvas.toBlob(blob=>resolve(blob),'image/png',0.95);
+        }).catch(()=>{try{document.body.removeChild(wrap);}catch(e){}resolve(null);});
+    });
+}
+
+async function openShareModal(saleId){
+    currentShareSaleId=saleId;
+    currentShareBlob=null;
+    const preview=document.getElementById('share-preview-wrap');
+    preview.innerHTML='<div style="text-align:center;padding:20px;color:#8a9e6a;font-size:12px;font-weight:700">Gerando comprovante...</div>';
+    openModal('modal-share');
+    preview.innerHTML=buildReceiptHTML(saleId);
+    currentShareBlob=await captureBlob(saleId);
+}
+
+async function shareVia(platform){
+    const s=sales.find(x=>x.id===currentShareSaleId);if(!s)return;
+    const cust=contacts.find(c=>c.id===s.customerId);
+    const rawPhone=cust?(cust.phone||'').replace(/\D/g,''):'';
+    const text=buildShareText(currentShareSaleId);
+
+    // Try native share with image first (works on iOS/Android)
+    if(currentShareBlob&&navigator.canShare){
+        try{
+            const file=new File([currentShareBlob],'comprovante.png',{type:'image/png'});
+            if(navigator.canShare({files:[file]})){
+                await navigator.share({files:[file],text:text.replace(/\*/g,'')});
+                return;
+            }
+        }catch(e){}
+    }
+
+    // Fallback per platform
+    if(platform==='whatsapp'){
+        const encoded=encodeURIComponent(text);
+        const url=rawPhone?`https://wa.me/${rawPhone}?text=${encoded}`:`https://wa.me/?text=${encoded}`;
+        // Also try to download image for user to attach manually
+        if(currentShareBlob){
+            try{
+                const a=document.createElement('a');
+                a.href=URL.createObjectURL(currentShareBlob);
+                a.download='comprovante_biojoia.png';
+                a.click();
+                setTimeout(()=>window.open(url,'_blank'),600);
+            }catch(e){window.open(url,'_blank');}
+        } else window.open(url,'_blank');
+    } else if(platform==='telegram'){
+        const encoded=encodeURIComponent(text.replace(/\*/g,''));
+        const url=rawPhone?`https://t.me/+${rawPhone}`:`https://t.me/share/url?url=.&text=${encoded}`;
+        if(currentShareBlob){
+            try{
+                const a=document.createElement('a');
+                a.href=URL.createObjectURL(currentShareBlob);
+                a.download='comprovante_biojoia.png';
+                a.click();
+                setTimeout(()=>window.open(url,'_blank'),600);
+            }catch(e){window.open(url,'_blank');}
+        } else window.open(url,'_blank');
+    } else if(platform==='instagram'){
+        if(currentShareBlob){
+            try{
+                const a=document.createElement('a');
+                a.href=URL.createObjectURL(currentShareBlob);
+                a.download='comprovante_biojoia.png';
+                a.click();
+                setTimeout(()=>{
+                    alert('Imagem salva na galeria!\n\nAbra o Instagram > Direct Messages > selecione o cliente > anexe a imagem salva.');
+                    window.open('https://www.instagram.com/direct/inbox/','_blank');
+                },800);
+            }catch(e){window.open('https://www.instagram.com/direct/inbox/','_blank');}
+        } else window.open('https://www.instagram.com/direct/inbox/','_blank');
+    }
+}
+
+function printCurrentReceipt(){
+    const html=buildReceiptHTML(currentShareSaleId);
+    const win=window.open('','_blank');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprovante</title>
+        <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#f4f6f0}@media print{body{margin:0}}</style>
+    </head><body>${html}<script>window.onload=function(){setTimeout(()=>window.print(),500);}<\/script></body></html>`);
+    win.document.close();
+}
+
+function generateSalePDF(saleId){openShareModal(saleId);}
+
+// --- RETURN/EXCHANGE ---
+function openReturnModal(saleId){
+    currentReturnSaleId=saleId;currentReturnType=null;
+    const s=sales.find(x=>x.id===saleId);if(!s)return;
+    const items=Array.isArray(s.items)?s.items:[];
+    const label=items.map(it=>typeof it==='object'?`${it.name} (${it.qty||1}x)`:it).join(', ');
+    const diffDays=(new Date()-new Date(s.date))/(1000*60*60*24);
+    const expired=diffDays>RETURN_DAYS;
+    const alreadyExchanged=s.exchanged===true;
+    document.getElementById('return-sale-info').innerHTML=`
+        <p class="text-[9px] font-black uppercase mb-1" style="color:var(--haki-light)">Produto Original</p>
+        <p class="text-[11px] font-bold mb-1" style="color:var(--haki-dark)">${label}</p>
+        <p class="text-[10px] font-black" style="color:var(--haki-gold)">${fmtMoney(s.total)} · ${s.method}</p>
+        <p class="text-[9px] font-bold mt-1" style="color:var(--haki-light)">Data: ${fmtDate(s.date)}</p>
+        ${alreadyExchanged?`<div class="mt-2 p-2 rounded-xl text-[9px] font-black" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5">TROCA JA UTILIZADA: Este produto ja foi trocado uma vez.</div>`:''}
+        ${!alreadyExchanged&&expired?`<div class="mt-2 p-2 rounded-xl text-[9px] font-black" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5">PRAZO EXPIRADO: Mais de ${RETURN_DAYS} dias desde a compra.</div>`:''}
+        ${!alreadyExchanged&&!expired?`<div class="mt-2 p-2 rounded-xl text-[9px] font-black" style="background:#f0fdf4;color:#15803d;border:1px solid #86efac">Dentro do prazo (${RETURN_DAYS} dias). 1 troca disponivel.</div>`:''}`;
+    document.getElementById('exchange-section').classList.add('hidden');
+    document.getElementById('exchange-diff-info').classList.add('hidden');
+    const btnR=document.getElementById('btn-refund'),btnE=document.getElementById('btn-exchange');
+    btnR.style.background='#fef2f2';btnR.style.color='#dc2626';
+    btnE.style.background='#eff6ff';btnE.style.color='#2563eb';
+    const sel=document.getElementById('exchange-product-select');
+    sel.innerHTML='<option value="">-- Selecione o produto para troca --</option>'+
+        products.filter(p=>p.stock>0).map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} - ${fmtMoney(p.price)} (Est: ${fmtNum(p.stock)})</option>`).join('');
+    sel.onchange=function(){
+        const opt=sel.options[sel.selectedIndex];
+        const np=parseFloat(opt.getAttribute('data-price')||0);
+        const diff=np-s.total;
+        const info=document.getElementById('exchange-diff-info');
+        if(sel.value){
+            info.classList.remove('hidden');
+            if(diff>0){info.style.cssText='background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;padding:10px;border-radius:10px';info.innerHTML=`Produto mais caro. Cliente deve pagar: <b>${fmtMoney(diff)}</b>`;}
+            else if(diff<0){info.style.cssText='background:#f0fdf4;color:#15803d;border:1px solid #86efac;padding:10px;border-radius:10px';info.innerHTML=`Produto mais barato. Reembolso ao cliente: <b>${fmtMoney(Math.abs(diff))}</b>`;}
+            else{info.style.cssText='background:#fffbeb;color:#92400e;border:1px solid #fbbf24;padding:10px;border-radius:10px';info.innerHTML='Mesmo preco. Sem diferenca de pagamento.';}
+        }else info.classList.add('hidden');
+    };
+    openModal('modal-return');
+}
+
+function setReturnType(type){
+    currentReturnType=type;
+    const btnR=document.getElementById('btn-refund'),btnE=document.getElementById('btn-exchange');
+    if(type==='refund'){btnR.style.background='#dc2626';btnR.style.color='white';btnE.style.background='#eff6ff';btnE.style.color='#2563eb';document.getElementById('exchange-section').classList.add('hidden');}
+    else{btnE.style.background='#2563eb';btnE.style.color='white';btnR.style.background='#fef2f2';btnR.style.color='#dc2626';document.getElementById('exchange-section').classList.remove('hidden');}
+}
+
+async function processReturn(){
+    if(!currentReturnType){alert('Selecione Reembolso ou Troca.');return;}
+    const s=sales.find(x=>x.id===currentReturnSaleId);if(!s)return;
+    const diffDays=(new Date()-new Date(s.date))/(1000*60*60*24);
+    if(diffDays>RETURN_DAYS){alert(`Prazo de ${RETURN_DAYS} dias encerrado.`);return;}
+    if(s.exchanged&&currentReturnType==='exchange'){alert('Troca ja utilizada. Apenas 1 troca por venda e permitida.');return;}
+    if(currentReturnType==='refund'){
+        const items=Array.isArray(s.items)?s.items:[];
+        for(let it of items){if(typeof it==='object'&&it.productId){const prod=products.find(p=>p.id===it.productId);if(prod)await window.fs_upd(window.fs_doc(window.fs,"products",it.productId),{stock:(prod.stock||0)+(it.qty||1)});}}
+        await window.fs_del(window.fs_doc(window.fs,"sales",currentReturnSaleId));
+        alert('Reembolso processado. Itens devolvidos ao estoque.');
+    }else{
+        const sel=document.getElementById('exchange-product-select');
+        if(!sel.value){alert('Selecione um produto para troca.');return;}
+        const newProd=products.find(p=>p.id===sel.value);if(!newProd)return;
+        const oldItems=Array.isArray(s.items)?s.items:[];
+        const oldItemsLabel=oldItems.map(it=>typeof it==='object'?`${it.name}(${it.qty||1}x)`:it).join(', ');
+        for(let it of oldItems){if(typeof it==='object'&&it.productId){const prod=products.find(p=>p.id===it.productId);if(prod)await window.fs_upd(window.fs_doc(window.fs,"products",it.productId),{stock:(prod.stock||0)+(it.qty||1)});}}
+        await window.fs_upd(window.fs_doc(window.fs,"products",newProd.id),{stock:Math.max(0,(newProd.stock||0)-1)});
+        const diff=newProd.price-s.total;
+        const np=calcNetProfit(newProd.price,s.method);
+        let diffNote='';
+        if(diff>0)diffNote=`Diferenca cobrada: +${fmtMoney(diff)}`;
+        else if(diff<0)diffNote=`Reembolso ao cliente: ${fmtMoney(Math.abs(diff))}`;
+        else diffNote='Sem diferenca de preco';
+        const exchNote=`Produto original: ${oldItemsLabel} (${fmtMoney(s.total)}) | Novo produto: ${newProd.name} (${fmtMoney(newProd.price)}) | ${diffNote} | Data da troca: ${fmtDate(new Date().toISOString())}`;
+        // Mark original sale as exchanged
+        await window.fs_upd(window.fs_doc(window.fs,"sales",currentReturnSaleId),{exchanged:true,exchangeNote:exchNote});
+        // Create new sale record
+        await window.fs_add(window.fs_coll(window.fs,"sales"),{
+            date:new Date().toISOString(),method:s.method,total:newProd.price,
+            grossProfit:newProd.price*PROFIT_RATE,bankFee:calcBankFee(newProd.price,s.method),
+            netProfit:np,profit:np,customerId:s.customerId||'',customer:s.customer,
+            items:[{name:newProd.name,qty:1,price:newProd.price,productId:newProd.id}],
+            exchanged:false,isExchangeSale:true,
+            exchangeNote:`Troca efetuada. Produto anterior: ${oldItemsLabel} | ${diffNote}`
+        });
+        if(diff>0)alert(`Troca concluida!\nCliente deve pagar: ${fmtMoney(diff)}`);
+        else if(diff<0)alert(`Troca concluida!\nReembolso ao cliente: ${fmtMoney(Math.abs(diff))}`);
+        else alert('Troca concluida! Sem diferenca de preco.');
+    }
+    closeModal('modal-return');closeModal('modal-customer-detail');
+}
+
+// --- STOCK ---
+function renderStock(){
+    let tq=0,tc=0,ts=0,tP=0;
+    document.getElementById('stock-list').innerHTML=products.map(p=>{
+        const stock=parseInt(p.stock)||0,cost=parseFloat(p.cost)||0,price=parseFloat(p.price)||0;
+        tq+=stock;tc+=cost*stock;ts+=price*stock;tP+=(price-cost)*stock;
+        const cat=p.category||'Acessorios',s=getCatStyle(cat);
+        const sc=stock===0?'#dc2626':stock<=3?'#d97706':'#15803d';
+        const sb=stock===0?'#fef2f2':stock<=3?'#fffbeb':'#f0fdf4';
+        return`<div onclick="openProductModal('${p.id}')" class="bg-white p-5 rounded-3xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)">
+            <div>
+                <span style="font-size:8px;font-weight:900;text-transform:uppercase;padding:2px 8px;border-radius:8px;background:${s.bg};color:${s.text};border:1px solid ${s.border}">${s.emoji} ${cat}</span>
+                <h4 class="font-extrabold text-[12px] uppercase mt-1" style="color:var(--haki-dark)">${p.name}</h4>
+                <p class="text-[10px] font-bold" style="color:var(--haki-light)">Venda: ${fmtMoney(price)} | Custo: ${fmtMoney(cost)}</p>
+            </div>
+            <div class="text-right">
+                <div class="font-black text-sm px-4 py-2 rounded-xl" style="background:${sb};color:${sc};border:1px solid ${sc}30">${fmtNum(stock)} UN</div>
+                ${stock===0?`<p class="text-[8px] font-black mt-1" style="color:#dc2626">SEM ESTOQUE</p>`:stock<=3?`<p class="text-[8px] font-black mt-1" style="color:#d97706">ESTOQUE BAIXO</p>`:''}
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('stk-total-qty').innerText=fmtNum(tq);
+    document.getElementById('stk-total-cost').innerText=fmtMoney(tc);
+    document.getElementById('stk-total-sale').innerText=fmtMoney(ts);
+    document.getElementById('stk-total-profit').innerText=fmtMoney(tP);
+}
+
+async function addExpense(cat){
+    const val=parseFloat(document.getElementById('exp-val').value);if(!val)return;
+    await window.fs_add(window.fs_coll(window.fs,"expenses"),{date:new Date().toISOString(),cat,val});
+    document.getElementById('exp-val').value="";
+}
+
+function renderExpenses(){
+    document.getElementById('expense-list').innerHTML=expenses.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(e=>`
+        <div class="bg-white p-5 rounded-3xl flex justify-between items-center shadow-sm" style="border:1px solid var(--haki-pale)">
+            <div><b class="text-[11px] uppercase font-black" style="color:var(--haki-dark)">${e.cat}</b>
+            <p class="text-[9px] font-bold" style="color:var(--haki-light)">${fmtDate(e.date)}</p></div>
+            <div class="flex items-center gap-4"><span class="font-black text-sm text-red-600">${fmtMoney(e.val)}</span>
+            <button onclick="window.fs_del(window.fs_doc(window.fs,'expenses','${e.id}'))" style="color:var(--haki-pale);background:none;border:none;cursor:pointer"><i class="fas fa-trash"></i></button></div>
+        </div>`).join('');
+}
+
+function renderFinance(){
+    const totalRevenue=sales.reduce((s,x)=>s+(x.total||0),0);
+    const totalNet=sales.reduce((s,x)=>s+(x.netProfit||x.profit||0),0);
+    const totalExp=expenses.reduce((s,x)=>s+(x.val||0),0);
+    const set=(id,val)=>{const e=document.getElementById(id);if(e)e.innerText=val;};
+    set('fin-final-balance',fmtMoney(totalNet-totalExp));
+    set('fin-total-revenue',fmtMoney(totalRevenue));
+    set('fin-total-exp',fmtMoney(totalExp));
+    const tbody=document.getElementById('sales-list-body');if(!tbody)return;
+    tbody.innerHTML=sales.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(s=>{
+        const items=Array.isArray(s.items)?s.items:[];
+        const firstName=items.length?(typeof items[0]==='object'?items[0].name:items[0]):s.customer;
+        const totalQty=items.reduce((sum,it)=>sum+(typeof it==='object'?(it.qty||1):1),0);
+        const net=s.netProfit!==undefined?s.netProfit:calcNetProfit(s.total,s.method);
+        const mc=s.method==='Dinheiro'?'#16a34a':s.method==='Cartao'?'#2563eb':'#7c3aed';
+        const exchIcon=s.exchanged?`<span title="Trocado" style="font-size:9px;margin-left:3px">🔄</span>`:'';
+        return`<tr>
+            <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${firstName}">${firstName}${exchIcon}</td>
+            <td style="font-size:9px;white-space:nowrap">${fmtDate(s.date)}</td>
+            <td class="font-black text-green-700">${fmtMoney(s.total)}</td>
+            <td><span style="background:${mc}20;color:${mc};padding:2px 6px;border-radius:8px;font-size:8px;font-weight:900">${s.method}</span></td>
+            <td class="font-black" style="color:var(--haki-gold)">${fmtMoney(net)}</td>
+            <td><button onclick="openShareModal('${s.id}')" style="background:var(--haki-dark);color:var(--haki-gold);border:none;border-radius:8px;padding:4px 8px;font-size:9px;font-weight:900;cursor:pointer"><i class="fas fa-share-alt"></i></button></td>
+            <td><button onclick="cancelSale('${s.id}')" style="background:none;border:none;cursor:pointer;color:#f87171" title="Cancelar e devolver estoque"><i class="fas fa-undo"></i></button></td>
+        </tr>`;
+    }).join('');
+}
+
+// --- CUSTOMER DETAIL ---
+function openCustomerDetail(customerId){
+    currentCustomerId=customerId;
+    const c=contacts.find(x=>x.id===customerId);if(!c)return;
+    document.getElementById('detail-customer-name').innerText=c.name;
+    const custSales=sales.filter(s=>s.customerId===customerId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const totalSpent=custSales.reduce((sum,s)=>sum+(s.total||0),0);
+    const totalItems=custSales.reduce((sum,s)=>{const its=Array.isArray(s.items)?s.items:[];return sum+its.reduce((ss,it)=>ss+(typeof it==='object'?(it.qty||1):1),0);},0);
+    document.getElementById('detail-customer-info').innerHTML=`
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+            <div>
+                <p class="text-[9px] font-black uppercase mb-1" style="color:var(--haki-light)">Contato</p>
+                <p class="font-bold text-sm" style="color:var(--haki-dark)">📱 ${c.phone||'Nao informado'}</p>
+                <p class="text-[9px] font-bold mt-1" style="color:var(--haki-light)">${c.type==='customer'?'👤 Cliente':'🚚 Fornecedor'}</p>
+            </div>
+            <div style="text-align:right">
+                <p class="text-[9px] font-black uppercase mb-1" style="color:var(--haki-light)">Resumo</p>
+                <p class="font-black text-base" style="color:var(--haki-gold)">${fmtMoney(totalSpent)}</p>
+                <p class="text-[9px] font-bold" style="color:var(--haki-light)">${custSales.length} venda(s) · ${totalItems} item(s)</p>
+            </div>
+        </div>`;
+    const rc=document.getElementById('detail-customer-sales');
+    if(!custSales.length){rc.innerHTML=`<p class="text-[11px] font-bold text-center py-4" style="color:var(--haki-light)">Nenhuma compra registrada.</p>`;
+    }else{
+        rc.innerHTML=custSales.map(s=>{
+            const items=Array.isArray(s.items)?s.items:[];
+            const label=items.map(it=>typeof it==='object'?`${it.name} (${it.qty||1}x)`:it).join(', ');
+            const totalQty=items.reduce((sum,it)=>sum+(typeof it==='object'?(it.qty||1):1),0);
+            const mc=s.method==='Dinheiro'?'#16a34a':s.method==='Cartao'?'#2563eb':'#7c3aed';
+            const diffDays=(new Date()-new Date(s.date))/(1000*60*60*24);
+            const canReturn=diffDays<=RETURN_DAYS&&!s.exchanged;
+            const alreadyExchanged=s.exchanged===true;
+            return`<div class="p-4 rounded-2xl" style="background:var(--haki-cream);border:1px solid var(--haki-pale)">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[9px] font-black" style="color:var(--haki-light)">${fmtDate(s.date)}</span>
+                    <span style="background:${mc}20;color:${mc};padding:2px 8px;border-radius:8px;font-size:8px;font-weight:900">${s.method}</span>
+                </div>
+                <p class="text-[10px] font-bold mb-1" style="color:var(--haki-dark)">${label}</p>
+                ${s.exchangeNote?`<p class="text-[9px] font-bold mb-1 p-2 rounded-lg" style="color:#78350f;background:#fffbeb">${s.exchangeNote}</p>`:''}
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[9px] font-bold" style="color:var(--haki-light)">Qtd: ${totalQty} | Total: ${fmtMoney(s.total)}</span>
+                    ${alreadyExchanged?`<span class="text-[8px] font-black px-2 py-1 rounded-full" style="background:#fbbf2420;color:#b8a84a">🔄 Trocado</span>`:''}
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="openShareModal('${s.id}')" style="background:var(--haki-dark);color:var(--haki-gold);border:none;border-radius:8px;padding:5px 10px;font-size:9px;font-weight:900;cursor:pointer"><i class="fas fa-share-alt mr-1"></i>PDF</button>
+                    ${canReturn?`<button onclick="openReturnModal('${s.id}')" style="background:#dc2626;color:white;border:none;border-radius:8px;padding:5px 10px;font-size:9px;font-weight:900;cursor:pointer"><i class="fas fa-exchange-alt mr-1"></i>Troca/Dev.</button>`
+                    :alreadyExchanged?`<span style="font-size:8px;font-weight:900;color:#b8a84a;padding:5px 10px;background:#fffbeb;border-radius:8px">1 Troca usada</span>`
+                    :`<span style="font-size:8px;font-weight:900;color:#9ca3af;padding:5px 10px;background:#f3f4f6;border-radius:8px">Prazo Expirado</span>`}
+                </div>
+            </div>`;
+        }).join('');
+    }
+    openModal('modal-customer-detail');
+}
+
+function editCurrentCustomer(){
+    const c=contacts.find(x=>x.id===currentCustomerId);if(!c)return;
+    document.getElementById('edit-c-id').value=c.id;
+    document.getElementById('edit-c-type').value=c.type;
+    document.getElementById('edit-c-name').value=c.name;
+    document.getElementById('edit-c-phone').value=c.phone||'';
+    closeModal('modal-customer-detail');openModal('modal-edit-contact');
+}
+
+async function deleteCurrentCustomer(){
+    if(!currentCustomerId)return;
+    if(!confirm('Excluir este cliente?'))return;
+    await window.fs_del(window.fs_doc(window.fs,'contacts',currentCustomerId));
+    closeModal('modal-customer-detail');
+}
+
+async function saveEditContact(){
+    const id=document.getElementById('edit-c-id').value;
+    const type=document.getElementById('edit-c-type').value;
+    await window.fs_upd(window.fs_doc(window.fs,'contacts',id),{
+        name:document.getElementById('edit-c-name').value,
+        phone:document.getElementById('edit-c-phone').value,type
+    });
+    closeModal('modal-edit-contact');
+}
+
+async function saveSettings(){
+    const fields=['company','manager','cnpj','address','phone'];
+    for(let f of fields)await window.fs_set(window.fs_doc(window.fs,"config",f),{val:document.getElementById('set-'+f).value});
+    alert('Salvo com sucesso!');
+}
+
+function openProductModal(id=null){
+    if(id){const p=products.find(x=>x.id===id);
+        document.getElementById('p-id').value=p.id;document.getElementById('p-name').value=p.name;
+        document.getElementById('p-price').value=p.price;document.getElementById('p-cost').value=p.cost||'';
+        document.getElementById('p-stock').value=p.stock;document.getElementById('p-category').value=p.category||'';
+    }else{['p-id','p-name','p-price','p-cost'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('p-stock').value='0';document.getElementById('p-category').value='';}
+    openModal('modal-product');
+}
+
+async function saveProduct(){
+    const id=document.getElementById('p-id').value;
+    const data={name:document.getElementById('p-name').value,price:parseFloat(document.getElementById('p-price').value)||0,
+        cost:parseFloat(document.getElementById('p-cost').value)||0,stock:parseInt(document.getElementById('p-stock').value)||0,
+        category:document.getElementById('p-category').value||'Acessorios'};
+    id?await window.fs_upd(window.fs_doc(window.fs,"products",id),data):await window.fs_add(window.fs_coll(window.fs,"products"),data);
+    closeModal('modal-product');
+}
+
+function openModal(id){document.getElementById(id).classList.add('modal-active');}
+function closeModal(id){document.getElementById(id).classList.remove('modal-active');}
+function clearCart(){cart=[];renderCart();clearSelectedCustomer();}
+
+function openContactModal(type){
+    document.getElementById('c-id').value='';document.getElementById('c-name').value='';
+    document.getElementById('c-phone').value='';document.getElementById('c-type').value=type;
+    document.getElementById('contact-modal-title').innerText=type==='customer'?'Novo Cliente':'Novo Fornecedor';
+    openModal('modal-contact');
+}
+
+async function saveContact(){
+    const name=document.getElementById('c-name').value.trim();
+    const phone=document.getElementById('c-phone').value.trim();
+    const type=document.getElementById('c-type').value;
+    if(!name){alert('Informe o nome.');return;}
+    await window.fs_add(window.fs_coll(window.fs,"contacts"),{name,phone,type});
+    closeModal('modal-contact');
+}
+
+async function importAllContacts(){
+    try{
+        if(!('contacts' in navigator&&'ContactsManager' in window)){
+            alert('Funcao disponivel apenas em dispositivos moveis compativeis (Android Chrome).');return;
+        }
+        // Request ALL contacts automatically without manual selection
+        let list=[];
+        try{
+            // Try to get all contacts at once
+            list=await navigator.contacts.select(['name','tel'],{multiple:true});
+        }catch(e){
+            alert('Nao foi possivel acessar a agenda: '+(e.message||''));return;
+        }
+        if(!list||!list.length){alert('Nenhum contato encontrado na agenda.');return;}
+        let count=0,skipped=0;
+        for(const item of list){
+            const name=item.name&&item.name[0]?item.name[0].trim():'';
+            const phone=item.tel&&item.tel[0]?item.tel[0].trim():'';
+            if(!name){skipped++;continue;}
+            const already=contacts.find(c=>c.name===name&&c.type==='customer');
+            if(!already){await window.fs_add(window.fs_coll(window.fs,"contacts"),{name,phone,type:'customer'});count++;}
+            else skipped++;
+        }
+        alert(`Importacao concluida!\n✅ ${count} novo(s) cliente(s) adicionado(s)\n⏭️ ${skipped} ja existiam ou sem nome`);
+    }catch(e){alert('Erro ao acessar agenda: '+(e.message||''));}
+}
+
+function renderContactList(type){
+    const list=contacts.filter(c=>c.type===type);
+    const el=document.getElementById(type==='customer'?'customer-list':'supplier-list');
+    if(!list.length){el.innerHTML=`<p class="text-center text-[11px] font-bold py-8" style="color:var(--haki-light)">Nenhum registro encontrado.</p>`;return;}
+    el.innerHTML=list.map(c=>{
+        const custSales=sales.filter(s=>s.customerId===c.id);
+        const totalSpent=custSales.reduce((sum,s)=>sum+(s.total||0),0);
+        return`<div onclick="openCustomerDetail('${c.id}')" class="bg-white p-5 rounded-3xl flex justify-between items-center shadow-sm cursor-pointer" style="border:1px solid var(--haki-pale)">
+            <div><h4 class="font-extrabold text-[12px] uppercase" style="color:var(--haki-dark)">${c.name}</h4>
+            <p class="text-[10px] font-bold" style="color:var(--haki-light)">${c.phone||'Sem telefone'}</p>
+            ${type==='customer'?`<p class="text-[9px] font-black mt-1" style="color:var(--haki-gold)">${custSales.length} compra(s) · ${fmtMoney(totalSpent)}</p>`:''}</div>
+            <i class="fas fa-chevron-right" style="color:var(--haki-pale)"></i>
+        </div>`;
+    }).join('');
+}
+
+async function pickFromContacts(){
+    try{
+        const list=await navigator.contacts.select(['name','tel'],{multiple:false});
+        if(list.length){
+            if(list[0].name)document.getElementById('c-name').value=list[0].name[0];
+            if(list[0].tel)document.getElementById('c-phone').value=list[0].tel[0];
+        }
+    }catch(e){alert('Disponivel apenas em dispositivos moveis.');}
+}
+</script>
+</body>
+</html>
